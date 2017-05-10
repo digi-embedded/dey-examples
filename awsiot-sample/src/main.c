@@ -18,16 +18,38 @@
  */
 
 #include <aws_iot_log.h>
+#include <getopt.h>
+#include <libgen.h>
 #include <signal.h>
 #include <unistd.h>
+
+#include "daemonize.h"
+
+/*------------------------------------------------------------------------------
+                             D E F I N I T I O N S
+------------------------------------------------------------------------------*/
+#define VERSION			"0.1" GIT_REVISION
+
+#define USAGE \
+	"AWS IoT Device SDK demo.\n" \
+	"Copyright(c) Digi International Inc.\n" \
+	"\n" \
+	"Version: %s\n" \
+	"\n" \
+	"Usage: %s [options]\n\n" \
+	"  -d  --daemon              Daemonize the process\n" \
+	"  -h  --help                Print help and exit\n" \
+	"\n"
 
 /*------------------------------------------------------------------------------
                     F U N C T I O N  D E C L A R A T I O N S
 ------------------------------------------------------------------------------*/
+static int start_aws_iot(const char *config_file);
 static int check_stop(void);
 static void add_sigkill_signal(void);
 static void graceful_shutdown(void);
 static void sigint_handler(int signum);
+static void usage(char const *const name);
 
 /*------------------------------------------------------------------------------
                          G L O B A L  V A R I A B L E S
@@ -38,6 +60,63 @@ static volatile int stop = 0;
                      F U N C T I O N  D E F I N I T I O N S
 ------------------------------------------------------------------------------*/
 int main(int argc, char **argv)
+{
+	int result = EXIT_SUCCESS;
+	char *name = basename(argv[0]);
+	static int opt, opt_index;
+	int create_daemon = 0;
+	char *config_file = NULL;
+	static const char *short_options = "dh";
+	static const struct option long_options[] = {
+			{"daemon", no_argument, NULL, 'd'},
+			{"help", no_argument, NULL, 'h'},
+			{NULL, 0, NULL, 0}
+	};
+
+	while (1) {
+		opt = getopt_long(argc, argv, short_options, long_options,
+				&opt_index);
+		if (opt == -1)
+			break;
+
+		switch (opt) {
+		case 'd':
+			create_daemon = 1;
+			break;
+		case 'h':
+			usage(name);
+			goto done;
+		default:
+			usage(name);
+			result = EXIT_FAILURE;
+			goto done;
+		}
+	}
+
+	/* Daemonize if requested. */
+	if (create_daemon) {
+		if (start_daemon(name) != 0) {
+			result = EXIT_FAILURE;
+			goto done;
+		}
+	}
+
+	/* Do the real work. */
+	start_aws_iot(config_file);
+
+done:
+	return result;
+}
+
+/*
+ * start_aws_iot() - Start AWS IoT Device SDK
+ *
+ * @config_file:	Absolute path of the configuration file to use.
+ * 			NULL to use the default one (/etc/awsiotsdk.conf).
+ *
+ * Return: 0 on success, 1 otherwise.
+ */
+static int start_aws_iot(const char *config_file)
 {
 	int result = EXIT_SUCCESS;
 
@@ -96,4 +175,14 @@ static void sigint_handler(int signum)
 {
 	IOT_DEBUG("Received signal %d to close Cloud connection.", signum);
 	exit(0);
+}
+
+/**
+ * usage() - Print usage information
+ *
+ * @name:	Application name.
+ */
+static void usage(char const *const name)
+{
+	printf(USAGE, VERSION, name);
 }
