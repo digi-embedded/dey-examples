@@ -23,6 +23,7 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include "aws_config.h"
 #include "daemonize.h"
 
 /*------------------------------------------------------------------------------
@@ -38,6 +39,8 @@
 	"\n" \
 	"Usage: %s [options]\n\n" \
 	"  -d  --daemon              Daemonize the process\n" \
+	"  -c  --config-file=<PATH>  Use a custom configuration file instead of\n" \
+	"                            the default one located in " AWS_IOT_CONFIG_FILE "\n" \
 	"  -h  --help                Print help and exit\n" \
 	"\n"
 
@@ -66,9 +69,10 @@ int main(int argc, char **argv)
 	static int opt, opt_index;
 	int create_daemon = 0;
 	char *config_file = NULL;
-	static const char *short_options = "dh";
+	static const char *short_options = "dc:h";
 	static const struct option long_options[] = {
 			{"daemon", no_argument, NULL, 'd'},
+			{"config-file", required_argument, NULL, 'c'},
 			{"help", no_argument, NULL, 'h'},
 			{NULL, 0, NULL, 0}
 	};
@@ -82,6 +86,9 @@ int main(int argc, char **argv)
 		switch (opt) {
 		case 'd':
 			create_daemon = 1;
+			break;
+		case 'c':
+			config_file = optarg;
 			break;
 		case 'h':
 			usage(name);
@@ -119,8 +126,12 @@ done:
 static int start_aws_iot(const char *config_file)
 {
 	int result = EXIT_SUCCESS;
+	aws_iot_cfg_t aws_cfg;
 
 	add_sigkill_signal();
+
+	if (parse_configuration(config_file ? config_file : AWS_IOT_CONFIG_FILE, &aws_cfg) != 0)
+		return EXIT_FAILURE;;
 
 	do {
 		sleep(1);

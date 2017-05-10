@@ -25,7 +25,9 @@ CFLAGS += $(LOG_FLAGS)
 CFLAGS += -DGIT_REVISION=\"$(if $(GIT_REVISION),-g$(GIT_REVISION))\"
 
 CFLAGS += $(shell pkg-config --cflags awsiotsdk)
+CFLAGS += $(shell pkg-config --cflags libconfuse)
 LDLIBS += $(shell pkg-config --libs --static awsiotsdk)
+LDLIBS += $(shell pkg-config --libs --static libconfuse)
 
 SRCS = $(wildcard $(SRC)/*.c)
 OBJS = $(SRCS:.c=.o)
