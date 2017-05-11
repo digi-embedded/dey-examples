@@ -47,6 +47,8 @@
  * @shadow_report_rate:	Frequency at which report system information (seconds)
  * @temp_variation:	Temperature variation between last reported and current
  * 			(C) to report again
+ * @cpuload_variation:	CPU load variation between last reported and current (%)
+ * 			to report again
  */
 typedef struct {
 	char *thing_name;
@@ -59,6 +61,7 @@ typedef struct {
 	char *priv_key_fname;
 	uint32_t shadow_report_rate;
 	uint16_t temp_variation;
+	uint16_t cpuload_variation;
 } aws_iot_cfg_t;
 
 /*------------------------------------------------------------------------------

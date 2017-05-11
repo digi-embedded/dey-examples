@@ -168,6 +168,8 @@ static int start_aws_iot(const char *config_file)
 	       !check_stop()) {
 		aws_iot_cfg_t *aws_cfg = device_shadow.aws_config;
 		double t;
+		double load;
+		int change_shadow = 0;
 
 		rc = aws_iot_mqtt_yield(&mqtt_client, 200);
 
@@ -182,9 +184,17 @@ static int start_aws_iot(const char *config_file)
 		device_shadow.temp_update = (t <= (device_shadow.temp - aws_cfg->temp_variation) ||
 					     t >= (device_shadow.temp + aws_cfg->temp_variation));
 
-		if (device_shadow.temp_update ||
+		load = get_cpu_load();
+		device_shadow.cpu_load_update = (load <= (device_shadow.cpu_load - aws_cfg->cpuload_variation) ||
+						 load >= (device_shadow.cpu_load + aws_cfg->cpuload_variation));
+
+		change_shadow = device_shadow.temp_update ||
+				device_shadow.cpu_load_update;
+
+		if (change_shadow ||
 		    (time(NULL) - time_start) >= aws_cfg->shadow_report_rate) {
 			device_shadow.temp = t;
+			device_shadow.cpu_load = load;
 
 			IOT_INFO("\n=========================================");
 			IOT_INFO("Updating shadow...");
@@ -192,8 +202,12 @@ static int start_aws_iot(const char *config_file)
 				IOT_INFO(
 					 "Temperature variation greater than %dC\n",
 					 aws_cfg->temp_variation);
-			
+			if (device_shadow.cpu_load_update)
+				IOT_INFO(
+					 "CPU Load variation greater than %d%%\n",
+					 aws_cfg->cpuload_variation);
 			IOT_INFO("Temperature: %fC", t);
+			IOT_INFO("CPU Load: %f%%", load);
 			IOT_INFO("=========================================\n");
 
 			rc = update_shadow(&mqtt_client);

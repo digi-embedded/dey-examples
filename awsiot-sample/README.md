@@ -2,11 +2,11 @@ AWS IoT device SDK Demo Application
 ===================================
 Demo application to connect devices to AWS IoT.
 
-This application monitors the CPU temperature.
+This application monitors the CPU temperature and load.
 
 The demo uploads the device Thing Shadow every minute or when the difference
-between the temperature current value and the last reported is bigger than a
-configured value.
+between the current value of temperature or load and the last reported is bigger
+than a configured value (1C for temperature and 10% for CPU load).
 
 The repository has the following directories:
 
@@ -50,7 +50,8 @@ You can specify the configuration file with `-c`:
   {
     "state" : {
       "reported" : {
-        "temperature" : 45.971
+        "temperature" : 45.971,
+        "cpuLoad" : 4.504505
       }
     },
     "clientToken" : "<thing_name>-3"

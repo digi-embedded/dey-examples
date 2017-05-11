@@ -185,6 +185,14 @@ IoT_Error_t initialize_shadow(AWS_IoT_Client *mqtt_client,
 	device_shadow->temp = 0;
 	device_shadow->temp_update = 0;
 
+	device_shadow->cpu_load_handler.cb = NULL;
+	device_shadow->cpu_load_handler.pKey = ATTR_CPU_LOAD;
+	device_shadow->cpu_load_handler.pData = &(device_shadow->cpu_load);
+	device_shadow->cpu_load_handler.type = SHADOW_JSON_DOUBLE;
+
+	device_shadow->cpu_load = 0;
+	device_shadow->cpu_load_update = 0;
+
 	device_shadow->aws_config = &aws_cfg;
 
 	return SUCCESS;
@@ -208,8 +216,9 @@ IoT_Error_t update_shadow(AWS_IoT_Client *mqtt_client)
 		return rc;
 
 	rc = aws_iot_shadow_add_reported(json_doc_buf, size_json_doc_buf,
-					 1,
-					 &(device_shadow->temp_handler));
+					 2,
+					 &(device_shadow->temp_handler),
+					 &(device_shadow->cpu_load_handler));
 	if (rc != SUCCESS)
 		return rc;
 
@@ -260,6 +269,7 @@ static void shadow_update_status_callback(const char *pThingName,
 	case SHADOW_ACK_ACCEPTED:
 		IOT_INFO("Shadow update accepted");
 		dev_shadow->temp_update = 0;
+		dev_shadow->cpu_load_update = 0;
 		break;
 	}
 }

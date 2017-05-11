@@ -44,6 +44,9 @@
 #define SETTING_TEMP_VARIATION		"temperature_variation"
 #define SETTING_TEMP_VARIATION_MIN	0.1 /* C */
 #define SETTING_TEMP_VARIATION_MAX	10.0 /* C */
+#define SETTING_CPULOAD_VARIATION	"cpu_load_variation"
+#define SETTING_CPULOAD_VARIATION_MIN	1 /* % */
+#define SETTING_CPULOAD_VARIATION_MAX	50.0 /* % */
 
 #define SETTING_UNKNOWN			"__unknown"
 
@@ -58,6 +61,7 @@ static int cfg_check_certificates_path(cfg_t *cfg, cfg_opt_t *opt);
 static int cfg_check_cert_file(cfg_t *cfg, cfg_opt_t *opt);
 static int cfg_check_shadow_report_rate(cfg_t *cfg, cfg_opt_t *opt);
 static int cfg_check_temp_variation(cfg_t *cfg, cfg_opt_t *opt);
+static int cfg_check_cpuload_variation(cfg_t *cfg, cfg_opt_t *opt);
 static int cfg_check_int_range(cfg_t *cfg, cfg_opt_t *opt, uint32_t min, uint32_t max);
 static int cfg_check_float_range(cfg_t *cfg, cfg_opt_t *opt, float min, float max);
 static int cfg_check_empty_string(cfg_t *cfg, cfg_opt_t *opt);
@@ -106,6 +110,7 @@ int parse_configuration(const char *const filename, aws_iot_cfg_t *aws_cfg)
 
 		CFG_INT		(SETTING_SHADOW_REPORT_RATE,	60,		CFGF_NONE),
 		CFG_FLOAT	(SETTING_TEMP_VARIATION,	1,		CFGF_NONE),
+		CFG_FLOAT	(SETTING_CPULOAD_VARIATION,	10,		CFGF_NONE),
 
 		/* Needed for unknown settings. */
 		CFG_STR		(SETTING_UNKNOWN,		NULL,		CFGF_NONE),
@@ -133,6 +138,7 @@ int parse_configuration(const char *const filename, aws_iot_cfg_t *aws_cfg)
 	cfg_set_validate_func(cfg, SETTING_PRIVKEY_NAME, cfg_check_cert_file);
 	cfg_set_validate_func(cfg, SETTING_SHADOW_REPORT_RATE, cfg_check_shadow_report_rate);
 	cfg_set_validate_func(cfg, SETTING_TEMP_VARIATION, cfg_check_temp_variation);
+	cfg_set_validate_func(cfg, SETTING_CPULOAD_VARIATION, cfg_check_cpuload_variation);
 
 	/* Parse the configuration file. */
 	switch (cfg_parse(cfg, filename)) {
@@ -192,6 +198,7 @@ static int fill_aws_iot_config(aws_iot_cfg_t *aws_cfg)
 		return -1;
 	aws_cfg->shadow_report_rate = cfg_getint(cfg, SETTING_SHADOW_REPORT_RATE);
 	aws_cfg->temp_variation = cfg_getfloat(cfg, SETTING_TEMP_VARIATION);
+	aws_cfg->cpuload_variation = cfg_getfloat(cfg, SETTING_CPULOAD_VARIATION);
 
 	return 0;
 }
@@ -334,6 +341,22 @@ static int cfg_check_temp_variation(cfg_t *cfg, cfg_opt_t *opt)
 	return cfg_check_float_range(cfg, opt,
 				     SETTING_TEMP_VARIATION_MIN,
 				     SETTING_TEMP_VARIATION_MAX);
+}
+
+/*
+ * cfg_check_cpuload_variation() - Validate CPU load variation value is between
+ * 				0.1 and 50.0
+ *
+ * @cfg:	The section where the option is defined.
+ * @opt:	The option to check.
+ *
+ * @Return: 0 on success, any other value otherwise.
+ */
+static int cfg_check_cpuload_variation(cfg_t *cfg, cfg_opt_t *opt)
+{
+	return cfg_check_float_range(cfg, opt,
+				     SETTING_CPULOAD_VARIATION_MIN,
+				     SETTING_CPULOAD_VARIATION_MAX);
 }
 
 /*

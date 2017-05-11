@@ -29,6 +29,7 @@
                              D E F I N I T I O N S
 ------------------------------------------------------------------------------*/
 #define ATTR_TEMPERATURE			"temperature"
+#define ATTR_CPU_LOAD				"cpuLoad"
 
 /*------------------------------------------------------------------------------
                  D A T A    T Y P E S    D E F I N I T I O N S
@@ -40,6 +41,9 @@
  * @temp:		Last temperature reported (C)
  * @temp_handler:	Temperature handler
  * @temp_update:	Temperature value locally updated
+ * @cpu_load:		Last CPU load reported (%)
+ * @cpu_load_handler:	CPU load handler
+ * @cpu_load_update:	CPU load value locally updated
  * @update_required:	Update shadow immediately
  * @aws_config:		AWS IoT Decive SDK configuration struct
  */
@@ -47,6 +51,9 @@ typedef struct {
 	double temp;
 	jsonStruct_t temp_handler;
 	unsigned int temp_update;
+	double cpu_load;
+	jsonStruct_t cpu_load_handler;
+	unsigned int cpu_load_update;
 	unsigned int update_required;
 	aws_iot_cfg_t *aws_config;
 } device_shadow_t;
