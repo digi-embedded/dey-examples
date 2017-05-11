@@ -30,6 +30,10 @@
 ------------------------------------------------------------------------------*/
 #define ATTR_TEMPERATURE			"temperature"
 #define ATTR_CPU_LOAD				"cpuLoad"
+#define ATTR_LED				"ledON"
+
+#define ON					"ON"
+#define OFF					"OFF"
 
 /*------------------------------------------------------------------------------
                  D A T A    T Y P E S    D E F I N I T I O N S
@@ -44,6 +48,9 @@
  * @cpu_load:		Last CPU load reported (%)
  * @cpu_load_handler:	CPU load handler
  * @cpu_load_update:	CPU load value locally updated
+ * @led_on:		Last LED value reported
+ * @led_actuator:	LED actuator
+ * @led_update:		LED value locally updated
  * @update_required:	Update shadow immediately
  * @aws_config:		AWS IoT Decive SDK configuration struct
  */
@@ -54,6 +61,9 @@ typedef struct {
 	double cpu_load;
 	jsonStruct_t cpu_load_handler;
 	unsigned int cpu_load_update;
+	bool led_on;
+	jsonStruct_t led_actuator;
+	unsigned int led_update;
 	unsigned int update_required;
 	aws_iot_cfg_t *aws_config;
 } device_shadow_t;

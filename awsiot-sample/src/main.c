@@ -58,6 +58,7 @@
                     F U N C T I O N  D E C L A R A T I O N S
 ------------------------------------------------------------------------------*/
 static int start_aws_iot(const char *config_file);
+static int initialize_system(device_shadow_t *dev_shadow);
 static int check_stop(void);
 static void add_sigkill_signal(void);
 static void graceful_shutdown(void);
@@ -160,6 +161,9 @@ static int start_aws_iot(const char *config_file)
 		goto done;
 	}
 
+	if (initialize_system(&device_shadow) != 0)
+		IOT_WARN("Unable to initialize the whole system");
+
 	time_start = time(NULL);
 	/* Loop and publish shadow changes */
 	while (rc == NETWORK_ATTEMPTING_RECONNECT ||
@@ -189,7 +193,8 @@ static int start_aws_iot(const char *config_file)
 						 load >= (device_shadow.cpu_load + aws_cfg->cpuload_variation));
 
 		change_shadow = device_shadow.temp_update ||
-				device_shadow.cpu_load_update;
+				device_shadow.cpu_load_update ||
+				device_shadow.led_update;
 
 		if (change_shadow ||
 		    (time(NULL) - time_start) >= aws_cfg->shadow_report_rate) {
@@ -206,8 +211,15 @@ static int start_aws_iot(const char *config_file)
 				IOT_INFO(
 					 "CPU Load variation greater than %d%%\n",
 					 aws_cfg->cpuload_variation);
+			if (device_shadow.led_update)
+				IOT_INFO(
+					 "LED changed to %s\n",
+					 device_shadow.led_on ? ON : OFF);
 			IOT_INFO("Temperature: %fC", t);
 			IOT_INFO("CPU Load: %f%%", load);
+			IOT_INFO(
+				 "LED status: %s",
+				 device_shadow.led_on ? ON : OFF);
 			IOT_INFO("=========================================\n");
 
 			rc = update_shadow(&mqtt_client);
@@ -226,6 +238,29 @@ done:
 	}
 
 	return rc;
+}
+
+/*
+ * initialize_system() - Stop application
+ *
+ * @dev_shadow:		Device shadow.
+ *
+ * Return: 0 if it is successfully initialized, -1 otherwise.
+ */
+static int initialize_system(device_shadow_t *dev_shadow)
+{
+	int led_gpio = dev_shadow->aws_config->led_gpio;
+
+	if (led_gpio > -1 &&
+	    (init_gpio(led_gpio) != 0 ||
+	     set_gpio_direction(led_gpio, OUTPUT) != 0 ||
+	     set_gpio_value(led_gpio, dev_shadow->led_on) != 0)) {
+		IOT_ERROR("Unable to initialize User LED");
+		dev_shadow->aws_config->led_gpio = -1;
+		return -1;
+	}
+
+	return 0;
 }
 
 /*

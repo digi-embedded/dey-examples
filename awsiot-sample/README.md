@@ -2,7 +2,8 @@ AWS IoT device SDK Demo Application
 ===================================
 Demo application to connect devices to AWS IoT.
 
-This application monitors the CPU temperature and load.
+This application monitors the CPU temperature and load and allows to remotely
+switch on/off a device LED.
 
 The demo uploads the device Thing Shadow every minute or when the difference
 between the current value of temperature or load and the last reported is bigger
@@ -51,10 +52,33 @@ You can specify the configuration file with `-c`:
     "state" : {
       "reported" : {
         "temperature" : 45.971,
-        "cpuLoad" : 4.504505
+        "cpuLoad" : 4.504505,
+        "ledON" : false
       }
     },
     "clientToken" : "<thing_name>-3"
+  }
+  ```
+* To switch on the configured LED send to the topic
+  `$aws/things/<thing_name>/shadow/update`:
+  ```
+  {
+    "state" : {
+      "desired" : {
+        "ledON" : true
+      }
+    }
+  }
+  ```
+* To switch off the configured LED send to the topic
+  `$aws/things/<thing_name>/shadow/update`:
+  ```
+  {
+    "state" : {
+      "desired" : {
+        "ledON" : false
+      }
+    }
   }
   ```
 

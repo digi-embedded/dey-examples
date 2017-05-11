@@ -21,9 +21,18 @@
 #define DEVICE_CONTROL_H_
 
 /*------------------------------------------------------------------------------
+                             D E F I N I T I O N S
+------------------------------------------------------------------------------*/
+#define INPUT		0
+#define OUTPUT		1
+
+/*------------------------------------------------------------------------------
                     F U N C T I O N  D E C L A R A T I O N S
 ------------------------------------------------------------------------------*/
 double get_cpu_load(void);
 double get_cpu_temp(void);
+int init_gpio(int gpio);
+int set_gpio_value(int gpio, unsigned int value);
+int set_gpio_direction(int gpio, unsigned int out);
 
 #endif /* DEVICE_CONTROL_H_ */

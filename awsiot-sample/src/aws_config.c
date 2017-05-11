@@ -47,6 +47,7 @@
 #define SETTING_CPULOAD_VARIATION	"cpu_load_variation"
 #define SETTING_CPULOAD_VARIATION_MIN	1 /* % */
 #define SETTING_CPULOAD_VARIATION_MAX	50.0 /* % */
+#define SETTING_USER_LED		"user_led"
 
 #define SETTING_UNKNOWN			"__unknown"
 
@@ -111,6 +112,8 @@ int parse_configuration(const char *const filename, aws_iot_cfg_t *aws_cfg)
 		CFG_INT		(SETTING_SHADOW_REPORT_RATE,	60,		CFGF_NONE),
 		CFG_FLOAT	(SETTING_TEMP_VARIATION,	1,		CFGF_NONE),
 		CFG_FLOAT	(SETTING_CPULOAD_VARIATION,	10,		CFGF_NONE),
+
+		CFG_INT		(SETTING_USER_LED,		-1,		CFGF_NONE),
 
 		/* Needed for unknown settings. */
 		CFG_STR		(SETTING_UNKNOWN,		NULL,		CFGF_NONE),
@@ -199,6 +202,7 @@ static int fill_aws_iot_config(aws_iot_cfg_t *aws_cfg)
 	aws_cfg->shadow_report_rate = cfg_getint(cfg, SETTING_SHADOW_REPORT_RATE);
 	aws_cfg->temp_variation = cfg_getfloat(cfg, SETTING_TEMP_VARIATION);
 	aws_cfg->cpuload_variation = cfg_getfloat(cfg, SETTING_CPULOAD_VARIATION);
+	aws_cfg->led_gpio = cfg_getint(cfg, SETTING_USER_LED);
 
 	return 0;
 }

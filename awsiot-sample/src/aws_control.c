@@ -35,6 +35,8 @@
 /*------------------------------------------------------------------------------
                     F U N C T I O N  D E C L A R A T I O N S
 ------------------------------------------------------------------------------*/
+static void led_actuate_callback(const char *json_string, uint32_t len,
+				  jsonStruct_t *json_struct);
 static void shadow_update_status_callback(const char *pThingName,
 					  ShadowActions_t action,
 					  Shadow_Ack_Status_t status,
@@ -175,6 +177,8 @@ IoT_Error_t disconnect_shadow_client(AWS_IoT_Client *mqtt_client)
 IoT_Error_t initialize_shadow(AWS_IoT_Client *mqtt_client,
 			      device_shadow_t *dev_shadow)
 {
+	IoT_Error_t rc = FAILURE;
+
 	device_shadow = dev_shadow;
 
 	device_shadow->temp_handler.cb = NULL;
@@ -193,9 +197,22 @@ IoT_Error_t initialize_shadow(AWS_IoT_Client *mqtt_client,
 	device_shadow->cpu_load = 0;
 	device_shadow->cpu_load_update = 0;
 
+	device_shadow->led_actuator.cb = led_actuate_callback;
+	device_shadow->led_actuator.pKey = ATTR_LED;
+	device_shadow->led_actuator.pData = &(device_shadow->led_on);
+	device_shadow->led_actuator.type = SHADOW_JSON_BOOL;
+
+	device_shadow->led_on = false;
+	device_shadow->led_update = 0;
+
 	device_shadow->aws_config = &aws_cfg;
 
-	return SUCCESS;
+	rc = aws_iot_shadow_register_delta(mqtt_client,
+					   &(device_shadow->led_actuator));
+	if (rc != SUCCESS)
+		IOT_ERROR("Unable to register Shadow Delta for LED, error: %d", rc);
+
+	return rc;
 }
 
 /**
@@ -216,9 +233,10 @@ IoT_Error_t update_shadow(AWS_IoT_Client *mqtt_client)
 		return rc;
 
 	rc = aws_iot_shadow_add_reported(json_doc_buf, size_json_doc_buf,
-					 2,
+					 3,
 					 &(device_shadow->temp_handler),
-					 &(device_shadow->cpu_load_handler));
+					 &(device_shadow->cpu_load_handler),
+					 &(device_shadow->led_actuator));
 	if (rc != SUCCESS)
 		return rc;
 
@@ -230,6 +248,35 @@ IoT_Error_t update_shadow(AWS_IoT_Client *mqtt_client)
 				     json_doc_buf,
 				     shadow_update_status_callback,
 				     (void *) device_shadow, 4, true);
+}
+
+/**
+ * led_actuate_callback() - Callback to be executed on receiving the LED value
+ *
+ * @json_string:	Thing name of the shadow to be updated.
+ * @len:		The response of the action.
+ * @json_struct:	The struct used to parse JSON value.
+ */
+static void led_actuate_callback(const char *json_string, uint32_t len,
+				 jsonStruct_t *json_struct)
+{
+	bool status = false;
+	int led_gpio = aws_cfg.led_gpio;
+	IOT_UNUSED(json_string);
+	IOT_UNUSED(len);
+
+	if (json_struct == NULL)
+		return;
+
+	status = *(bool *) (json_struct->pData);
+
+	if (led_gpio <= -1 ||
+	    (led_gpio > -1 && set_gpio_value(led_gpio, status) == 0)) {
+		IOT_INFO("Delta - LED state changed to %s", status ? ON : OFF);
+		device_shadow->led_update = 1;
+	} else {
+		IOT_ERROR("Error setting LED to %s", status ? ON : OFF);
+	}
 }
 
 /**
@@ -270,6 +317,7 @@ static void shadow_update_status_callback(const char *pThingName,
 		IOT_INFO("Shadow update accepted");
 		dev_shadow->temp_update = 0;
 		dev_shadow->cpu_load_update = 0;
+		dev_shadow->led_update = 0;
 		break;
 	}
 }

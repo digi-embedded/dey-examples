@@ -49,6 +49,7 @@
  * 			(C) to report again
  * @cpuload_variation:	CPU load variation between last reported and current (%)
  * 			to report again
+ * @led_gpio:		GPIO number of the LED
  */
 typedef struct {
 	char *thing_name;
@@ -62,6 +63,7 @@ typedef struct {
 	uint32_t shadow_report_rate;
 	uint16_t temp_variation;
 	uint16_t cpuload_variation;
+	int led_gpio;
 } aws_iot_cfg_t;
 
 /*------------------------------------------------------------------------------
