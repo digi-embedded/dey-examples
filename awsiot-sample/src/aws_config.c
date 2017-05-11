@@ -38,6 +38,12 @@
 #define SETTING_ROOTCA_NAME		"rootca_filename"
 #define SETTING_SCERT_NAME		"signed_cert_filename"
 #define SETTING_PRIVKEY_NAME		"private_key_filename"
+#define SETTING_SHADOW_REPORT_RATE	"shadow_report_rate"
+#define SETTING_SHADOW_REPORT_RATE_MIN	1 /* second */
+#define SETTING_SHADOW_REPORT_RATE_MAX	(365 * 24 * 60 * 60UL) /* A year */
+#define SETTING_TEMP_VARIATION		"temperature_variation"
+#define SETTING_TEMP_VARIATION_MIN	0.1 /* C */
+#define SETTING_TEMP_VARIATION_MAX	10.0 /* C */
 
 #define SETTING_UNKNOWN			"__unknown"
 
@@ -50,7 +56,10 @@ static int cfg_check_client_id(cfg_t *cfg, cfg_opt_t *opt);
 static int cfg_check_port(cfg_t *cfg, cfg_opt_t *opt);
 static int cfg_check_certificates_path(cfg_t *cfg, cfg_opt_t *opt);
 static int cfg_check_cert_file(cfg_t *cfg, cfg_opt_t *opt);
+static int cfg_check_shadow_report_rate(cfg_t *cfg, cfg_opt_t *opt);
+static int cfg_check_temp_variation(cfg_t *cfg, cfg_opt_t *opt);
 static int cfg_check_int_range(cfg_t *cfg, cfg_opt_t *opt, uint32_t min, uint32_t max);
+static int cfg_check_float_range(cfg_t *cfg, cfg_opt_t *opt, float min, float max);
 static int cfg_check_empty_string(cfg_t *cfg, cfg_opt_t *opt);
 static int cfg_check_string_length(cfg_t *cfg, cfg_opt_t *opt, uint16_t min, uint16_t max);
 static int file_exists(const char *const filename);
@@ -95,6 +104,9 @@ int parse_configuration(const char *const filename, aws_iot_cfg_t *aws_cfg)
 		CFG_STR		(SETTING_SCERT_NAME,	AWS_IOT_CERTIFICATE_FILENAME,CFGF_NONE),
 		CFG_STR		(SETTING_PRIVKEY_NAME,	AWS_IOT_PRIVATE_KEY_FILENAME,CFGF_NONE),
 
+		CFG_INT		(SETTING_SHADOW_REPORT_RATE,	60,		CFGF_NONE),
+		CFG_FLOAT	(SETTING_TEMP_VARIATION,	1,		CFGF_NONE),
+
 		/* Needed for unknown settings. */
 		CFG_STR		(SETTING_UNKNOWN,		NULL,		CFGF_NONE),
 		CFG_END()
@@ -119,6 +131,8 @@ int parse_configuration(const char *const filename, aws_iot_cfg_t *aws_cfg)
 	cfg_set_validate_func(cfg, SETTING_ROOTCA_NAME, cfg_check_cert_file);
 	cfg_set_validate_func(cfg, SETTING_SCERT_NAME, cfg_check_cert_file);
 	cfg_set_validate_func(cfg, SETTING_PRIVKEY_NAME, cfg_check_cert_file);
+	cfg_set_validate_func(cfg, SETTING_SHADOW_REPORT_RATE, cfg_check_shadow_report_rate);
+	cfg_set_validate_func(cfg, SETTING_TEMP_VARIATION, cfg_check_temp_variation);
 
 	/* Parse the configuration file. */
 	switch (cfg_parse(cfg, filename)) {
@@ -176,6 +190,8 @@ static int fill_aws_iot_config(aws_iot_cfg_t *aws_cfg)
 	aws_cfg->priv_key_fname = cfg_getstr(cfg, SETTING_PRIVKEY_NAME);
 	if (aws_cfg->priv_key_fname == NULL)
 		return -1;
+	aws_cfg->shadow_report_rate = cfg_getint(cfg, SETTING_SHADOW_REPORT_RATE);
+	aws_cfg->temp_variation = cfg_getfloat(cfg, SETTING_TEMP_VARIATION);
 
 	return 0;
 }
@@ -289,6 +305,38 @@ static int cfg_check_cert_file(cfg_t *cfg, cfg_opt_t *opt)
 }
 
 /*
+ * cfg_check_shadow_report_rate() - Validate shadow report rate value is between
+ * 					1s and a year
+ *
+ * @cfg:	The section where the option is defined.
+ * @opt:	The option to check.
+ *
+ * @Return: 0 on success, any other value otherwise.
+ */
+static int cfg_check_shadow_report_rate(cfg_t *cfg, cfg_opt_t *opt)
+{
+	return cfg_check_int_range(cfg, opt,
+				   SETTING_SHADOW_REPORT_RATE_MIN,
+				   SETTING_SHADOW_REPORT_RATE_MAX);
+}
+
+/*
+ * cfg_check_temp_variation() - Validate temperature variation value is between
+ * 				0.1 and 10.0
+ *
+ * @cfg:	The section where the option is defined.
+ * @opt:	The option to check.
+ *
+ * @Return: 0 on success, any other value otherwise.
+ */
+static int cfg_check_temp_variation(cfg_t *cfg, cfg_opt_t *opt)
+{
+	return cfg_check_float_range(cfg, opt,
+				     SETTING_TEMP_VARIATION_MIN,
+				     SETTING_TEMP_VARIATION_MAX);
+}
+
+/*
  * cfg_check_int_range() - Validate a parameter int value is between the given range
  *
  * @cfg:	The section where the option is defined.
@@ -305,6 +353,29 @@ static int cfg_check_int_range(cfg_t *cfg, cfg_opt_t *opt, uint32_t min, uint32_
 	if (val > max || val < min) {
 		cfg_error(cfg,
 			  "Invalid %s (%d): value must be between %d and %d",
+			  opt->name, val, min, max);
+		return -1;
+	}
+	return 0;
+}
+
+/*
+ * cfg_check_float_range() - Validate a parameter float value is between the given range
+ *
+ * @cfg:	The section where the option is defined.
+ * @opt:	The option to check.
+ * @min:	Minimum value of the parameter.
+ * @max:	Maximum value of the parameter.
+ *
+ * @Return: 0 on success, any other value otherwise.
+ */
+static int cfg_check_float_range(cfg_t *cfg, cfg_opt_t *opt, float min, float max)
+{
+	float val = cfg_opt_getnfloat(opt, 0);
+
+	if (val > max || val < min) {
+		cfg_error(cfg,
+			  "Invalid %s (%f): value must be between %f and %f",
 			  opt->name, val, min, max);
 		return -1;
 	}

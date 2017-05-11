@@ -18,24 +18,34 @@
  */
 
 #include <aws_iot_log.h>
+#include <aws_iot_version.h>
+#include <aws_iot_shadow_interface.h>
 #include <getopt.h>
 #include <libgen.h>
 #include <signal.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "aws_config.h"
+#include "aws_control.h"
 #include "daemonize.h"
+#include "device_control.h"
 
 /*------------------------------------------------------------------------------
                              D E F I N I T I O N S
 ------------------------------------------------------------------------------*/
+#define STRINGIFY(x)		#x
+#define TOSTRING(x)		STRINGIFY(x)
+
 #define VERSION			"0.1" GIT_REVISION
+#define AWS_IOT_VERSION		TOSTRING(VERSION_MAJOR) "." TOSTRING(VERSION_MINOR) "." TOSTRING(VERSION_PATCH) "-" VERSION_TAG
 
 #define USAGE \
 	"AWS IoT Device SDK demo.\n" \
 	"Copyright(c) Digi International Inc.\n" \
 	"\n" \
 	"Version: %s\n" \
+	"AWS IoT SDK Version: " AWS_IOT_VERSION "\n" \
 	"\n" \
 	"Usage: %s [options]\n\n" \
 	"  -d  --daemon              Daemonize the process\n" \
@@ -58,6 +68,7 @@ static void usage(char const *const name);
                          G L O B A L  V A R I A B L E S
 ------------------------------------------------------------------------------*/
 static volatile int stop = 0;
+static AWS_IoT_Client mqtt_client;
 
 /*------------------------------------------------------------------------------
                      F U N C T I O N  D E F I N I T I O N S
@@ -125,19 +136,82 @@ done:
  */
 static int start_aws_iot(const char *config_file)
 {
-	int result = EXIT_SUCCESS;
-	aws_iot_cfg_t aws_cfg;
+	IoT_Error_t rc = FAILURE;
+	device_shadow_t device_shadow;
+	time_t time_start;
 
 	add_sigkill_signal();
 
-	if (parse_configuration(config_file ? config_file : AWS_IOT_CONFIG_FILE, &aws_cfg) != 0)
-		return EXIT_FAILURE;;
+	rc = initialize_shadow_client(&mqtt_client, config_file);
+	if (rc != SUCCESS) {
+		IOT_ERROR("Cannot initialize Shadow client, error: %d", rc);
+		return rc;
+	}
 
-	do {
+	rc = connect_shadow_client(&mqtt_client);
+	if (rc != SUCCESS) {
+		IOT_ERROR("Unable to connect, error: %d", rc);
+		return rc;
+	}
+
+	rc = initialize_shadow(&mqtt_client, &device_shadow);
+	if (rc != SUCCESS) {
+		IOT_ERROR("Unable to initialize device Shadow, error: %d", rc);
+		goto done;
+	}
+
+	time_start = time(NULL);
+	/* Loop and publish shadow changes */
+	while (rc == NETWORK_ATTEMPTING_RECONNECT ||
+	       rc == NETWORK_RECONNECTED ||
+	       rc == SUCCESS ||
+	       !check_stop()) {
+		aws_iot_cfg_t *aws_cfg = device_shadow.aws_config;
+		double t;
+
+		rc = aws_iot_mqtt_yield(&mqtt_client, 200);
+
+		if (rc == NETWORK_ATTEMPTING_RECONNECT) {
+			sleep(1);
+			/* If the client is attempting to reconnect,
+			 * skip the rest of the loop */
+			continue;
+		}
+
+		t = get_cpu_temp();
+		device_shadow.temp_update = (t <= (device_shadow.temp - aws_cfg->temp_variation) ||
+					     t >= (device_shadow.temp + aws_cfg->temp_variation));
+
+		if (device_shadow.temp_update ||
+		    (time(NULL) - time_start) >= aws_cfg->shadow_report_rate) {
+			device_shadow.temp = t;
+
+			IOT_INFO("\n=========================================");
+			IOT_INFO("Updating shadow...");
+			if (device_shadow.temp_update)
+				IOT_INFO(
+					 "Temperature variation greater than %dC\n",
+					 aws_cfg->temp_variation);
+			
+			IOT_INFO("Temperature: %fC", t);
+			IOT_INFO("=========================================\n");
+
+			rc = update_shadow(&mqtt_client);
+
+			if ((time(NULL) - time_start) >= aws_cfg->shadow_report_rate)
+				time_start = time(NULL);
+		}
+
 		sleep(1);
-	} while (!check_stop());
+	}
 
-	return result;
+done:
+	if (rc != SUCCESS) {
+		IOT_ERROR("Error occurred in the loop: %d", rc);
+		graceful_shutdown();
+	}
+
+	return rc;
 }
 
 /*
@@ -147,6 +221,14 @@ static int start_aws_iot(const char *config_file)
  */
 static int check_stop(void)
 {
+	if (stop) {
+		IoT_Error_t rc = disconnect_shadow_client(&mqtt_client);
+		if (rc != SUCCESS) {
+			IOT_ERROR("Disconnect error: %d", rc);
+			stop = 0;
+		}
+	}
+
 	return stop;
 }
 

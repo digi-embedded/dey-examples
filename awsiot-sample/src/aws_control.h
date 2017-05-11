@@ -17,54 +17,47 @@
  * =======================================================================
  */
 
-#ifndef AWS_CONFIG_H_
-#define AWS_CONFIG_H_
+#ifndef AWS_CONTROL_H_
+#define AWS_CONTROL_H_
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stddef.h>
+#include <aws_iot_mqtt_client.h>
+#include <aws_iot_shadow_json.h>
+
+#include "aws_config.h"
 
 /*------------------------------------------------------------------------------
                              D E F I N I T I O N S
 ------------------------------------------------------------------------------*/
-#define AWS_IOT_CONFIG_FILE	"/etc/awsiotsdk.conf"
-#define DEFAULT_CERTS_PATH	"/etc/ssl/certs"
+#define ATTR_TEMPERATURE			"temperature"
 
 /*------------------------------------------------------------------------------
                  D A T A    T Y P E S    D E F I N I T I O N S
 ------------------------------------------------------------------------------*/
+
 /**
- * aws_iot_cfg_t - AWS IoT Device SDK configuration type
+ * device_shadow_t - Device Shadow type
  *
- * @thing_name:		Thing Name of the Shadow this device is associated with
- * @client_id:		MQTT client ID. It should be unique for every device
- * @host:		MQTT host
- * @port:		Port for MQTT/S
- * @certs_path:		Absolute path to the certificates directory
- * @rootca_fname:	Name of the Root CA file
- * @signed_cert_fname:	Name of the device signed certificate
- * @priv_key_fname:	Name of the device private key
- * @shadow_report_rate:	Frequency at which report system information (seconds)
- * @temp_variation:	Temperature variation between last reported and current
- * 			(C) to report again
+ * @temp:		Last temperature reported (C)
+ * @temp_handler:	Temperature handler
+ * @temp_update:	Temperature value locally updated
+ * @update_required:	Update shadow immediately
+ * @aws_config:		AWS IoT Decive SDK configuration struct
  */
 typedef struct {
-	char *thing_name;
-	char *client_id;
-	char *host;
-	int port;
-	char *certs_path;
-	char *rootca_fname;
-	char *signed_cert_fname;
-	char *priv_key_fname;
-	uint32_t shadow_report_rate;
-	uint16_t temp_variation;
-} aws_iot_cfg_t;
+	double temp;
+	jsonStruct_t temp_handler;
+	unsigned int temp_update;
+	unsigned int update_required;
+	aws_iot_cfg_t *aws_config;
+} device_shadow_t;
 
 /*------------------------------------------------------------------------------
                     F U N C T I O N  D E C L A R A T I O N S
 ------------------------------------------------------------------------------*/
-int parse_configuration(const char *const filename, aws_iot_cfg_t *aws_cfg);
-void free_configuration(void);
+IoT_Error_t initialize_shadow_client(AWS_IoT_Client *mqtt_client, const char *config_file);
+IoT_Error_t connect_shadow_client(AWS_IoT_Client *mqtt_client);
+IoT_Error_t disconnect_shadow_client(AWS_IoT_Client *mqtt_client);
+IoT_Error_t initialize_shadow(AWS_IoT_Client *mqtt_client, device_shadow_t *device_shadow);
+IoT_Error_t update_shadow(AWS_IoT_Client *mqtt_client);
 
-#endif /* AWS_CONFIG_H_ */
+#endif /* AWS_CONTROL_H_ */
