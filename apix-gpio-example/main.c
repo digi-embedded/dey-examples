@@ -36,8 +36,11 @@ struct gpio_interrupt_cb_data {
 };
 
 /*
- * Function:    usage_and_exit
- * Description: show usage information and exit with 'exitval' return value
+ * usage_and_exit() - Show usage information and exit with 'exitval' return
+ *					  value
+ *
+ * @name:	Application name.
+ * @exitval:	The exit code.
  */
 static void usage_and_exit(char *name, int exitval)
 {
@@ -54,22 +57,33 @@ static void usage_and_exit(char *name, int exitval)
 	exit(exitval);
 }
 
+/*
+ * cleanup() - Frees all the allocated memory before exiting
+ */
 static void cleanup(void)
 {
 	/* Stop the interrupt handler thread */
-	gpio_stop_wait_interrupt(gpio_input);
+	ldx_gpio_stop_wait_interrupt(gpio_input);
 
 	/* Free gpios */
-	gpio_free(gpio_input);
-	gpio_free(gpio_output);
+	ldx_gpio_free(gpio_input);
+	ldx_gpio_free(gpio_output);
 }
 
+/*
+ * sigaction_handler() - Handler to execute after receiving a signal
+ *
+ * @signum:	Received signal.
+ */
 static void sigaction_handler(int signum)
 {
 	/* 'atexit' executes the cleanup function */
 	exit(EXIT_FAILURE);
 }
 
+/*
+ * register_signals() - Registers program signals
+ */
 static void register_signals(void)
 {
 	struct sigaction action;
@@ -83,22 +97,14 @@ static void register_signals(void)
 	sigaction(SIGTERM, &action, NULL);
 }
 
-static int gpio_interrupt_cb(void *arg)
-{
-	struct gpio_interrupt_cb_data *data = arg;
-
-	printf("Input GPIO interrupt detected; toggling output GPIO\n");
-
-	/* Toggle output GPIO */
-	data->value = data->value ? GPIO_LOW : GPIO_HIGH;
-	gpio_set_value(data->gpio, data->value);
-
-	/* Decrease remaining loops */
-	data->remaining_loops -= 1;
-
-	return 0;
-}
-
+/*
+ * parse_argument() - Parses the given string argument and returns the
+ *					  corresponding integer value
+ *
+ * @argv:	Argument to parse in string format.
+ *
+ * Return: The parsed integer argument, -1 on error.
+ */
 static int parse_argument(char *argv)
 {
 	char *endptr;
@@ -112,9 +118,30 @@ static int parse_argument(char *argv)
 		return -1;
 
 	if (endptr == argv)
-		return gpio_get_kernel_number(endptr);
+		return ldx_gpio_get_kernel_number(endptr);
 
 	return value;
+}
+
+/*
+ * gpio_interrupt_cb() - GPIO callback for interrupts
+ *
+ * @arg:	GPIO interrupt data (struct gpio_interrupt_cb_data).
+ */
+static int gpio_interrupt_cb(void *arg)
+{
+	struct gpio_interrupt_cb_data *data = arg;
+
+	printf("Input GPIO interrupt detected; toggling output GPIO\n");
+
+	/* Toggle output GPIO */
+	data->value = data->value ? GPIO_LOW : GPIO_HIGH;
+	ldx_gpio_set_value(data->gpio, data->value);
+
+	/* Decrease remaining loops */
+	data->remaining_loops -= 1;
+
+	return 0;
 }
 
 int main(int argc, char *argv[])
@@ -142,7 +169,7 @@ int main(int argc, char *argv[])
 
 	/* Request input GPIO */
 	gpio_input =
-	    gpio_request((unsigned)button, GPIO_IRQ_EDGE_RISING,
+		ldx_gpio_request((unsigned int)button, GPIO_IRQ_EDGE_RISING,
 			 REQUEST_SHARED);
 	if (!gpio_input) {
 		printf("Failed to initialize input GPIO\n");
@@ -151,14 +178,14 @@ int main(int argc, char *argv[])
 
 	/* Request output GPIO */
 	gpio_output =
-	    gpio_request((unsigned)led, GPIO_OUTPUT_LOW, REQUEST_SHARED);
+	    ldx_gpio_request((unsigned int)led, GPIO_OUTPUT_LOW, REQUEST_SHARED);
 	if (!gpio_output) {
 		printf("Failed to initialize output GPIO\n");
 		return EXIT_FAILURE;
 	}
 
 	/* Configure input GPIO to active HIGH */
-	gpio_set_active_mode(gpio_input, GPIO_ACTIVE_HIGH);
+	ldx_gpio_set_active_mode(gpio_input, GPIO_ACTIVE_HIGH);
 
 	/*
 	 * Test blocking interrupt mode
@@ -166,10 +193,10 @@ int main(int argc, char *argv[])
 	printf("[INFO] Testing interrupt blocking mode\n");
 	printf("Press the button (for %d events):\n", TEST_LOOPS);
 	for (i = 0; i < TEST_LOOPS; i++) {
-		if (gpio_wait_interrupt(gpio_input, -1) == GPIO_IRQ_ERROR_NONE) {
+		if (ldx_gpio_wait_interrupt(gpio_input, -1) == GPIO_IRQ_ERROR_NONE) {
 			printf("Press %d; toggling output GPIO\n", i + 1);
 			output_value = output_value ? GPIO_LOW : GPIO_HIGH;
-			gpio_set_value(gpio_output, output_value);
+			ldx_gpio_set_value(gpio_output, output_value);
 		}
 	}
 
@@ -187,7 +214,7 @@ int main(int argc, char *argv[])
 	    ("Parent process will wait until %d interrupts have been detected\n",
 	     TEST_LOOPS);
 
-	if (gpio_start_wait_interrupt(gpio_input, &gpio_interrupt_cb, &cb_data)
+	if (ldx_gpio_start_wait_interrupt(gpio_input, &gpio_interrupt_cb, &cb_data)
 	    != EXIT_SUCCESS) {
 		printf("Failed to start interrupt handler thread\n");
 		return EXIT_FAILURE;

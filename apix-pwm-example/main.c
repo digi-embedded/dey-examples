@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Digi International Inc.
+ * Copyright 2017, Digi International Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -9,89 +9,134 @@
  * REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
  * AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
  * INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
- * LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
- * OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+ * OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  * PERFORMANCE OF THIS SOFTWARE.
- * =======================================================================
  */
+
+#include <errno.h>
 #include <libgen.h>
+#include <limits.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <pwm.h>
-
-/*------------------------------------------------------------------------------
-							 D E F I N I T I O N S
-------------------------------------------------------------------------------*/
+#include <libdigiapix/pwm.h>
 
 #define DEFAULT_PWM_CHANNEL	0
-#define DEFAULT_FREQUENCY	1000 /* In Hz */
-#define DEFAULT_PWM_ALIAS	"DEFAULT_PWM"
 
-
-#define BUFF_SIZE 256
-#define USAGE							\
-	"Usage:\n"						\
-	"%s [pwm-chip pwm-freq]\n\n"		\
-	"Where:\n"						\
-	"  'pwm-chip' is an optional PWM chip number\n"		\
-	"  'pwm-freq' is an optional frequency to use (Hz)\n\n" \
-
-/*------------------------------------------------------------------------------
-			F U N C T I O N	 D E C L A R A T I O N S
-------------------------------------------------------------------------------*/
-static void cleanup();
-static void add_sigkill_signal(void);
-static void graceful_shutdown(void);
-static void sigint_handler(int signum);
-static void usage(char const * const name);
-
-/**
- * sigint_handler() - Manage signal received.
- *
- * @signum: Received signal.
- */
-static void sigint_handler(int signum)
-{
-	exit(EXIT_SUCCESS);
-}
-
-/**
- * usage() - Print usage information
- *
- * @name:	Name of the application.
- */
-static void usage(char const * const name)
-{
-	printf(USAGE, name);
-}
-
-/*------------------------------------------------------------------------------
-			G L O B A L  V A R I A B L E S
-------------------------------------------------------------------------------*/
 static pwm_t *pwm_line;
 static int running = 1;
 
+/*
+ * usage_and_exit() - Show usage information and exit with 'exitval' return
+ *					  value
+ *
+ * @name:	Application name.
+ * @exitval:	The exit code.
+ */
+static void usage_and_exit(char *name, int exitval)
+{
+	fprintf(stdout,
+		"Example application using libdigiapix PWM support\n"
+		"\n"
+		"Usage: %s <pwm-chip> <pwm-freq>\n\n"
+		"<pwm-chip>       PWM chip number or alias\n"
+		"<pwm-freq>       Frequency to use (Hz)\n\n", name);
+
+	exit(exitval);
+}
+
+/*
+ * cleanup() - Frees all the allocated memory before exiting
+ */
+static void cleanup(void)
+{
+	running = 0;
+	if (pwm_line) {
+		ldx_pwm_enable(pwm_line, PWM_DISABLED);
+		ldx_pwm_free(pwm_line);
+	}
+}
+
+/*
+ * sigaction_handler() - Handler to execute after receiving a signal
+ *
+ * @signum:	Received signal.
+ */
+static void sigaction_handler(int signum)
+{
+	/* 'atexit' executes the cleanup function */
+	exit(EXIT_FAILURE);
+}
+
+/*
+ * register_signals() - Registers program signals
+ */
+static void register_signals(void)
+{
+	struct sigaction action;
+
+	action.sa_handler = sigaction_handler;
+	action.sa_flags = 0;
+	sigemptyset(&action.sa_mask);
+
+	sigaction(SIGHUP, &action, NULL);
+	sigaction(SIGINT, &action, NULL);
+	sigaction(SIGTERM, &action, NULL);
+}
+
+/*
+ * parse_argument() - Parses the given string argument and returns the
+ *					  corresponding integer value
+ *
+ * @argv:	Argument to parse in string format.
+ *
+ * Return: The parsed integer argument, -1 on error.
+ */
+static int parse_argument(char *argv)
+{
+	char *endptr;
+	long value;
+
+	errno = 0;
+	value = strtol(argv, &endptr, 10);
+
+	if ((errno == ERANGE && (value == LONG_MAX || value == LONG_MIN))
+			  || (errno != 0 && value == 0))
+		return -1;
+
+	if (endptr == argv)
+		return ldx_pwm_get_channel(endptr);
+
+	return value;
+}
+
 int main(int argc, char **argv)
 {
-	unsigned int pwm_freq = DEFAULT_FREQUENCY;
 	int ret, duty_cycle = 10, ascending = 1;
 	char *name = basename(argv[0]);
+	unsigned int pwm_chip, pwm_freq = 0;
 
 	/* Check if the PWM values are passed in the command line. */
-	if (argc == 3) {
-		unsigned int pwm_chip = atoi(argv[1]);
-		pwm_freq = atoi(argv[2]);
-		pwm_line = pwm_request(pwm_chip, DEFAULT_PWM_CHANNEL, REQUEST_SHARED);
-	} else if (argc == 1) {
-		/* Initialize the PWM. */
-		pwm_line = pwm_request_by_alias(DEFAULT_PWM_ALIAS, REQUEST_SHARED);
-	} else if (argc <= 2 || argc > 3) {
-		usage(name);
+	if (argc != 3)
+		usage_and_exit(name, EXIT_FAILURE);
+
+	pwm_chip = parse_argument(argv[1]);
+	pwm_freq = atoi(argv[2]);
+
+	if (pwm_chip < 0) {
+		printf("Unable to parse PWM chip\n");
 		return EXIT_FAILURE;
 	}
+
+	if (pwm_freq <= 0) {
+		printf("Frequency must be greater than 0\n");
+		return EXIT_FAILURE;
+	}
+
+	pwm_line = ldx_pwm_request(pwm_chip, DEFAULT_PWM_CHANNEL, REQUEST_SHARED);
 
 	/* Check PWM. */
 	if (!pwm_line) {
@@ -99,32 +144,34 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	add_sigkill_signal();
+	/* Register signals and exit cleanup function */
+	atexit(cleanup);
+	register_signals();
 
 	printf("Setting PWM frequency to %dHz...", pwm_freq);
 	/* Set a duty cycle of 0 to avoid errors configuring the frequency */
-	pwm_set_duty_cycle(pwm_line, 0);
-	ret = pwm_set_freq(pwm_line, pwm_freq);
+	ldx_pwm_set_duty_cycle(pwm_line, 0);
+	ret = ldx_pwm_set_freq(pwm_line, pwm_freq);
 	if (ret != PWM_CONFIG_ERROR_NONE) {
 		printf("Failed\n");
 		return EXIT_FAILURE;
 	}
 
 	/* Check the frequency. */
-	ret = pwm_get_freq(pwm_line);
+	ret = ldx_pwm_get_freq(pwm_line);
 	printf("%s\n", ret >= 0 ? "Done" : "Failed");
 	if (ret == -1) {
 		return EXIT_FAILURE;
 	}
 
 	printf("Enabling PWM %d:%d...", pwm_line->chip, pwm_line->channel);
-	ret = pwm_enable(pwm_line, PWM_ENABLED);
+	ret = ldx_pwm_enable(pwm_line, PWM_ENABLED);
 	if (ret != EXIT_SUCCESS) {
 		printf("Failed\n");
 		return EXIT_FAILURE;
 	}
 
-	ret = pwm_is_enabled(pwm_line);
+	ret = ldx_pwm_is_enabled(pwm_line);
 	printf("%s\n", ret == PWM_ENABLED ? "Done" : "Failed");
 	if (ret != PWM_ENABLED) {
 		return EXIT_FAILURE;
@@ -133,7 +180,7 @@ int main(int argc, char **argv)
 	/* Main application loop.*/
 	while (running) {
 		/* Set the duty cycle. */
-		ret = pwm_set_duty_cycle_percentage(pwm_line, duty_cycle);
+		ret = ldx_pwm_set_duty_cycle_percentage(pwm_line, duty_cycle);
 		if (ret != PWM_CONFIG_ERROR_NONE) {
 			printf("Failed to set the duty cycle\n");
 			return EXIT_FAILURE;
@@ -155,43 +202,4 @@ int main(int argc, char **argv)
 	}
 
 	return EXIT_SUCCESS;
-}
-
-/**
- * cleanup() - Frees and leaves PWM into a known state before exit
- */
-static void cleanup()
-{
-	if (pwm_line) {
-		pwm_enable(pwm_line, PWM_DISABLED);
-		pwm_free(pwm_line);
-	}
-}
-
-/**
- * add_sigkill_signal() - Add the kill signal to the process
- */
-static void add_sigkill_signal(void)
-{
-	struct sigaction new_action;
-	struct sigaction old_action;
-
-	/* Setup signal hander. */
-	atexit(graceful_shutdown);
-	new_action.sa_handler = sigint_handler;
-	sigemptyset(&new_action.sa_mask);
-	new_action.sa_flags = 0;
-	sigaction(SIGINT, NULL, &old_action);
-
-	if (old_action.sa_handler != SIG_IGN)
-		sigaction(SIGINT, &new_action, NULL);
-}
-
-/**
- * graceful_shutdown() - Stop main loop
- */
-void graceful_shutdown(void)
-{
-	running = 0;
-	cleanup();
 }

@@ -29,6 +29,9 @@ install: $(BINARY)
 	install -d $(DESTDIR)/usr/bin
 	install -m 0755 $^ $(DESTDIR)/usr/bin/
 
+.PHONY: all
+all: $(BINARY)
+
 .PHONY: clean
 clean:
 	-rm -f *.o $(BINARY)

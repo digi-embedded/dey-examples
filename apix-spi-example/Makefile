@@ -21,9 +21,6 @@ CFLAGS += -Wall -O2
 CFLAGS += $(shell pkg-config --cflags libdigiapix)
 LDLIBS += $(shell pkg-config --libs libdigiapix)
 
-.PHONY: all
-all: $(BINARY)
-
 $(BINARY): main.o
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
@@ -31,6 +28,9 @@ $(BINARY): main.o
 install: $(BINARY)
 	install -d $(DESTDIR)/usr/bin
 	install -m 0755 $^ $(DESTDIR)/usr/bin/
+
+.PHONY: all
+all: $(BINARY)
 
 .PHONY: clean
 clean:

@@ -35,8 +35,11 @@ static uint8_t *tx_buf;
 static uint8_t *rx_buf;
 
 /*
- * usage_and_exit() -  Show usage information and exit with 'exitval' return
- *                     value
+ * usage_and_exit() - Show usage information and exit with 'exitval' return
+ *					  value
+ *
+ * @name:	Application name.
+ * @exitval:	The exit code.
  */
 static void usage_and_exit(char *name, int exitval)
 {
@@ -62,22 +65,22 @@ static void usage_and_exit(char *name, int exitval)
 static void cleanup(void)
 {
 	/* Free i2c */
-	i2c_free(i2c_bus);
+	ldx_i2c_free(i2c_bus);
 
 	/* Free buffers */
 	free(rx_buf);
 	free(tx_buf);
 }
 
-/**
- * sigaction_handler() - Handler to execute after receiving a signal.
+/*
+ * sigaction_handler() - Handler to execute after receiving a signal
  *
- * @signum: Received signal.
+ * @signum:	Received signal.
  */
 static void sigaction_handler(int signum)
 {
 	/* 'atexit' executes the cleanup function */
-	exit(EXIT_SUCCESS);
+	exit(EXIT_FAILURE);
 }
 
 /*
@@ -96,6 +99,40 @@ static void register_signals(void)
 	sigaction(SIGTERM, &action, NULL);
 }
 
+/*
+ * parse_argument() - Parses the given string argument and returns the
+ *					  corresponding integer value
+ *
+ * @argv:	Argument to parse in string format.
+ *
+ * Return: The parsed integer argument, -1 on error.
+ */
+static int parse_argument(char *argv)
+{
+	char *endptr;
+	long value;
+
+	errno = 0;
+	value = strtol(argv, &endptr, 10);
+
+	if ((errno == ERANGE && (value == LONG_MAX || value == LONG_MIN))
+			  || (errno != 0 && value == 0))
+		return -1;
+
+	if (endptr == argv)
+		return ldx_i2c_get_bus(endptr);
+
+	return value;
+}
+
+/*
+ * write_page() - Writes an EEPROM page with the given data
+ *
+ * @page_index:	index of the EEPROM page to write.
+ * @data:	the data to write.
+ *
+ * Return: EXIT_SUCCESS on success, EXIT_FAILURE otherwise.
+ */
 static int write_page(int page_index, uint8_t *data)
 {
 	unsigned int page_address = eeprom_page_size * page_index;
@@ -103,7 +140,7 @@ static int write_page(int page_index, uint8_t *data)
 	uint8_t *write_data;
 
 	/* Create write buffer */
-	write_data = (uint8_t*)calloc(eeprom_page_size + eeprom_addr_size, sizeof(uint8_t));
+	write_data = (uint8_t *)calloc(eeprom_page_size + eeprom_addr_size, sizeof(uint8_t));
 	if (write_data == NULL) {
 		printf("Error: allocating page memory\n");
 		return EXIT_FAILURE;
@@ -113,7 +150,7 @@ static int write_page(int page_index, uint8_t *data)
 			page_index, page_address);
 
 	for (i = 0; i < eeprom_addr_size; i++) {
-		write_data[i] = (page_address >> (8 * (eeprom_addr_size - i -1)));
+		write_data[i] = (page_address >> (8 * (eeprom_addr_size - i - 1)));
 	}
 
 	/* Fill the data array. */
@@ -121,7 +158,7 @@ static int write_page(int page_index, uint8_t *data)
 		write_data[(i + eeprom_addr_size)] = data[i];
 	}
 
-	if (i2c_write(i2c_bus, i2c_address, write_data, (uint16_t)(eeprom_page_size + eeprom_addr_size)) != EXIT_SUCCESS) {
+	if (ldx_i2c_write(i2c_bus, i2c_address, write_data, (uint16_t)(eeprom_page_size + eeprom_addr_size)) != EXIT_SUCCESS) {
 		printf("Error: Data written failed.\n");
 		free(write_data);
 		return EXIT_FAILURE;
@@ -131,7 +168,7 @@ static int write_page(int page_index, uint8_t *data)
 	   we get a success result). */
 	do {
 		printf("Write in progress...\n");
-		ret = i2c_write(i2c_bus, i2c_address, write_data, (uint16_t)eeprom_addr_size);
+		ret = ldx_i2c_write(i2c_bus, i2c_address, write_data, (uint16_t)eeprom_addr_size);
 		usleep(1);
 	} while (ret == EXIT_FAILURE);
 	printf("Write finished!\n");
@@ -141,6 +178,14 @@ static int write_page(int page_index, uint8_t *data)
 	return EXIT_SUCCESS;
 }
 
+/*
+ * read_page() - Reads an EEPROM page
+ *
+ * @page_index:	index of the EEPROM page to read.
+ * @data:	buffer to store the read data in.
+ *
+ * Return: EXIT_SUCCESS on success, EXIT_FAILURE otherwise.
+ */
 static int read_page(int page_index, uint8_t *data)
 {
 	unsigned int page_address = eeprom_page_size * page_index;
@@ -148,7 +193,7 @@ static int read_page(int page_index, uint8_t *data)
 	int i;
 
 	/* Create write buffer */
-	write_data = (uint8_t*)calloc(eeprom_addr_size, sizeof(uint8_t));
+	write_data = (uint8_t *)calloc(eeprom_addr_size, sizeof(uint8_t));
 	if (write_data == NULL) {
 		printf("Error: allocating page memory\n");
 		return EXIT_FAILURE;
@@ -158,10 +203,10 @@ static int read_page(int page_index, uint8_t *data)
 			page_index, page_address);
 
 	for (i = 0; i < eeprom_addr_size; i++) {
-		write_data[i] = (page_address >> (8 * (eeprom_addr_size - i -1)));
+		write_data[i] = (page_address >> (8 * (eeprom_addr_size - i - 1)));
 	}
 
-	if (i2c_transfer(i2c_bus, i2c_address, write_data, (uint16_t)eeprom_addr_size,
+	if (ldx_i2c_transfer(i2c_bus, i2c_address, write_data, (uint16_t)eeprom_addr_size,
 			 data, (uint16_t)eeprom_page_size) != EXIT_SUCCESS) {
 		printf("Failed to read data\n");
 		free(write_data);
@@ -186,8 +231,8 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	i2c_bus_nb = atoi(argv[1]);
-	i2c_address = (unsigned int)strtol(argv[2],NULL,16);
+	i2c_bus_nb = parse_argument(argv[1]);
+	i2c_address = (unsigned int)strtol(argv[2], NULL, 16);
 	eeprom_addr_size = atoi(argv[3]);
 	eeprom_page_size = atoi(argv[4]);
 	page_index = atoi(argv[5]);
@@ -217,14 +262,14 @@ int main(int argc, char **argv)
 	register_signals();
 
 	/* Request I2C */
-	i2c_bus = i2c_request((unsigned int)i2c_bus_nb);
+	i2c_bus = ldx_i2c_request((unsigned int)i2c_bus_nb);
 	if (!i2c_bus) {
 		printf("Failed to initialize I2C\n");
 		return EXIT_FAILURE;
 	}
 
 	/* Set the timeout for the I2C slave. */
-	if (i2c_set_timeout(i2c_bus, I2C_TIMEOUT) != EXIT_SUCCESS) {
+	if (ldx_i2c_set_timeout(i2c_bus, I2C_TIMEOUT) != EXIT_SUCCESS) {
 		printf("Failed to set I2C timeout\n");
 		return EXIT_FAILURE;
 	}
@@ -232,7 +277,7 @@ int main(int argc, char **argv)
 	printf("Preparing I2C data to write...\n");
 
 	/* Create write buffer */
-	tx_buf = (uint8_t*)calloc(eeprom_page_size + eeprom_addr_size, sizeof(uint8_t));
+	tx_buf = (uint8_t *)calloc(eeprom_page_size + eeprom_addr_size, sizeof(uint8_t));
 	if (tx_buf == NULL) {
 		printf("Error: allocating page memory\n");
 		return EXIT_FAILURE;
@@ -262,7 +307,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Create read buffer */
-	rx_buf = (uint8_t*)calloc(eeprom_page_size, sizeof(uint8_t));
+	rx_buf = (uint8_t *)calloc(eeprom_page_size, sizeof(uint8_t));
 	if (rx_buf == NULL) {
 		printf("Error: allocating page memory\n");
 		return EXIT_FAILURE;

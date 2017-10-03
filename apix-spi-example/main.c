@@ -51,8 +51,11 @@ static uint8_t *tx_buffer;
 static uint8_t *rx_buffer;
 
 /*
- * usage_and_exit() -  Show usage information and exit with 'exitval' return
- *                     value
+ * usage_and_exit() - Show usage information and exit with 'exitval' return
+ *					  value
+ *
+ * @name:	Application name.
+ * @exitval:	The exit code.
  */
 static void usage_and_exit(char *name, int exitval)
 {
@@ -78,7 +81,7 @@ static void usage_and_exit(char *name, int exitval)
 static void cleanup(void)
 {
 	/* Free spi */
-	spi_free(spi_dev);
+	ldx_spi_free(spi_dev);
 
 	/* Free buffers */
 	free(tx_buffer);
@@ -87,6 +90,8 @@ static void cleanup(void)
 
 /*
  * sigaction_handler() - Handler to execute after receiving a signal
+ *
+ * @signum:	Received signal.
  */
 static void sigaction_handler(int signum)
 {
@@ -111,7 +116,42 @@ static void register_signals(void)
 }
 
 /*
- * enable_write() - Sets the SPI write enable bit.
+ * parse_argument() - Parses the given string argument and returns the
+ *					  corresponding integer value
+ *
+ * @argv:	Argument to parse in string format.
+ * @arg_type:	Type of the argument to parse.
+ *
+ * Return: The parsed integer argument, -1 on error.
+ */
+static int parse_argument(char *argv, int arg_type)
+{
+	char *endptr;
+	long value;
+
+	errno = 0;
+	value = strtol(argv, &endptr, 10);
+
+	if ((errno == ERANGE && (value == LONG_MAX || value == LONG_MIN))
+			  || (errno != 0 && value == 0))
+		return -1;
+
+	if (endptr == argv) {
+		switch (arg_type) {
+		case ARG_SPI_DEVICE:
+			return ldx_spi_get_device(endptr);
+		case ARG_SPI_SLAVE:
+			return ldx_spi_get_slave(endptr);
+		default:
+			return -1;
+		}
+	}
+
+	return value;
+}
+
+/*
+ * enable_write() - Sets the SPI write enable bit
  *
  * Return: EXIT_SUCCESS on success, EXIT_FAILURE otherwise.
  */
@@ -122,13 +162,13 @@ static int enable_write(void)
 	printf("[INFO] Setting write enable bit...\n");
 	write_data[0] = WREN;
 
-	return spi_write(spi_dev, write_data, sizeof(write_data));
+	return ldx_spi_write(spi_dev, write_data, sizeof(write_data));
 }
 
 /*
- * read_status_register() - Reads the SPI status register.
+ * read_status_register() - Reads the SPI status register
  *
- * @status: Variable to store the read status.
+ * @status:	Variable to store the read status.
  *
  * Return: EXIT_SUCCESS on success, EXIT_FAILURE otherwise.
  */
@@ -139,7 +179,7 @@ static int read_status_register(uint8_t *status)
 
 	printf("[INFO] Reading status register...\n");
 	write_data[0] = RDSR;
-	if (spi_transfer(spi_dev, write_data, read_data, 2) != EXIT_SUCCESS) {
+	if (ldx_spi_transfer(spi_dev, write_data, read_data, 2) != EXIT_SUCCESS) {
 		return EXIT_FAILURE;
 	}
 
@@ -150,10 +190,10 @@ static int read_status_register(uint8_t *status)
 }
 
 /*
- * write_page() - Writes an EEPROM page with the given data.
+ * write_page() - Writes an EEPROM page with the given data
  *
- * @page_index: index of the EEPROM page to write.
- * @data: the data to write.
+ * @page_index:	index of the EEPROM page to write.
+ * @data:	the data to write.
  *
  * Return: EXIT_SUCCESS on success, EXIT_FAILURE otherwise.
  */
@@ -177,7 +217,7 @@ static int write_page(int page_index, uint8_t* data)
 	write_data[0] = WRITE; // Operation.
 	for (i = 0; i < address_bytes; i++) {
 		write_data[i + OPERATION_BYTES] = (page_address >> (8 * (address_bytes -
-				  i -1)));
+				  i - 1)));
 	}
 
 	/* Fill the data array. */
@@ -186,7 +226,7 @@ static int write_page(int page_index, uint8_t* data)
 	}
 
 	/* Perform the write operation. */
-	if (spi_write(spi_dev, write_data, page_size + OPERATION_BYTES +
+	if (ldx_spi_write(spi_dev, write_data, page_size + OPERATION_BYTES +
 			  address_bytes) != EXIT_SUCCESS) {
 		free(write_data);
 		return EXIT_FAILURE;
@@ -215,10 +255,10 @@ static int write_page(int page_index, uint8_t* data)
 }
 
 /*
- * read_page() - Reads an EEPROM page.
+ * read_page() - Reads an EEPROM page
  *
- * @page_index: index of the EEPROM page to read.
- * @data: buffer to store the read data in.
+ * @page_index:	index of the EEPROM page to read.
+ * @data:	buffer to store the read data in.
  *
  * Return: EXIT_SUCCESS on success, EXIT_FAILURE otherwise.
  */
@@ -246,11 +286,11 @@ static int read_page(int page_index, uint8_t* data)
 	write_data[0] = READ; // Operation.
 	for (i = 0; i < address_bytes; i++) {
 		write_data[i + OPERATION_BYTES] = (page_address >> (8 * (address_bytes -
-				i -1)));
+				i - 1)));
 	}
 
 	/* Perform the read operation with a transfer */
-	if (spi_transfer(spi_dev, write_data, read_data, page_size +
+	if (ldx_spi_transfer(spi_dev, write_data, read_data, page_size +
 			  OPERATION_BYTES + address_bytes) != EXIT_SUCCESS) {
 		free(write_data);
 		free(read_data);
@@ -264,41 +304,6 @@ static int read_page(int page_index, uint8_t* data)
 	free(read_data);
 
 	return EXIT_SUCCESS;
-}
-
-/*
- * parse_argument() - Parses the given string argument and returns the
- *                    corresponding integer value
- *
- * @argv:     Argument to parse in string format.
- * @arg_type: Type of the argument to parse.
- *
- * Return: The parsed integer argument, -1 on error.
- */
-static int parse_argument(char *argv, int arg_type)
-{
-	char *endptr;
-	long value;
-
-	errno = 0;
-	value = strtol(argv, &endptr, 10);
-
-	if ((errno == ERANGE && (value == LONG_MAX || value == LONG_MIN))
-			  || (errno != 0 && value == 0))
-		return -1;
-
-	if (endptr == argv) {
-		switch (arg_type) {
-		case ARG_SPI_DEVICE:
-			return spi_get_device(endptr);
-		case ARG_SPI_SLAVE:
-			return spi_get_slave(endptr);
-		default:
-			return -1;
-		}
-	}
-
-	return value;
 }
 
 int main(int argc, char *argv[])
@@ -339,7 +344,7 @@ int main(int argc, char *argv[])
 	register_signals();
 
 	/* Request SPI */
-	spi_dev = spi_request((unsigned)spi_device, (unsigned)spi_slave);
+	spi_dev = ldx_spi_request((unsigned int)spi_device, (unsigned int)spi_slave);
 	if (!spi_dev) {
 		printf("Failed to initialize SPI\n");
 		return EXIT_FAILURE;
@@ -349,19 +354,19 @@ int main(int argc, char *argv[])
 	transfer_mode.clk_mode = CLK_MODE;
 	transfer_mode.chip_select = CHIP_SELECT;
 	transfer_mode.bit_order = BIT_ORDER;
-	if (spi_set_transfer_mode(spi_dev, &transfer_mode) != EXIT_SUCCESS) {
+	if (ldx_spi_set_transfer_mode(spi_dev, &transfer_mode) != EXIT_SUCCESS) {
 		printf("Failed to configure SPI transfer mode\n");
 		return EXIT_FAILURE;
 	}
 
 	/* Configure the bits-per-word */
-	if (spi_set_bits_per_word(spi_dev, BITS_PER_WORD) != EXIT_SUCCESS) {
+	if (ldx_spi_set_bits_per_word(spi_dev, BITS_PER_WORD) != EXIT_SUCCESS) {
 		printf("Failed to configure SPI bits-per-word\n");
 		return EXIT_FAILURE;
 	}
 
 	/* Configure the max bus speed */
-	if (spi_set_speed(spi_dev, MAX_BUS_SPEED) != EXIT_SUCCESS) {
+	if (ldx_spi_set_speed(spi_dev, MAX_BUS_SPEED) != EXIT_SUCCESS) {
 		printf("Failed to configure SPI max bus speed\n");
 		return EXIT_FAILURE;
 	}
