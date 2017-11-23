@@ -32,8 +32,6 @@ static adc_t *adc;
 
 struct adc_sampling_cb_data {
 	adc_t *adc;
-	int total_value;
-	int total_value_rms;
 	int number_of_samples;
 };
 
@@ -143,8 +141,6 @@ static int adc_sampling_cb(int sample, void *arg)
 	struct adc_sampling_cb_data *data = arg;
 	float sample_mv = 0;
 
-	data->total_value += sample;
-	data->total_value_rms += powf(sample, 2);
 	data->number_of_samples--;
 	sample_mv = ldx_adc_convert_sample_to_mv(data->adc, sample);
 
@@ -193,8 +189,6 @@ int main(int argc, char *argv[])
 	}
 
 	cb_data.number_of_samples = number_of_samples;
-	cb_data.total_value = 0;
-	cb_data.total_value_rms = 0;
 
 	/* Register signals and exit cleanup function */
 	atexit(cleanup);
@@ -219,11 +213,6 @@ int main(int argc, char *argv[])
 				cb_data.number_of_samples);
 		sleep(1);
 	}
-
-	printf("The mean value of the samples is: %d mV\n",
-			cb_data.total_value/number_of_samples);
-	printf("The RMS value of the samples is: %.2f mV\n",
-			sqrt(cb_data.total_value_rms/number_of_samples));
 
 	return EXIT_SUCCESS;
 }

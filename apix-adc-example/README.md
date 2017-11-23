@@ -4,7 +4,7 @@ Digi APIX ADC Sample Application
 Sample application to access and manage ADC channels using the Digi APIX library.
 
 The application enables one ADC channel on the board. After that, the application 
-takes periodic samples and calculates the rms and mean value of the samples batch.
+takes periodic samples and prints the raw value and the value in mv.
 
 The ADC lines used in the sample are mapped as follows in the Digi Boards:
  - **CCIMX6 SBC**: PMIC_ADCIN1 (GPIO Connector Pin 1).
