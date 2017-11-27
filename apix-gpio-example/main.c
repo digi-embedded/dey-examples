@@ -24,7 +24,9 @@
 
 #include <libdigiapix/gpio.h>
 
-#define TEST_LOOPS	6
+#define TEST_LOOPS			6
+#define DEFAULT_USER_LED_ALIAS		"USER_LED"
+#define DEFAULT_USER_BUTTON_ALIAS	"USER_BUTTON"
 
 static gpio_t *gpio_input;
 static gpio_t *gpio_output;
@@ -152,12 +154,18 @@ int main(int argc, char *argv[])
 	char *name = basename(argv[0]);
 
 	/* Check input parameters */
-	if (argc != 3)
+	if (argc == 1) {
+		/* Use default values */
+		button = parse_argument(DEFAULT_USER_BUTTON_ALIAS);
+		led = parse_argument(DEFAULT_USER_LED_ALIAS);
+	} else if (argc == 3) {
+		/* Parse command line arguments */
+		button = parse_argument(argv[1]);
+		led = parse_argument(argv[2]);
+	} else {
 		usage_and_exit(name, EXIT_FAILURE);
+	}
 
-	/* Parse command line arguments */
-	button = parse_argument(argv[1]);
-	led = parse_argument(argv[2]);
 	if (button < 0 || led < 0) {
 		printf("Unable to parse button and led GPIOs\n");
 		return EXIT_FAILURE;

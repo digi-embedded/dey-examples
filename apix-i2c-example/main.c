@@ -28,6 +28,12 @@
 
 #define I2C_TIMEOUT 1
 
+#define DEFAULT_I2C_ALIAS		"DEFAULT_I2C_BUS"
+#define DEFAULT_I2C_ADDRESS		0x54
+#define DEFAULT_I2C_ADDRESS_SIZE	2
+#define DEFAULT_I2C_PAGE_SIZE		128
+#define DEFAULT_I2C_PAGE_INDEX		0
+
 static i2c_t *i2c_bus;
 static unsigned int i2c_address;
 static int eeprom_page_size, eeprom_addr_size;
@@ -47,7 +53,7 @@ static void usage_and_exit(char *name, int exitval)
 		"Example application using libdigiapix I2C support\n"
 		"\n"
 		"Usage: %s <i2c-bus> <i2c-address> <address-size> <page-size> <page-index>\n\n"
-		"<i2c-bus>       I2C bus index to use\n"
+		"<i2c-bus>       I2C bus index to use or alias\n"
 		"<i2c-address>   Address of the I2C EEPROM memory\n"
 		"<address-size>  Number of EEPROM memory address bytes\n"
 		"<page-size>     EEPROM memory page size in bytes\n"
@@ -221,21 +227,28 @@ static int read_page(int page_index, uint8_t *data)
 int main(int argc, char **argv)
 {
 	char *name = basename(argv[0]);
-	int page_index;
-	int i2c_bus_nb;
+	int page_index = 0;
+	int i2c_bus_nb = 0;
 	int i;
 
 	/* Check input parameters */
-	if (argc != 6) {
+	if (argc == 1) {
+		/* Use default values */
+		i2c_bus_nb = ldx_i2c_get_bus(DEFAULT_I2C_ALIAS);
+		i2c_address = DEFAULT_I2C_ADDRESS;
+		eeprom_addr_size = DEFAULT_I2C_ADDRESS_SIZE;
+		eeprom_page_size = DEFAULT_I2C_PAGE_SIZE;
+		page_index = DEFAULT_I2C_PAGE_INDEX;
+	} else if (argc == 6) {
+		/* Parse command line arguments */
+		i2c_bus_nb = parse_argument(argv[1]);
+		i2c_address = (unsigned int)strtol(argv[2], NULL, 16);
+		eeprom_addr_size = atoi(argv[3]);
+		eeprom_page_size = atoi(argv[4]);
+		page_index = atoi(argv[5]);
+	} else {
 		usage_and_exit(name, EXIT_FAILURE);
-		return EXIT_FAILURE;
 	}
-
-	i2c_bus_nb = parse_argument(argv[1]);
-	i2c_address = (unsigned int)strtol(argv[2], NULL, 16);
-	eeprom_addr_size = atoi(argv[3]);
-	eeprom_page_size = atoi(argv[4]);
-	page_index = atoi(argv[5]);
 
 	if (eeprom_addr_size <= 0) {
 		printf("Address size must be greater than 0\n");

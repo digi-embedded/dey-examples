@@ -24,7 +24,12 @@
 
 #include <libdigiapix/pwm.h>
 
-#define DEFAULT_PWM_CHANNEL	0
+
+#define DEFAULT_PWM_FREQUENCY	1000
+#define DEFAULT_PWM_ALIAS	"DEFAULT_PWM"
+
+#define ARG_PWM_CHIP		0
+#define ARG_PWM_CHANNEL		1
 
 static pwm_t *pwm_line;
 static int running = 1;
@@ -43,7 +48,11 @@ static void usage_and_exit(char *name, int exitval)
 		"\n"
 		"Usage: %s <pwm-chip> <pwm-freq>\n\n"
 		"<pwm-chip>       PWM chip number or alias\n"
-		"<pwm-freq>       Frequency to use (Hz)\n\n", name);
+		"<pwm-channel>    PWM channel number or alias\n"
+		"<pwm-freq>       Frequency to use (Hz)\n"
+		"\n"
+		"Aliases for PWM can be configured in the library config file\n"
+		"\n", name);
 
 	exit(exitval);
 }
@@ -92,10 +101,11 @@ static void register_signals(void)
  *					  corresponding integer value
  *
  * @argv:	Argument to parse in string format.
+ * @arg_type:	Type of the argument to parse.
  *
  * Return: The parsed integer argument, -1 on error.
  */
-static int parse_argument(char *argv)
+static int parse_argument(char *argv, int arg_type)
 {
 	char *endptr;
 	long value;
@@ -107,27 +117,39 @@ static int parse_argument(char *argv)
 			  || (errno != 0 && value == 0))
 		return -1;
 
-	if (endptr == argv)
-		return ldx_pwm_get_channel(endptr);
-
+	if (endptr == argv){
+		switch (arg_type) {
+		case ARG_PWM_CHIP:
+			return ldx_pwm_get_chip(endptr);
+		case ARG_PWM_CHANNEL:
+			return ldx_pwm_get_channel(endptr);
+		default:
+			return -1;
+		}
+	}
 	return value;
 }
 
 int main(int argc, char **argv)
 {
-	int ret, duty_cycle = 10, ascending = 1;
+	int ret, duty_cycle = 10, ascending = 1, pwm_chip, pwm_channel, pwm_freq = 0;
 	char *name = basename(argv[0]);
-	unsigned int pwm_chip, pwm_freq = 0;
 
 	/* Check if the PWM values are passed in the command line. */
-	if (argc != 3)
+	if (argc == 1) {
+		pwm_chip = ldx_pwm_get_chip(DEFAULT_PWM_ALIAS);
+		pwm_channel = ldx_pwm_get_channel(DEFAULT_PWM_ALIAS);
+		pwm_freq = DEFAULT_PWM_FREQUENCY;
+	} else if (argc == 4) {
+		pwm_chip = parse_argument(argv[1], ARG_PWM_CHIP);
+		pwm_channel = parse_argument(argv[2], ARG_PWM_CHANNEL);
+		pwm_freq = atoi(argv[3]);
+	} else {
 		usage_and_exit(name, EXIT_FAILURE);
+	}
 
-	pwm_chip = parse_argument(argv[1]);
-	pwm_freq = atoi(argv[2]);
-
-	if (pwm_chip < 0) {
-		printf("Unable to parse PWM chip\n");
+	if (pwm_chip < 0 || pwm_channel < 0 ) {
+		printf("Unable to parse PWM chip or channel\n");
 		return EXIT_FAILURE;
 	}
 
@@ -136,7 +158,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	pwm_line = ldx_pwm_request(pwm_chip, DEFAULT_PWM_CHANNEL, REQUEST_SHARED);
+	pwm_line = ldx_pwm_request(pwm_chip, pwm_channel, REQUEST_SHARED);
 
 	/* Check PWM. */
 	if (!pwm_line) {

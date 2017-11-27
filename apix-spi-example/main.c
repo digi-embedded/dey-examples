@@ -26,6 +26,11 @@
 
 #include <libdigiapix/spi.h>
 
+#define DEFAULT_SPI_ALIAS		"DEFAULT_SPI"
+#define DEFAULT_SPI_ADDRESS_SIZE	1
+#define DEFAULT_SPI_PAGE_SIZE		16
+#define DEFAULT_SPI_PAGE_INDEX		0
+
 #define ARG_SPI_DEVICE		0
 #define ARG_SPI_SLAVE		1
 
@@ -63,8 +68,8 @@ static void usage_and_exit(char *name, int exitval)
 		"Example application using libdigiapix SPI support\n"
 		"\n"
 		"Usage: %s <spi-dev> <spi-ss> <address-size> <page-size> <page-index>\n\n"
-		"<spi-dev>       SPI device index to use\n"
-		"<spi-ss>        SPI slave index to use\n"
+		"<spi-dev>       SPI device index to use or alias\n"
+		"<spi-ss>        SPI slave index to use or alias\n"
 		"<address-size>  Number of EEPROM memory address bytes\n"
 		"<page-size>     EEPROM memory page size in bytes\n"
 		"<page-index>    EEPROM memory page index to use\n"
@@ -308,20 +313,29 @@ static int read_page(int page_index, uint8_t* data)
 
 int main(int argc, char *argv[])
 {
-	int spi_device, spi_slave, page_index, i = 0;
+	int spi_device = 0, spi_slave = 0, page_index = 0, i = 0;
 	spi_transfer_cfg_t transfer_mode = {0};
 	char *name = basename(argv[0]);
 
 	/* Check input parameters */
-	if (argc != 6)
+	if (argc == 1) {
+		/* Use default values */
+		spi_device = ldx_spi_get_device(DEFAULT_SPI_ALIAS);
+		spi_slave = ldx_spi_get_slave(DEFAULT_SPI_ALIAS);
+		address_bytes = DEFAULT_SPI_ADDRESS_SIZE;
+		page_size = DEFAULT_SPI_PAGE_SIZE;
+		page_index = DEFAULT_SPI_PAGE_INDEX;
+	} else if (argc == 6) {
+		/* Parse command line arguments */
+		spi_device = parse_argument(argv[1], ARG_SPI_DEVICE);
+		spi_slave = parse_argument(argv[2], ARG_SPI_SLAVE);
+		address_bytes = atoi(argv[3]);
+		page_size = atoi(argv[4]);
+		page_index = atoi(argv[5]);
+	} else {
 		usage_and_exit(name, EXIT_FAILURE);
+	}
 
-	/* Parse command line arguments */
-	spi_device = parse_argument(argv[1], ARG_SPI_DEVICE);
-	spi_slave = parse_argument(argv[2], ARG_SPI_SLAVE);
-	address_bytes = atoi(argv[3]);
-	page_size = atoi(argv[4]);
-	page_index = atoi(argv[5]);
 	if (spi_device < 0 || spi_slave < 0) {
 		printf("Unable to parse SPI device/slave arguments\n");
 		return EXIT_FAILURE;

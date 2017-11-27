@@ -12,6 +12,11 @@ The I2C connections for the sample depend on the running platform:
     - GND: Pin 6
     - I2C-3 SDA: Pin 2
     - I2C-3 SCL: Pin 1
+ - **CCIMX6Plus SBC**: I2C connector of the board.
+    - VCC: Pin 3
+    - GND: Pin 6
+    - I2C-3 SDA: Pin 2
+    - I2C-3 SCL: Pin 1
  - **CCIMX6UL SBC Express**: Expansion connector of the board.
     - VCC: Pin 1
     - GND: Pin 6
@@ -28,19 +33,22 @@ Running the application
 Once the binary is in the target, launch the application:
 
 ```
-#> apix-i2c-example
+# ./apix-i2c-example
 Example application using libdigiapix I2C support
 
-Usage: %s <i2c-bus> <i2c-address> <address-size> <page-size> <page-index>
+Usage: apix-i2c-example <i2c-bus> <i2c-address> <address-size> <page-size> <page-index>
 
-<i2c-bus>       I2C bus index to use
+<i2c-bus>       I2C bus index to use or alias
 <i2c-address>   Address of the I2C EEPROM memory
 <address-size>  Number of EEPROM memory address bytes
 <page-size>     EEPROM memory page size in bytes
 <page-index>    EEPROM memory page index to use
 
-Aliases for SPI can be configured in the library config file
+Aliases for I2C can be configured in the library config file
 ```
+If no arguments are provided, the example will use the default values:
+ - For the interfaces, default values are configured in "/etc/libdigiapix.conf"
+ - Specific application default values are defined in the main file.
 
 Compiling the application
 -------------------------

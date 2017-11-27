@@ -3,66 +3,37 @@ Digi APIX ADC Sample Application
 
 Sample application to access and manage ADC channels using the Digi APIX library.
 
-The application enables one ADC channel on the board. After that, the application 
+The application enables one ADC channel on the board. After that, the application
 takes periodic samples and prints the raw value and the value in mv.
 
 The ADC lines used in the sample are mapped as follows in the Digi Boards:
  - **CCIMX6 SBC**: PMIC_ADCIN1 (GPIO Connector Pin 1).
+ - **CCIMX6Plus SBC**: PMIC_ADCIN1 (GPIO Connector Pin 1).
  - **CCIMX6UL SBC Express**: ADC1_IN4 (Expansion Connector Pin 7).
  - **CCIMX6UL SBC Pro**: ADC1_IN2 (GPIO Connector Pin 13).
-
-The following device tree modifications are required for the sample to work:
- - **CCIMX6 SBC**: _No device tree modifications are required._
- - **CCIMX6UL SBC Express**:
-```
-&adc1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_adc1>;
-	adc-ch-list = <4>;
-	status = "okay";
-};
- 
-&iomuxc {
-	imx6ul-ccimx6ul {
-		pinctrl_adc1: adc1grp {
-			fsl,pins = <
-				MX6UL_PAD_GPIO1_IO04__GPIO1_IO04        0xb0
-			>;
-		};
-	};
-};
-```
- - **CCIMX6UL SBC Pro**:
-```
-&adc1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_adc1>;
-	adc-ch-list = <2>;
-	status = "okay";
-};
- 
-&iomuxc {
-	imx6ul-ccimx6ul {
-		pinctrl_adc1: adc1grp {
-			fsl,pins = <
-				MX6UL_PAD_GPIO1_IO02__GPIO1_IO02        0xb0
-			>;
-		};
-	};
-};
-```
 
 Running the application
 -----------------------
 Once the binary is in the target, launch the application:
+
 ```
-#> apix-adc-example [adc_chip adc_channel interval number_of_samples]
+# ./apix-adc-example
+Example application using libdigiapix ADC support
+
+Usage: apix-adc-example <adc_chip> <adc_channel> <interval> <number_of_samples>
+
+<adc_chip>           ADC chip number or alias
+<adc_channel>        ADC channel number or alias
+<interval>           Time interval for sampling
+<number_of_samples>  Number of samples to get
+
+Alias for ADC can be configured in the library config file
+
 ```
-Where:
- - 'adc_chip' the ADC chip number.
- - 'adc_channel' the ADC channel number.
- - 'interval' is the time interval between samples.
- - 'number_of_samples' is the number of samples to take.
+
+If no arguments are provided, the example will use the default values:
+ - For the interfaces, default values are configured in "/etc/libdigiapix.conf"
+ - Specific application default values are defined in the main file.
 
 Compiling the application
 -------------------------

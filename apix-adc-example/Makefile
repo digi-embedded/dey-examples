@@ -22,7 +22,7 @@ CFLAGS += $(shell pkg-config --cflags libdigiapix)
 LDLIBS += $(shell pkg-config --libs libdigiapix)
 
 $(BINARY): main.o
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@ -lm
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 .PHONY: install
 install: $(BINARY)

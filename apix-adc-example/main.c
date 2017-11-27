@@ -17,7 +17,6 @@
 #include <errno.h>
 #include <libgen.h>
 #include <limits.h>
-#include <math.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,8 +24,12 @@
 
 #include "libdigiapix/adc.h"
 
-#define ARG_ADC_CHIP		0
-#define ARG_ADC_CHANNEL		1
+#define ARG_ADC_CHIP			0
+#define ARG_ADC_CHANNEL			1
+
+#define DEFAULT_ADC_ALIAS		"DEFAULT_ADC"
+#define DEFAULT_TIME_INTERVAl		1
+#define DEFAULT_NUMBER_OF_SAMPLES	10
 
 static adc_t *adc;
 
@@ -48,11 +51,12 @@ static void usage_and_exit(char *name, int exitval)
 		"Example application using libdigiapix ADC support\n"
 		"\n"
 		"Usage: %s <adc_chip> <adc_channel> <interval> <number_of_samples> \n\n"
-		"<adc_chip>           ADC chip number\n"
-		"<adc_channel>        ADC channel number\n"
+		"<adc_chip>           ADC chip number or alias\n"
+		"<adc_channel>        ADC channel number or alias\n"
 		"<interval>           Time interval for sampling\n"
 		"<number_of_samples>  Number of samples to get\n"
-		"\n\n"
+		"\n"
+		"Alias for ADC can be configured in the library config file\n"
 		"\n", name);
 
 	exit(exitval);
@@ -151,22 +155,26 @@ static int adc_sampling_cb(int sample, void *arg)
 
 int main(int argc, char *argv[])
 {
-	unsigned int channel, chip, interval;
-	int number_of_samples;
+	int channel = 0, chip = 0, interval = 0, number_of_samples = 0;
 	char *name = basename(argv[0]);
 	struct adc_sampling_cb_data cb_data;
 
 	/* Check input parameters */
-	if (argc != 5) {
+	if (argc == 1) {
+		/* Use default values */
+		chip = ldx_adc_get_chip(DEFAULT_ADC_ALIAS);
+		channel = ldx_adc_get_channel(DEFAULT_ADC_ALIAS);
+		interval = DEFAULT_TIME_INTERVAl;
+		number_of_samples = DEFAULT_NUMBER_OF_SAMPLES;
+	} else if (argc == 5) {
+		/* Parse command line arguments */
+		chip = parse_argument(argv[1], ARG_ADC_CHIP);
+		channel = parse_argument(argv[2], ARG_ADC_CHANNEL);
+		interval = atoi(argv[3]);
+		number_of_samples = atoi(argv[4]);
+	} else {
 		usage_and_exit(name, EXIT_FAILURE);
-		return EXIT_FAILURE;
 	}
-
-	/* Parse command line arguments */
-	chip = parse_argument(argv[1], ARG_ADC_CHIP);
-	channel = parse_argument(argv[2], ARG_ADC_CHANNEL);
-	interval = atoi(argv[3]);
-	number_of_samples = atoi(argv[4]);
 
 	if (chip < 0) {
 		printf("Invalid chip number\n");
@@ -194,7 +202,7 @@ int main(int argc, char *argv[])
 	atexit(cleanup);
 	register_signals();
 
-	adc = ldx_adc_request(chip,channel);
+	adc = ldx_adc_request(chip, channel);
 
 	if (!adc) {
 		printf("Failed to initialize ADC\n");
