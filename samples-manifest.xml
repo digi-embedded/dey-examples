@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <samples>
+    <sample id="apix-adc-sample">
+        <name>Digi APIX ADC Sample</name>
+        <description>
+Sample application to access and manage ADC channels using the Digi APIX library.
+The application enables one ADC channel on the board. After that, the application takes periodic samples and prints the raw value and the value in mv.
+        </description>
+        <path>apix-adc-example</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+        </platforms>
+    </sample>
     <sample id="apix-gpio-sample">
         <name>Digi APIX GPIO Sample</name>
         <description>
@@ -57,20 +71,6 @@ Most of EEPROM memories are compatible with the sample specifying the page size 
 the number of address bytes.
         </description>
         <path>apix-spi-example</path>
-        <platforms>
-            <platform>ccimx6sbc</platform>
-            <platform>ccimx6qpsbc</platform>
-            <platform>ccimx6ulstarter</platform>
-            <platform>ccimx6ulsbc</platform>
-        </platforms>
-    </sample>
-    <sample id="apix-adc-sample">
-        <name>Digi APIX ADC Sample</name>
-        <description>
-Sample application to access and manage ADC channels using the Digi APIX library. 
-The application enables one ADC channel on the board. After that, the application takes periodic samples and prints the raw value and the value in mv.
-        </description>
-        <path>apix-adc-example</path>
         <platforms>
             <platform>ccimx6sbc</platform>
             <platform>ccimx6qpsbc</platform>
