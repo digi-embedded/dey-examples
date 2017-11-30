@@ -16,7 +16,7 @@
 
 BINARY := apix-adc-example
 
-CFLAGS += -Wall -O2
+CFLAGS += -Wall -O0
 
 CFLAGS += $(shell pkg-config --cflags libdigiapix)
 LDLIBS += $(shell pkg-config --libs libdigiapix)
