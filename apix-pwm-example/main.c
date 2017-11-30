@@ -64,6 +64,7 @@ static void cleanup(void)
 {
 	running = 0;
 	if (pwm_line) {
+		ldx_pwm_set_duty_cycle(pwm_line, 0);
 		ldx_pwm_enable(pwm_line, PWM_DISABLED);
 		ldx_pwm_free(pwm_line);
 	}
@@ -171,8 +172,6 @@ int main(int argc, char **argv)
 	register_signals();
 
 	printf("Setting PWM frequency to %dHz...", pwm_freq);
-	/* Set a duty cycle of 0 to avoid errors configuring the frequency */
-	ldx_pwm_set_duty_cycle(pwm_line, 0);
 	ret = ldx_pwm_set_freq(pwm_line, pwm_freq);
 	if (ret != PWM_CONFIG_ERROR_NONE) {
 		printf("Failed\n");
