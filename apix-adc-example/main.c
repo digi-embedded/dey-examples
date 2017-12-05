@@ -31,12 +31,13 @@
 #define DEFAULT_TIME_INTERVAl		1
 #define DEFAULT_NUMBER_OF_SAMPLES	10
 
-static adc_t *adc;
-
 struct adc_sampling_cb_data {
 	adc_t *adc;
 	int number_of_samples;
 };
+
+static adc_t *adc;
+struct adc_sampling_cb_data cb_data;
 
 /*
  * usage_and_exit() - Show usage information and exit with 'exitval' return
@@ -157,7 +158,6 @@ int main(int argc, char *argv[])
 {
 	int channel = 0, chip = 0, interval = 0, number_of_samples = 0;
 	char *name = basename(argv[0]);
-	struct adc_sampling_cb_data cb_data;
 
 	/* Check input parameters */
 	if (argc == 1) {
