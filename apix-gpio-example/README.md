@@ -11,10 +11,10 @@ The GPIOs lines used in the sample are mapped as follows in the Digi Boards:
  - **CCIMX6Plus SBC**:
     - User button: EXP_GPIO_0 (GPIO Connector Pin 6)
     - User led: USER_LED0 (Connected in the board)
- - **CCIMX6UL SBC Express**: ADC1_IN4 (Expansion Connector Pin 7)
+ - **CCIMX6UL SBC Express**:
     - User button: GPIO3_IO3 (Connected in the board)
     - User led: GPIO3_IO11 (Connected in the board)
- - **CCIMX6UL SBC Pro**: ADC1_IN2 (GPIO Connector Pin 13)
+ - **CCIMX6UL SBC Pro**:
     - User button: MCA_IO1 (GPIO Connector Pin 7)
     - User led: USER_LED1 (Connected in the board)
 
