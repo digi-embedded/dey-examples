@@ -1,21 +1,24 @@
 Digi APIX GPIO Example Application
 ==================================
-The example application uses a gpio as input (e.g. a user button) and another
+
+Example application to access and manage GPIO lines using the Digi APIX library.
+
+This application uses a GPIO as input (e.g. a user button) and another
 one as output (e.g. a user led). The application toggles the output GPIO
 whenever an interrupt is generated in the input GPIO.
 
-The GPIOs lines used in the sample are mapped as follows in the Digi Boards:
- - **CCIMX6 SBC**:
-    - User button: EXP_GPIO_0 (GPIO Connector Pin 6)
+The GPIOs lines used in this example are mapped as follows in the Digi boards:
+ - **ConectCore 6 SBC**:
+    - User button: EXP_GPIO_0 (GPIO connector, J30, Pin 6)
     - User led: USER_LED0 (Connected in the board)
- - **CCIMX6Plus SBC**:
-    - User button: EXP_GPIO_0 (GPIO Connector Pin 6)
+ - **ConnectCore 6 Plus SBC**:
+    - User button: EXP_GPIO_0 (GPIO connector, J30, Pin 6)
     - User led: USER_LED0 (Connected in the board)
- - **CCIMX6UL SBC Express**:
+ - **ConnectCore 6UL SBC Express**:
     - User button: GPIO3_IO3 (Connected in the board)
     - User led: GPIO3_IO11 (Connected in the board)
- - **CCIMX6UL SBC Pro**:
-    - User button: MCA_IO1 (GPIO Connector Pin 7)
+ - **ConnectCore 6UL SBC Pro**:
+    - User button: MCA_IO1 (GPIO connector, J30, Pin 7)
     - User led: USER_LED1 (Connected in the board)
 
 Running the application
@@ -35,7 +38,7 @@ Aliases for GPIO numbers can be configured in the library config file
 ```
 
 If no arguments are provided, the example will use the default values:
- - For the interfaces, default values are configured in "/etc/libdigiapix.conf"
+ - For the interfaces, default values are configured in `/etc/libdigiapix.conf`.
  - Specific application default values are defined in the main file.
 
 Compiling the application

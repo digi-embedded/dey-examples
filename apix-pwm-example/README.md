@@ -1,17 +1,17 @@
-Digi APIX PWM Sample Application
+Digi APIX PWM Example Application
 ===================================
 
-Sample application to access and manage PWM lines using the Digi APIX library.
+Example application to access and manage PWM lines using the Digi APIX library.
 
-The application enables one PWM line of the board using a frequency of
-1000Hz. Then, progressively modifies the duty cycle in a loop from 10% to
-90% and vice-versa.
+This application enables one PWM line of the board using a frequency of 1000Hz.
+Then, it progressively modifies the duty cycle in a loop from 10% to 90% and
+vice-versa.
 
-The PWM lines used in the sample are mapped as follows in the Digi Boards:
- - **CCIMX6 SBC**: PWM1 - Pin **10** of the parallel video (LCD) connector.
- - **CCIMX6Plus SBC**: PWM1 - Pin **10** of the parallel video (LCD) connector.
- - **CCIMX6UL SBC Express**: PWM1 - Pin **27** of the expansion connector.
- - **CCIMX6UL SBC Pro**: PWM4 - Pin **11** of the GPIO connector.
+The PWM lines used in this example are mapped as follows in the Digi boards:
+ - **ConnectCore 6 SBC**: PWM1 - Pin **10** of the parallel video (LCD) connector (J21).
+ - **ConnectCore 6 Plus SBC**: PWM1 - Pin **10** of the parallel video (LCD) connector (J21).
+ - **ConnectCore 6UL SBC Express**: PWM1 - Pin **27** of the expansion connector (J8).
+ - **ConnectCore 6UL SBC Pro**: PWM4 - Pin **11** of the GPIO connector (J30).
 
 Running the application
 -----------------------
@@ -31,7 +31,7 @@ Aliases for PWM can be configured in the library config file
 ```
 
 If no arguments are provided, the example will use the default values:
- - For the interfaces, default values are configured in "/etc/libdigiapix.conf"
+ - For the interfaces, default values are configured in `/etc/libdigiapix.conf`.
  - Specific application default values are defined in the main file.
 
 Compiling the application

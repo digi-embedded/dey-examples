@@ -1,34 +1,37 @@
 Digi APIX SPI Example Application
 ==================================
-The example application writes a page of an external EEPROM memory with random
-data and then reads the data back to validate it.
 
-Most of EEPROM memories are compatible with the sample specifying the page size and
-the number of address bytes.
+Example application to access and manage SPI slaves using the Digi APIX library.
 
-The SPI connections for the sample depends on the running platform:
- - **CCIMX6 SBC**: SPI connector of the board.
+This application writes a page of an external EEPROM memory with random data.
+Afterward, it reads the data back to validate it.
+
+Most EEPROM memories are compatible with the example. You only need to specify
+the page size and the address size in bytes.
+
+The SPI connections for this example depends on the running platform:
+ - **ConnectCore 6 SBC**: SPI connector of the board (J34).
     - VCC: Pin 1
     - GND: Pin 8
     - SPI-1 CLK: Pin 2
     - SPI-1 MISO: Pin 3
     - SPI-1 MOSI: Pin 4
     - SPI-1 SS0: Pin 5
- - **CCIMX6Plus SBC**: SPI connector of the board.
+ - **ConnectCore 6 Plus SBC**: SPI connector of the board (J34).
     - VCC: Pin 1
     - GND: Pin 8
     - SPI-1 CLK: Pin 2
     - SPI-1 MISO: Pin 3
     - SPI-1 MOSI: Pin 4
     - SPI-1 SS0: Pin 5
- - **CCIMX6UL SBC Express**: Expansion connector of the board.
+ - **ConnectCore 6UL SBC Express**: Expansion connector of the board (J8).
     - VCC: Pin 17
     - GND: Pin 20
     - SPI-3 CLK: Pin 23
     - SPI-3 MISO: Pin 21
     - SPI-3 MOSI: Pin 19
     - SPI-3 SS0: Pin 24
- - **CCIMX6UL SBC Pro**: SPI connector of the board.
+ - **ConnectCore 6UL SBC Pro**: SPI connector of the board (J34).
     - VCC: Pin 1
     - GND: Pin 8
     - SPI-1 CLK: Pin 2
@@ -38,13 +41,14 @@ The SPI connections for the sample depends on the running platform:
 
 Running the application
 -----------------------
-Before launching the application you need to enable the SPI module with the
+Before launching the application, you must enable the SPI module with the
 following command:
 
 ```
 # modprobe spidev
 ```
-Once the binary is in the target,launch the application:
+
+Once the binary is in the target, launch the application:
 
 ```
 # ./apix-spi-example
@@ -61,7 +65,7 @@ Usage: apix-spi-example <spi-dev> <spi-ss> <address-size> <page-size> <page-inde
 Aliases for SPI can be configured in the library config file
 ```
 If no arguments are provided, the example will use the default values:
- - For the interfaces, default values are configured in "/etc/libdigiapix.conf"
+ - For the interfaces, default values are configured in `/etc/libdigiapix.conf`.
  - Specific application default values are defined in the main file.
 
 Compiling the application

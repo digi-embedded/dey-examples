@@ -1,28 +1,28 @@
-Digi APIX I2C Sample Application
+Digi APIX I2C Example Application
 =================================
 
-Sample application to access and manage I2C slaves using the Digi APIX library.
+Example application to access and manage I2C slaves using the Digi APIX library.
 
-The application writes a page of an external EEPROM memory with random
-data and then reads the data back to validate it (tested with 24FC1026).
+This application writes a page of an external EEPROM memory with random data.
+Afterward, it reads the data back to validate it (tested with 24FC1026).
 
-The I2C connections for the sample depend on the running platform:
- - **CCIMX6 SBC**: I2C connector of the board.
+The I2C connections for this example depend on the running platform:
+ - **ConnectCore 6 SBC**: I2C connector of the board (J28).
     - VCC: Pin 3
     - GND: Pin 6
     - I2C-3 SDA: Pin 2
     - I2C-3 SCL: Pin 1
- - **CCIMX6Plus SBC**: I2C connector of the board.
+ - **ConnectCore 6 Plus SBC**: I2C connector of the board (J28).
     - VCC: Pin 3
     - GND: Pin 6
     - I2C-3 SDA: Pin 2
     - I2C-3 SCL: Pin 1
- - **CCIMX6UL SBC Express**: Expansion connector of the board.
+ - **ConnectCore 6UL SBC Express**: Expansion connector of the board (J8).
     - VCC: Pin 1
     - GND: Pin 6
     - I2C-1 SDA: Pin 3
     - I2C-1 SCL: Pin 5
- - **CCIMX6UL SBC Pro**: I2C connector of the board.
+ - **ConnectCore 6UL SBC Pro**: I2C connector of the board (J28).
     - VCC: Pin 3
     - GND: Pin 6
     - I2C-2 SDA: Pin 2
@@ -47,7 +47,7 @@ Usage: apix-i2c-example <i2c-bus> <i2c-address> <address-size> <page-size> <page
 Aliases for I2C can be configured in the library config file
 ```
 If no arguments are provided, the example will use the default values:
- - For the interfaces, default values are configured in "/etc/libdigiapix.conf"
+ - For the interfaces, default values are configured in `/etc/libdigiapix.conf`.
  - Specific application default values are defined in the main file.
 
 Compiling the application

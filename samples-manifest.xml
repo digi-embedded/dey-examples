@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <samples>
     <sample id="apix-adc-sample">
-        <name>Digi APIX ADC Sample</name>
+        <name>Digi APIX ADC Example</name>
         <description>
-Sample application to access and manage ADC channels using the Digi APIX library.
-The application enables one ADC channel on the board. After that, the application takes periodic samples and prints the raw value and the value in mv.
+Example application to access and manage ADC channels using the Digi APIX library.
+This application enables one ADC channel on the board. After that, the
+application takes periodic samples and prints the raw value and the value in mv.
         </description>
         <path>apix-adc-example</path>
         <platforms>
@@ -15,10 +16,10 @@ The application enables one ADC channel on the board. After that, the applicatio
         </platforms>
     </sample>
     <sample id="apix-gpio-sample">
-        <name>Digi APIX GPIO Sample</name>
+        <name>Digi APIX GPIO Example</name>
         <description>
-Sample application to access and manage GPIO lines using the Digi APIX library.
-The application uses a gpio as input (e.g. a user button) and another
+Example application to access and manage GPIO lines using the Digi APIX library.
+This application uses a GPIO as input (e.g. a user button) and another
 one as output (e.g. a user led). The application toggles the output GPIO
 whenever an interrupt is generated in the input GPIO.
         </description>
@@ -31,11 +32,11 @@ whenever an interrupt is generated in the input GPIO.
         </platforms>
     </sample>
     <sample id="apix-i2c-sample">
-        <name>Digi APIX I2C Sample</name>
+        <name>Digi APIX I2C Example</name>
         <description>
-Sample application to access and manage I2C slaves using the Digi APIX library.
-The application writes a page of an external EEPROM memory with random
-data and then reads the data back to validate it (tested with 24FC1026).
+Example application to access and manage I2C slaves using the Digi APIX library.
+This application writes a page of an external EEPROM memory with random data.
+Afterward, it reads the data back to validate it (tested with 24FC1026).
         </description>
         <path>apix-i2c-example</path>
         <platforms>
@@ -46,12 +47,12 @@ data and then reads the data back to validate it (tested with 24FC1026).
         </platforms>
     </sample>
     <sample id="apix-pwm-sample">
-        <name>Digi APIX PWM Sample</name>
+        <name>Digi APIX PWM Example</name>
         <description>
-Sample application to access and manage PWM lines using the Digi APIX library.
-The application enables one PWM line of the board using a frequency of 
-1000Hz. Then, progressively modifies the duty cycle in a loop from 10% to 
-90% and vice-versa.
+Example application to access and manage PWM lines using the Digi APIX library.
+This application enables one PWM line of the board using a frequency of 1000Hz.
+Then, it progressively modifies the duty cycle in a loop from 10% to 90% and
+vice-versa.
         </description>
         <path>apix-pwm-example</path>
         <platforms>
@@ -62,13 +63,13 @@ The application enables one PWM line of the board using a frequency of
         </platforms>
     </sample>
     <sample id="apix-spi-sample">
-        <name>Digi APIX SPI Sample</name>
+        <name>Digi APIX SPI Example</name>
         <description>
-Sample application to access and manage SPI slaves using the Digi APIX library.
-The example application writes a page of an external EEPROM memory with random
-data and then reads the data back to validate it.
-Most of EEPROM memories are compatible with the sample specifying the page size and
-the number of address bytes.
+Example application to access and manage SPI slaves using the Digi APIX library.
+This application writes a page of an external EEPROM memory with random data.
+Afterward, it reads the data back to validate it.
+Most EEPROM memories are compatible with the example. You only need to specify
+the page size and the address size in bytes.
         </description>
         <path>apix-spi-example</path>
         <platforms>
