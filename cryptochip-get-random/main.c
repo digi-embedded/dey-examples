@@ -22,8 +22,18 @@
 int main(void)
 {
 	uint8_t random_number[32];
+	bool is_locked = false;
 
 	atcab_init(&cfg_ateccx08a_i2c_default);
+
+	/* Check if config zone is locked */
+	atcab_is_locked(LOCK_ZONE_CONFIG, &is_locked);
+	if (!is_locked) {
+		printf("**WARNING**: the cryptochip is currently not configured. Run "
+		       "ecc-test-main at least once to be able to run this example.\n");
+		atcab_release();
+		return 1;
+	}
 
 	while (true) {	
 		atcab_random(random_number);
