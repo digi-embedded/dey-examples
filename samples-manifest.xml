@@ -79,4 +79,20 @@ the page size and the address size in bytes.
             <platform>ccimx6ulsbc</platform>
         </platforms>
     </sample>
+    <sample id="apix-watchdog-sample">
+        <name>Digi APIX Watchdog Example</name>
+        <description>
+Example application to access and manage watchdog using the Digi APIX library.
+This application enables a watchdog device on the board. After that, the
+application starts refreshing the watchdog timer until the test time is consumed,
+then the device will reboot automatically after the timeout expires.
+        </description>
+        <path>apix-watchdog-example</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+        </platforms>
+    </sample>
 </samples>
