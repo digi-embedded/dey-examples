@@ -13,6 +13,7 @@ application takes periodic samples and prints the raw value and the value in mv.
             <platform>ccimx6qpsbc</platform>
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
         </platforms>
     </sample>
     <sample id="apix-gpio-sample">
@@ -29,6 +30,7 @@ whenever an interrupt is generated in the input GPIO.
             <platform>ccimx6qpsbc</platform>
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
         </platforms>
     </sample>
     <sample id="apix-i2c-sample">
@@ -44,6 +46,7 @@ Afterward, it reads the data back to validate it (tested with 24FC1026).
             <platform>ccimx6qpsbc</platform>
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
         </platforms>
     </sample>
     <sample id="apix-pwm-sample">
@@ -60,6 +63,7 @@ vice-versa.
             <platform>ccimx6qpsbc</platform>
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
+	    <platform>ccimx8x-sbc-express</platform>
         </platforms>
     </sample>
     <sample id="apix-spi-sample">
@@ -77,6 +81,23 @@ the page size and the address size in bytes.
             <platform>ccimx6qpsbc</platform>
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
+        </platforms>
+    </sample>
+    <sample id="apix-watchdog-sample">
+        <name>Digi APIX Watchdog Example</name>
+        <description>
+Example application to access and manage watchdog using the Digi APIX library.
+This application enables a watchdog device on the board. After that, the
+application starts refreshing the watchdog timer until the test time is consumed,
+then the device will reboot automatically after the timeout expires.
+        </description>
+        <path>apix-watchdog-example</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+	    <platform>ccimx8x-sbc-express</platform>
         </platforms>
     </sample>
 </samples>
