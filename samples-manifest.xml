@@ -14,6 +14,7 @@ application takes periodic samples and prints the raw value and the value in mv.
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
             <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
         </platforms>
     </sample>
     <sample id="apix-gpio-sample">
@@ -31,6 +32,7 @@ whenever an interrupt is generated in the input GPIO.
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
             <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
         </platforms>
     </sample>
     <sample id="apix-i2c-sample">
@@ -47,6 +49,7 @@ Afterward, it reads the data back to validate it (tested with 24FC1026).
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
             <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
         </platforms>
     </sample>
     <sample id="apix-pwm-sample">
@@ -63,7 +66,8 @@ vice-versa.
             <platform>ccimx6qpsbc</platform>
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
-	    <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
         </platforms>
     </sample>
     <sample id="apix-spi-sample">
@@ -81,6 +85,8 @@ the page size and the address size in bytes.
             <platform>ccimx6qpsbc</platform>
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
         </platforms>
     </sample>
     <sample id="apix-watchdog-sample">
@@ -97,7 +103,8 @@ then the device will reboot automatically after the timeout expires.
             <platform>ccimx6qpsbc</platform>
             <platform>ccimx6ulstarter</platform>
             <platform>ccimx6ulsbc</platform>
-	    <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
         </platforms>
     </sample>
 </samples>
