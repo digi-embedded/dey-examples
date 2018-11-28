@@ -14,7 +14,7 @@
 # PERFORMANCE OF THIS SOFTWARE.
 #
 
-SUBDIRS := apix-gpio-example apix-i2c-example apix-pwm-example apix-spi-example apix-adc-example
+SUBDIRS := apix-can-example apix-gpio-example apix-i2c-example apix-pwm-example apix-spi-example apix-adc-example
 
 all: $(SUBDIRS)
 
