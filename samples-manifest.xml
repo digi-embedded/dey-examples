@@ -17,6 +17,23 @@ application takes periodic samples and prints the raw value and the value in mv.
             <platform>ccimx8x-sbc-pro</platform>
         </platforms>
     </sample>
+    <sample id="apix-can-samples">
+        <name>Digi APIX CAN Examples</name>
+        <description>
+Example applications to manage CAN interfaces using the Digi APIX library.
+These applications enable one CAN interfaces of the board and start a transmission or
+reception using the selected baudrate.
+        </description>
+        <path>apix-can-examples</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
+        </platforms>
+    </sample>
     <sample id="apix-gpio-sample">
         <name>Digi APIX GPIO Example</name>
         <description>
