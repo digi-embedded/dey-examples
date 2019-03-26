@@ -13,7 +13,6 @@
 # OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
 #
-all: BINARYTX BINARYRX
 
 BINARYTX := apix-can-send-example
 BINARYRX := apix-can-recv-example
@@ -25,10 +24,13 @@ CFLAGS += -Wall -O0
 CFLAGS += $(shell pkg-config --cflags libdigiapix)
 LDLIBS += $(shell pkg-config --libs libdigiapix)
 
-BINARYTX: can-send-example.o
+.PHONY: all
+all: $(BINARIES)
+
+$(BINARYTX): can-send-example.o
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $(BINARYTX)
 
-BINARYRX: can-recv-example.o
+$(BINARYRX): can-recv-example.o
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $(BINARYRX)
 
 .PHONY: install
@@ -36,9 +38,6 @@ install: $(BINARIES)
 	install -d $(DESTDIR)/usr/bin
 	install -m 0755 $^ $(DESTDIR)/usr/bin/
 
-.PHONY: all
-all: $(BINARYTX) $(BINARYRX)
-
 .PHONY: clean
 clean:
-	-rm -f *.o $(BINARYTX) $(BINARYRX)
+	-rm -f *.o $(BINARIES)
