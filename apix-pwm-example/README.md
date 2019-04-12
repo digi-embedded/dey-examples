@@ -12,6 +12,8 @@ The PWM lines used in this example are mapped as follows in the Digi boards:
  - **ConnectCore 6 Plus SBC**: PWM1 - Pin **10** of the parallel video (LCD) connector (J21).
  - **ConnectCore 6UL SBC Express**: PWM1 - Pin **27** of the expansion connector (J8).
  - **ConnectCore 6UL SBC Pro**: PWM4 - Pin **11** of the GPIO connector (J30).
+ - **ConnectCore 8X SBC Express**: MCA PWM1 channel 0 - Pin **33** of the Raspberry Pi Expansion connector (J11).
+ - **ConnectCore 8X SBC Pro**: MCA PWM1 channel 0 - Pin **A5** of the Expansion connector (J20).
 
 Running the application
 -----------------------
