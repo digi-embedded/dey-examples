@@ -38,6 +38,20 @@ The SPI connections for this example depends on the running platform:
     - SPI-1 MISO: Pin 3
     - SPI-1 MOSI: Pin 4
     - SPI-1 SS0: Pin 5
+ - **ConnectCore 8X SBC Express**: Raspberry Pi expansion connector of the board (J11).
+    - VCC: Pin 1
+    - GND: Pin 6
+    - SPI-3 CLK: Pin 23
+    - SPI-3 MISO: Pin 21
+    - SPI-3 MOSI: Pin 19
+    - SPI-3 SS0: Pin 24
+ - **ConnectCore 8X SBC Pro**: Expansion connector of the board (J27).
+    - VCC: Pin D1
+    - GND: Pin C1
+    - SPI-0 CLK: Pin D2
+    - SPI-0 MISO: Pin D3
+    - SPI-0 MOSI: Pin D4
+    - SPI-0 SS0: Pin C2
 
 Running the application
 -----------------------

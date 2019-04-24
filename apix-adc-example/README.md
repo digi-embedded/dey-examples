@@ -11,6 +11,8 @@ The ADC lines used in this example are mapped as follows in the Digi boards:
  - **ConnectCore 6 Plus SBC**: PMIC_ADCIN1 (GPIO connector, J30, Pin 1).
  - **ConnectCore 6UL SBC Express**: ADC1_IN4 (Expansion connector, J8, Pin 7).
  - **ConnectCore 6UL SBC Pro**: ADC1_IN2 (GPIO connector, J30, Pin 13).
+ - **ConnectCore 8X SBC Express**: ADC_IN0 (Expansion connector, J17, Pin 2).
+ - **ConnectCore 8X SBC Pro**: ADC_IN0 (Expansion connector, J27, Pin D13).
 
 Running the application
 -----------------------
