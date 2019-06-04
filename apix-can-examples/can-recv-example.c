@@ -49,8 +49,14 @@ static void usage_and_exit(char *name, int exitval)
 		"Usage: %s -i <can-iface> -b <bitrate> [options]\n\n"
 		"-i <can-iface>      Name of the CAN interface\n"
 		"-b <bitrate>        Bitrate to use (Hz)\n"
+		"-s <sample-point>   Bitrate Sample Point\n"
 		"-f <filters>        Comma-separated filter list in the format\n"
 		"                    id:mask (id and mask values in hex)\n"
+		"-o                  Enable CAN FD support\n"
+		"--- CAN FD options ---\n"
+		"  -d <dbitrate>      Maximum data bitrate for CAN FD (Hz)\n"
+		"  -a <dsample-point> CAN FD data bitate sample point\n"
+		"---\n"
 		"-p                  Print message info\n"
 		"-c                  Print message counter\n"
 		"-h                  Help\n"
@@ -58,7 +64,8 @@ static void usage_and_exit(char *name, int exitval)
 		"Examples:\n"
 		"%s -i can0 -b 500000 -f 023:fff,006:00f\n"
 		"%s -i can1 -b 100000\n"
-		"\n", name, name, name);
+		"%s -i can1 -b 100000 -d 100000 -o -p\n"
+		"\n", name, name, name, name);
 
 	exit(exitval);
 }
@@ -201,6 +208,7 @@ int main(int argc, char **argv)
 	int nfilters = 0;
 	int opt;
 	int ret;
+	float sp = 0.0;
 	struct can_filter deffilter;
 
 	deffilter.can_id = 0;
@@ -212,7 +220,7 @@ int main(int argc, char **argv)
 
 	ldx_can_set_defconfig(&ifcfg);
 
-	while ((opt = getopt(argc, argv, "i:b:f:pc")) > 0) {
+	while ((opt = getopt(argc, argv, "i:b:f:d:s:a:opc")) > 0) {
 		switch (opt) {
 		case 'i':
 			iface = optarg;
@@ -222,12 +230,30 @@ int main(int argc, char **argv)
 			ifcfg.bitrate = strtoul(optarg, NULL, 10);
 			break;
 
+		case 'd':
+			ifcfg.dbitrate = strtoul(optarg, NULL, 10);
+			break;
+
+		case 's':
+			sp = strtof(optarg, NULL);
+			ifcfg.bit_timing.sample_point = (__u32)(sp * 1000);
+			break;
+
+		case 'a':
+			sp = strtof(optarg, NULL);
+			ifcfg.dbit_timing.sample_point = (__u32)(sp * 1000);
+			break;
+
 		case 'f':
 			ret = parse_filters(optarg, &cfilter, &nfilters);
 			if (ret) {
 				printf("Unable to parse filter information\n\n");
 				usage_and_exit(name, EXIT_FAILURE);
 			}
+			break;
+
+		case 'o':
+			ifcfg.canfd_enabled = true;
 			break;
 
 		case 'p':

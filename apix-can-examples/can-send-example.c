@@ -61,19 +61,26 @@ static void usage_and_exit(char *name, int exitval)
 		"Usage: %s -i <can-iface> -b <bitrate> [options]\n\n"
 		"-i <can-iface>      Name of the CAN interface\n"
 		"-b <bitrate>        Bitrate to use (Hz)\n"
+		"-s <sample-point>   CAN bitrate sample point\n"
 		"-n <num_msgs>       Number of messages to send (default 1)\n"
 		"-t <delay>          Inter frame delay in ms (default 100)\n"
 		"-I <msg_id>         Message id in hex (default 123)\n"
 		"-l <data_length>    Payload length (default 8)\n"
+		"-o                  Enable CAN FD support\n"
+		"--- CAN FD options ---\n"
+		"  -d <dbitrate>      Maximum data bitrate for CAN FD (Hz)\n"
+		"  -p <dsample-point> CAN FD data bitate sample point\n"
+		"---\n"
 		"-r                  Generate a random ID (will ignore the -I parameter)\n"
-		"-p                  Generate a random payload (will ignore the -l parameter)\n"
+		"-c                  Generate a random payload (will ignore the -l parameter)\n"
 		"-e                  Use extended id\n"
 		"-R                  Set RTR\n"
 		"\n"
 		"Examples:\n"
 		"%s -i can0 -b 500000 -n 100 -R\n"
 		"%s -i can1 -b 100000\n"
-		"\n", name, name, name);
+		"%s -i can1 -b 100000 -d 100000 -n 10 -o\n"
+		"\n", name, name, name, name);
 
 	exit(exitval);
 }
@@ -180,6 +187,7 @@ int main(int argc, char **argv)
 	uint32_t msg_id = 0x123;
 	uint8_t msg_len = 8;
 	uint8_t flags = 0;
+	float sp = 0.0;
 	struct canfd_frame frame;
 
 	srand (time(NULL));
@@ -190,7 +198,7 @@ int main(int argc, char **argv)
 
 	ldx_can_set_defconfig(&ifcfg);
 
-	while ((opt = getopt(argc, argv, "i:b:n:t:I:l:erRp")) > 0) {
+	while ((opt = getopt(argc, argv, "i:b:n:t:I:l:a:d:s:t:oerRc")) > 0) {
 		switch (opt) {
 		case 'i':
 			iface = optarg;
@@ -200,12 +208,26 @@ int main(int argc, char **argv)
 			ifcfg.bitrate = strtoul(optarg, NULL, 10);
 			break;
 
+		case 'd':
+			ifcfg.dbitrate = strtoul(optarg, NULL, 10);
+			break;
+
 		case 'n':
 			num_msgs = strtoul(optarg, NULL, 10);
 			break;
 
 		case 't':
 			ms_delay = strtoul(optarg, NULL, 10);
+			break;
+
+		case 's':
+			sp = strtof(optarg, NULL);
+			ifcfg.bit_timing.sample_point = (__u32)(sp * 1000);
+			break;
+
+		case 'a':
+			sp = strtof(optarg, NULL);
+			ifcfg.dbit_timing.sample_point = (__u32)(sp * 1000);
 			break;
 
 		case 'I':
@@ -220,6 +242,10 @@ int main(int argc, char **argv)
 			flags |= EXT_ID_MASK;
 			break;
 
+		case 'o':
+			ifcfg.canfd_enabled = true;
+			break;
+
 		case 'r':
 			flags |= RANDOM_ID_MASK;
 			break;
@@ -228,7 +254,7 @@ int main(int argc, char **argv)
 			flags |= RTR_BIT_MASK;
 			break;
 
-		case 'p':
+		case 'c':
 			flags |= RANDOM_DLC_MASK;
 			break;
 
