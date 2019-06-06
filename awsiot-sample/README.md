@@ -85,15 +85,15 @@ You can specify the configuration file with `-c`:
 Compiling the application
 -------------------------
 This demo can be compiled using a Digi Embedded Yocto based toolchain. Make
-sure to source the corresponding toolchain of the platform you want to build
-the connector for, e.g:
+sure to source the corresponding toolchain of the platform you are using,
+for example, for ConnectCore 6UL:
 
 ```
 $> . <DEY-toolchain-path>/environment-setup-cortexa7hf-vfp-neon-dey-linux-gnueabi
 $> make
 ```
 
-More information about [Digi Embedded Yocto](https://github.com/digi-embedded/meta-digi).
+For more information, see the [Digi Embedded Yocto online documentation](https://github.com/digi-embedded/meta-digi).
 
 License
 -------
