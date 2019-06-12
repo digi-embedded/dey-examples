@@ -24,7 +24,7 @@ standard random number generator, like /dev/random.
 For example, you can get hexdump to display a random sample on the standard
 output:
 ```
-root@ccimx6ulstarter:~# ./cryptochip-gen-random | hexdump
+~# ./cryptochip-gen-random | hexdump
 0000000 6239 ddd4 b378 693f 14ed bfa1 447b cff1
 0000010 275e fd14 e392 2b4a c2ff ac93 0f5e cbab
 0000020 16c1 e6b7 a458 c5ea c96f 59c9 776a 41c5
@@ -37,13 +37,13 @@ root@ccimx6ulstarter:~# ./cryptochip-gen-random | hexdump
 
 You can also save the random data to a random file for later analysis:
 ```
-root@ccimx6ulstarter:~# ./cryptochip-gen-random | pv --rate > data.bin
+~# ./cryptochip-gen-random | pv --rate > data.bin
 [ 912 B/s]
 ```
 
 And then run an entropy test:
 ```
-root@ccimx6ulstarter:~# ent data.bin 
+~# ent data.bin
 Entropy = 7.998261 bits per byte.
 
 Optimum compression would reduce the size
@@ -64,8 +64,8 @@ sure to source the corresponding toolchain of the platform you are using,
 for example, for ConnectCore 6UL:
 
 ```
-$> . <DEY-toolchain-path>/environment-setup-cortexa7hf-vfp-neon-dey-linux-gnueabi
-$> make
+~$ . <DEY-toolchain-path>/environment-setup-cortexa7hf-vfp-neon-dey-linux-gnueabi
+~$ make
 ```
 
 For more information, see the [Digi Embedded Yocto online documentation](https://github.com/digi-embedded/meta-digi).

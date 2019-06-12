@@ -59,13 +59,13 @@ Before launching the application, you must enable the SPI module with the
 following command:
 
 ```
-# modprobe spidev
+~# modprobe spidev
 ```
 
 Once the binary is in the target, launch the application:
 
 ```
-# ./apix-spi-example
+~# ./apix-spi-example
 Example application using libdigiapix SPI support
 
 Usage: apix-spi-example <spi-dev> <spi-ss> <address-size> <page-size> <page-index>
@@ -89,8 +89,8 @@ sure to source the corresponding toolchain of the platform you are using,
 for example, for ConnectCore 6UL:
 
 ```
-$ . <DEY-toolchain-path>/environment-setup-cortexa7hf-neon-dey-linux-gnueabi
-$ make
+~$ . <DEY-toolchain-path>/environment-setup-cortexa7hf-neon-dey-linux-gnueabi
+~$ make
 ```
 
 For more information, see the [Digi Embedded Yocto online documentation](https://github.com/digi-embedded/meta-digi).

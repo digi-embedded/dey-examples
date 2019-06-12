@@ -22,16 +22,16 @@ Running the application
 The following example shows how to encrypt and decrypt and file in place:
 
 ```
-# echo "Test file" > test.txt
-# caam-blob-example -e test.txt
-# hexdump -C test.txt
+~# echo "Test file" > test.txt
+~# caam-blob-example -e test.txt
+~# hexdump -C test.txt
 00000000  01 ee 30 e3 31 6b 72 94  94 06 62 e2 ef 17 4e 05  |..0.1kr...b...N.|
 00000010  34 c3 7b 96 58 35 ad b7  a2 89 b6 bc eb eb 81 39  |4.{.X5.........9|
 00000020  3c b2 e7 d7 2d 93 7d ff  8b a8 80 bd 55 e9 70 cf  |<...-.}.....U.p.|
 00000030  20 51 9f 15 9e c5 aa 68  b3 90                    | Q.....h..|
 0000003a
-# caam-blob-example -d test.txt
-# hexdump -C test.txt
+~# caam-blob-example -d test.txt
+~# hexdump -C test.txt
 00000000  54 65 73 74 20 66 69 6c  65 0a                    |Test file.|
 0000000a
 ```
@@ -41,12 +41,12 @@ The key modifier is a 16 byte value encoded as 32 hexadecimal characters.
 If you want to write the CAAM blob to a different file, add another positional argument.
 
 ```
-# caam-blob-example -e -m ff0102030405060708090a0b0c0d0e0f test.txt encrypted.bin
-# caam-blob-example -d encrypted.bin decrypted.txt
+~# caam-blob-example -e -m ff0102030405060708090a0b0c0d0e0f test.txt encrypted.bin
+~# caam-blob-example -d encrypted.bin decrypted.txt
 [ERROR] could not decrypt data.
 [ERROR] Decryption failed
-# caam-blob-example -d -m ff0102030405060708090a0b0c0d0e0f encrypted.bin decrypted.txt
-# cat decrypted.txt
+~# caam-blob-example -d -m ff0102030405060708090a0b0c0d0e0f encrypted.bin decrypted.txt
+~# cat decrypted.txt
 Test file
 ```
 
@@ -57,8 +57,8 @@ sure to source the corresponding toolchain of the platform you are using,
 for example, for ConnectCore 6UL:
 
 ```
-$> . <DEY-toolchain-path>/environment-setup-cortexa7hf-vfp-neon-dey-linux-gnueabi
-$> make
+~$ . <DEY-toolchain-path>/environment-setup-cortexa7hf-vfp-neon-dey-linux-gnueabi
+~$ make
 ```
 
 For more information, see the [Digi Embedded Yocto online documentation](https://github.com/digi-embedded/meta-digi).

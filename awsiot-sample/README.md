@@ -39,11 +39,11 @@ Running the application
 -----------------------
 Once the settings are properly configured, launch the application:
 ```
-#> awsiot-sample
+~# awsiot-sample
 ```
 You can specify the configuration file with `-c`:
 ```
-#> awsiot-sample -c <absolute_path_to_configuration_file>
+~# awsiot-sample -c <absolute_path_to_configuration_file>
 ```
 * The application reports its status to the topic
   `$aws/things/<thing_name>/shadow/update`. Something similar to:
@@ -89,8 +89,8 @@ sure to source the corresponding toolchain of the platform you are using,
 for example, for ConnectCore 6UL:
 
 ```
-$> . <DEY-toolchain-path>/environment-setup-cortexa7hf-vfp-neon-dey-linux-gnueabi
-$> make
+~$ . <DEY-toolchain-path>/environment-setup-cortexa7hf-vfp-neon-dey-linux-gnueabi
+~$ make
 ```
 
 For more information, see the [Digi Embedded Yocto online documentation](https://github.com/digi-embedded/meta-digi).

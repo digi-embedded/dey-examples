@@ -43,7 +43,7 @@ Running the application
 Once the binary is in the target, launch the application:
 
 ```
-# ./apix-i2c-example
+~# ./apix-i2c-example
 Example application using libdigiapix I2C support
 
 Usage: apix-i2c-example <i2c-bus> <i2c-address> <address-size> <page-size> <page-index>
@@ -67,8 +67,8 @@ sure to source the corresponding toolchain of the platform you are using,
 for example, for ConnectCore 6UL:
 
 ```
-$> . <DEY-toolchain-path>/environment-setup-cortexa7hf-vfp-neon-dey-linux-gnueabi
-$> make
+~$ . <DEY-toolchain-path>/environment-setup-cortexa7hf-vfp-neon-dey-linux-gnueabi
+~$ make
 ```
 
 For more information, see the [Digi Embedded Yocto online documentation](https://github.com/digi-embedded/meta-digi).
