@@ -69,6 +69,23 @@ Afterward, it reads the data back to validate it (tested with 24FC1026).
             <platform>ccimx8x-sbc-pro</platform>
         </platforms>
     </sample>
+    <sample id="apix-pm-sample">
+        <name>Digi APIX Power Management Example</name>
+        <description>
+Example applications that use the Digi APIX library to access and manage
+power-management related features of the CPU, such as temperature thresholds,
+frequencies, and governors.
+        </description>
+        <path>apix-pm-examples</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
+        </platforms>
+    </sample>
     <sample id="apix-pwm-sample">
         <name>Digi APIX PWM Example</name>
         <description>
