@@ -1,12 +1,9 @@
 Digi APIX Power Management example Applications
 ===============================================
 
-Example applications to access and manage CPU functions using the Digi APIX library.
-
-These applications show how to work with different functions and provide different
-examples to work with the CPU.
-
-Running the apix-cpu-example application
+Example applications that use the Digi APIX library to access and manage
+power-management related features of the CPU, such as temperature thresholds,
+frequencies, and governors.
 -----------------------
 Once the binary is in the target, launch the application:
 

@@ -65,7 +65,6 @@ static void list_available_governors()
 
 	printf("These are the governors available:\n");
 	for (i = 0; i < MAX_GOVERNORS; i++) {
-	for (i = 0; i < GOVERNOR_SIZE; i++) {
 		if (ldx_cpu_is_governor_available(i) == EXIT_SUCCESS)
 			printf("\t\t\t%s\n", ldx_cpu_get_governor_string_from_type(i));
 	}
@@ -123,6 +122,7 @@ int main(int argc, char *argv[])
 			break;
 		case 'g':
 			list_available_governors();
+			ret = EXIT_SUCCESS;
 			break;
 		case 'v':
 			governor = ldx_cpu_get_governor_string_from_type(ldx_cpu_get_governor());

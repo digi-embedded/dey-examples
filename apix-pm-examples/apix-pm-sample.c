@@ -86,7 +86,6 @@ static int verify_temperature_reduction()
  * @cpu:	1 to enable the cpu counter measurements.
  *
  * This function reduces the GPU multiplier to half of its value if
- * This function reduces the GPU multiplier to half its value if
  * the gpu value is enabled.
  *
  * This function reduces the CPU frequency to the minimum if the cpu value
