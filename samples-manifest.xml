@@ -141,4 +141,26 @@ then the device will reboot automatically after the timeout expires.
             <platform>ccimx8x-sbc-pro</platform>
         </platforms>
     </sample>
+    <sample id="caam-blob-example">
+        <name>Digi CAAM-blob Example</name>
+        <description>
+This example application shows how to encapsulate/decapsulate data to/from CAAM blobs.
+CAAM blobs are a way to protect sensitive data by encrypting their contents.
+You can think of CAAM blobs as data encrypted with an internal unreadable device-specific key which is protected by the hardware.
+Data encapsulated in a CAAM blob can only be decapsulated by the device that created it.
+When creating CAAM blobs, the input data size is limited to 1048527 bytes.
+Note that CAAM blobs are slightly bigger than the input data (48 bytes bigger).
+
+A key modifier may be used to further differentiate the key used in a particular blob.
+        </description>
+        <path>caam-blob-example</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
+        </platforms>
+    </sample>
 </samples>
