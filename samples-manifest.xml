@@ -141,6 +141,23 @@ then the device will reboot automatically after the timeout expires.
             <platform>ccimx8x-sbc-pro</platform>
         </platforms>
     </sample>
+    <sample id="ble-gat-server-example">
+        <name>Digi BLE GAT server Example</name>
+        <description>
+This application enables a BLE GATT server on the board. After that, the
+application starts listening for BLE connections to provide custom BLE
+GATT services and characteristics.
+        </description>
+        <path>ble-gatt-server-example</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
+        </platforms>
+    </sample>
     <sample id="caam-blob-example">
         <name>Digi CAAM-blob Example</name>
         <description>
