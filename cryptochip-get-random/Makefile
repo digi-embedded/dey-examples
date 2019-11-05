@@ -20,7 +20,7 @@ PROGRAM := cryptochip-gen-random
 CFLAGS += -Wall
 
 CFLAGS += $(shell pkg-config --cflags cryptoauthlib)
-LDLIBS += $(shell pkg-config --libs --static cryptoauthlib)
+LDLIBS += $(shell pkg-config --libs cryptoauthlib)
 
 all: $(PROGRAM)
 
