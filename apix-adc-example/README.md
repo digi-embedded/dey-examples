@@ -13,6 +13,8 @@ The ADC lines used in this example are mapped as follows in the Digi boards:
  - **ConnectCore 6UL SBC Pro**: ADC1_IN2 (GPIO connector, J30, Pin 13).
  - **ConnectCore 8X SBC Express**: ADC_IN0 (Expansion connector, J17, Pin 2).
  - **ConnectCore 8X SBC Pro**: ADC_IN0 (Expansion connector, J27, Pin D13).
+ - **ConnectCore 8M Nano DVK**: MCA_IO1 (channel 1) at XBEE1_UART_TX. By default 
+ this ADC channel is not enabled, you need to modify the device tree.
 
 Running the application
 -----------------------

@@ -3,7 +3,7 @@ Digi APIX CAN Example Applications
 
 Example applications to access and manage CAN interface using the Digi APIX library.
 
-These applications enable one CAN interface of the board and start a tranmission or
+These applications enable one CAN interface of the board and start a transmission or
 reception using the selected baudrate.
 
 In the reception example the application will wait for frames and print them in the
@@ -14,42 +14,42 @@ the ID and print in the console.
 
 The CAN interface for this example depends on the running platform:
 
-	ConnectCore 6 SBC: CAN connector of the board (J27).
-		CAN1_L: Pin 1
-		CAN1_H: Pin 2
-		GND: Pin 3
-		CAN2_L: Pin 4 *
-		CAN2_H: Pin 5 *
-		GND: Pin 6
 
-	ConnectCore 6 Plus SBC: CAN connector of the board (J27).
-		CAN1_L: Pin 1
-		CAN1_H: Pin 2
-		GND: Pin 3
-		CAN2_L: Pin 4 *
-		CAN2_H: Pin 5 *
-		GND: Pin 6
-
-	ConnectCore 6UL SBC Express: Raspberry PI connector (J8).
-	(An external CAN transceiver is needed).
-		RX: Pin 26
-		TX: Pin 22
-
-	ConnectCore 6UL SBC Pro: CAN connector of the board (J27).
-		CAN1_L: Pin 1
-		CAN1_H: Pin 2
-		GND: Pin 3
-		CAN2_L: Pin 4 *
-		CAN2_H: Pin 5 *
-		GND: Pin 6
-
-	ConnectCore CC8X SBC Pro: Expansion connector (J27).
-		CAN1_L: D 5
-		CAN1_H: D 6
-		GND: Pin 3
-		CAN2_L: C 5
-		CAN2_H: C 6
-
+- **ConectCore 6 SBC**: CAN connector of the board (J27).
+   - CAN1_L: Pin 1
+   - CAN1_H: Pin 2
+   - GND: Pin 3
+   - CAN2_L: Pin 4 *
+   - CAN2_H: Pin 5 *
+   - GND: Pin 6
+- **ConnectCore 6 Plus SBC**: CAN connector of the board (J27).
+   - CAN1_L: Pin 1
+   - CAN1_H: Pin 2
+   - GND: Pin 3
+   - CAN2_L: Pin 4 *
+   - CAN2_H: Pin 5 *
+   - GND: Pin 6
+- **ConnectCore 6UL SBC Express**: Raspberry PI connector (J8). (An external CAN transceiver is needed).
+   - RX: Pin 26
+   - TX: Pin 22
+- **ConnectCore 6UL SBC Pro**: CAN connector of the board (J27).
+   - CAN1_L: Pin 1
+   - CAN1_H: Pin 2
+   - GND: Pin 3
+   - CAN2_L: Pin 4 *
+   - CAN2_H: Pin 5 *
+   - GND: Pin 6
+- **ConnectCore 8X SBC Pro**: Expansion connector (J27).
+   - CAN1_L: D 5
+   - CAN1_H: D 6
+   - GND: Pin 3
+   - CAN2_L: C 5
+   - CAN2_H: C 6
+- **ConnectCore 8M Nano DVK**: CAN connector of the board (J24).
+   - 5V: Pin 1
+   - CAN1_H: Pin 2
+   - CAN1_L: Pin 3
+   - GND: Pin 4
 
 *Note: These pins are not enabled by default, you need to create a custom device tree
 

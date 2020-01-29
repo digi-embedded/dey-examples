@@ -37,6 +37,11 @@ The I2C connections for this example depend on the running platform:
     - GND: Pin C1
     - I2C-3 SDA: Pin D8
     - I2C-3 SCL: Pin D7
+ - **ConnectCore 8M Nano DVK**: Expansion connector of the board (J48).
+    - VCC: Connector J52 Pin 7
+    - GND: Pin 9
+    - I2C-4 SDA: Pin 3
+    - I2C-4 SCL: Pin 1
 
 Running the application
 -----------------------

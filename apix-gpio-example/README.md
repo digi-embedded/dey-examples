@@ -26,6 +26,9 @@ The GPIOs lines used in this example are mapped as follows in the Digi boards:
  - **ConnectCore 8X SBC Pro**:
     - User button: MCA_IO05 (GPIO connector, J20, Pin A5)
     - User led: USER_LED0 (Connected in the board)
+ - **ConnectCore 8M Nano DVK**:
+    - User button: MCA_IO10 (User Button 1 in the board)
+    - User led: USER_LED1 (User Led 1 in the board)
 
 Running the application
 -----------------------
