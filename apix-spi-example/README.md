@@ -10,14 +10,22 @@ Most EEPROM memories are compatible with the example. You only need to specify
 the page size and the address size in bytes.
 
 The SPI connections for this example depends on the running platform:
- - **ConnectCore 6 SBC**: SPI connector of the board (J34).
+
+ - **ConnectCore 8X SBC Pro**: Expansion connector of the board (J27).
+    - VCC: Pin D1
+    - GND: Pin C1
+    - SPI-0 CLK: Pin D2
+    - SPI-0 MISO: Pin D3
+    - SPI-0 MOSI: Pin D4
+    - SPI-0 SS0: Pin C2
+ - **ConnectCore 8X SBC Express**: Raspberry Pi expansion connector of the board (J11).
     - VCC: Pin 1
-    - GND: Pin 8
-    - SPI-1 CLK: Pin 2
-    - SPI-1 MISO: Pin 3
-    - SPI-1 MOSI: Pin 4
-    - SPI-1 SS0: Pin 5
- - **ConnectCore 6 Plus SBC**: SPI connector of the board (J34).
+    - GND: Pin 6
+    - SPI-3 CLK: Pin 23
+    - SPI-3 MISO: Pin 21
+    - SPI-3 MOSI: Pin 19
+    - SPI-3 SS0: Pin 24
+ - **ConnectCore 6UL SBC Pro**: SPI connector of the board (J34).
     - VCC: Pin 1
     - GND: Pin 8
     - SPI-1 CLK: Pin 2
@@ -31,27 +39,20 @@ The SPI connections for this example depends on the running platform:
     - SPI-3 MISO: Pin 21
     - SPI-3 MOSI: Pin 19
     - SPI-3 SS0: Pin 24
- - **ConnectCore 6UL SBC Pro**: SPI connector of the board (J34).
+ - **ConnectCore 6 Plus SBC**: SPI connector of the board (J34).
     - VCC: Pin 1
     - GND: Pin 8
     - SPI-1 CLK: Pin 2
     - SPI-1 MISO: Pin 3
     - SPI-1 MOSI: Pin 4
     - SPI-1 SS0: Pin 5
- - **ConnectCore 8X SBC Express**: Raspberry Pi expansion connector of the board (J11).
+ - **ConnectCore 6 SBC**: SPI connector of the board (J34).
     - VCC: Pin 1
-    - GND: Pin 6
-    - SPI-3 CLK: Pin 23
-    - SPI-3 MISO: Pin 21
-    - SPI-3 MOSI: Pin 19
-    - SPI-3 SS0: Pin 24
- - **ConnectCore 8X SBC Pro**: Expansion connector of the board (J27).
-    - VCC: Pin D1
-    - GND: Pin C1
-    - SPI-0 CLK: Pin D2
-    - SPI-0 MISO: Pin D3
-    - SPI-0 MOSI: Pin D4
-    - SPI-0 SS0: Pin C2
+    - GND: Pin 8
+    - SPI-1 CLK: Pin 2
+    - SPI-1 MISO: Pin 3
+    - SPI-1 MOSI: Pin 4
+    - SPI-1 SS0: Pin 5
 
 Running the application
 -----------------------

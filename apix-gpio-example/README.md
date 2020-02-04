@@ -8,27 +8,28 @@ one as output (e.g. a user led). The application toggles the output GPIO
 whenever an interrupt is generated in the input GPIO.
 
 The GPIOs lines used in this example are mapped as follows in the Digi boards:
- - **ConectCore 6 SBC**:
-    - User button: EXP_GPIO_0 (GPIO connector, J30, Pin 6)
-    - User led: USER_LED0 (Connected in the board)
- - **ConnectCore 6 Plus SBC**:
-    - User button: EXP_GPIO_0 (GPIO connector, J30, Pin 6)
-    - User led: USER_LED0 (Connected in the board)
- - **ConnectCore 6UL SBC Express**:
-    - User button: GPIO3_IO3 (Connected in the board)
-    - User led: GPIO3_IO11 (Connected in the board)
- - **ConnectCore 6UL SBC Pro**:
-    - User button: MCA_IO1 (GPIO connector, J30, Pin 7)
-    - User led: USER_LED1 (Connected in the board)
+
+ - **ConnectCore 8M Nano DVK**:
+   - User button: MCA_IO10 (User Button 1 in the board)
+   - User led: USER_LED1 (User Led 1 in the board)
+ - **ConnectCore 8X SBC Pro**:
+   - User button: MCA_IO05 (GPIO connector, J20, Pin A5)
+   - User led: USER_LED0 (Connected in the board)
  - **ConnectCore 8X SBC Express**:
     - User button: GPIO0_20 (Connected in the board)
     - User led: GPIO0_19 (Connected in the board)
- - **ConnectCore 8X SBC Pro**:
-    - User button: MCA_IO05 (GPIO connector, J20, Pin A5)
+ - **ConnectCore 6UL SBC Pro**:
+   - User button: MCA_IO1 (GPIO connector, J30, Pin 7)
+   - User led: USER_LED1 (Connected in the board)
+ - **ConnectCore 6UL SBC Express**:
+   - User button: GPIO3_IO3 (Connected in the board)
+   - User led: GPIO3_IO11 (Connected in the board)
+ - **ConnectCore 6 Plus SBC**:
+    - User button: EXP_GPIO_0 (GPIO connector, J30, Pin 6)
     - User led: USER_LED0 (Connected in the board)
- - **ConnectCore 8M Nano DVK**:
-    - User button: MCA_IO10 (User Button 1 in the board)
-    - User led: USER_LED1 (User Led 1 in the board)
+ - **ConectCore 6 SBC**:
+    - User button: EXP_GPIO_0 (GPIO connector, J30, Pin 6)
+    - User led: USER_LED0 (Connected in the board)
 
 Running the application
 -----------------------

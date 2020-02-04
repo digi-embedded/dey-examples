@@ -7,41 +7,42 @@ This application writes a page of an external EEPROM memory with random data.
 Afterward, it reads the data back to validate it (tested with 24FC1026).
 
 The I2C connections for this example depend on the running platform:
- - **ConnectCore 6 SBC**: I2C connector of the board (J28).
-    - VCC: Pin 3
-    - GND: Pin 6
-    - I2C-3 SDA: Pin 2
-    - I2C-3 SCL: Pin 1
- - **ConnectCore 6 Plus SBC**: I2C connector of the board (J28).
-    - VCC: Pin 3
-    - GND: Pin 6
-    - I2C-3 SDA: Pin 2
-    - I2C-3 SCL: Pin 1
- - **ConnectCore 6UL SBC Express**: Expansion connector of the board (J8).
-    - VCC: Pin 1
-    - GND: Pin 6
-    - I2C-1 SDA: Pin 3
-    - I2C-1 SCL: Pin 5
- - **ConnectCore 6UL SBC Pro**: I2C connector of the board (J28).
-    - VCC: Pin 3
-    - GND: Pin 6
-    - I2C-2 SDA: Pin 2
-    - I2C-2 SCL: Pin 1
- - **ConnectCore 8X SBC Express**: Raspberri Pi Expansion connector of the board (J11).
-    - VCC: Pin 1
-    - GND: Pin 6
-    - I2C-2 SDA: Pin 3
-    - I2C-2 SCL: Pin 5
- - **ConnectCore 8X SBC Pro**: Expansion connector of the board (J27).
-    - VCC: Pin D1
-    - GND: Pin C1
-    - I2C-3 SDA: Pin D8
-    - I2C-3 SCL: Pin D7
+
  - **ConnectCore 8M Nano DVK**: Expansion connector of the board (J48).
     - VCC: Connector J52 Pin 7
     - GND: Pin 9
     - I2C-4 SDA: Pin 3
     - I2C-4 SCL: Pin 1
+ - **ConnectCore 8X SBC Pro**: Expansion connector of the board (J27).
+    - VCC: Pin D1
+    - GND: Pin C1
+    - I2C-3 SDA: Pin D8
+    - I2C-3 SCL: Pin D7
+ - **ConnectCore 8X SBC Express**: Raspberri Pi Expansion connector of the board (J11).
+    - VCC: Pin 1
+    - GND: Pin 6
+    - I2C-2 SDA: Pin 3
+    - I2C-2 SCL: Pin 5
+ - **ConnectCore 6UL SBC Pro**: I2C connector of the board (J28).
+    - VCC: Pin 3
+    - GND: Pin 6
+    - I2C-2 SDA: Pin 2
+    - I2C-2 SCL: Pin 1
+ - **ConnectCore 6UL SBC Express**: Expansion connector of the board (J8).
+    - VCC: Pin 1
+    - GND: Pin 6
+    - I2C-1 SDA: Pin 3
+    - I2C-1 SCL: Pin 5
+ - **ConnectCore 6 Plus SBC**: I2C connector of the board (J28).
+    - VCC: Pin 3
+    - GND: Pin 6
+    - I2C-3 SDA: Pin 2
+    - I2C-3 SCL: Pin 1
+ - **ConnectCore 6 SBC**: I2C connector of the board (J28).
+    - VCC: Pin 3
+    - GND: Pin 6
+    - I2C-3 SDA: Pin 2
+    - I2C-3 SCL: Pin 1
 
 Running the application
 -----------------------
