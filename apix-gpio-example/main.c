@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Digi International Inc.
+ * Copyright 2017-2020, Digi International Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <libdigiapix/gpio.h>
 
@@ -49,12 +50,22 @@ static void usage_and_exit(char *name, int exitval)
 	fprintf(stdout,
 		"Example application using libdigiapix GPIO support\n"
 		"\n"
-		"Usage: %s <gpio_in> <gpio_out>\n\n"
-		"<gpio_in>     Push-button GPIO number or alias\n"
-		"<gpio_out>    LED GPIO number or alias\n"
+		"Usage: %s\n"
+		"                     %s is used as Push-button GPIO alias\n"
+		"                     %s is used as LED GPIO alias\n"
 		"\n"
-		"Aliases for GPIO numbers can be configured in the library config file\n"
-		"\n", name);
+		"Usage: %s <gpio-in-alias> <gpio-out-alias>\n"
+		"<gpio-in-alias>      Push-button GPIO alias\n"
+		"<gpio-out-alias>     LED GPIO alias\n"
+		"\n"
+		"Usage: %s <gpio_in_ctrl> <gpio_in_line> <gpio_out_ctrl> <gpio_out_line>\n"
+		"<gpio_in_ctrl>  Push-button GPIO controller name\n"
+		"<gpio_in_line>  Push-button GPIO line number\n"
+		"<gpio_out_ctrl> LED GPIO controller name\n"
+		"<gpio_out_line> LED GPIO line number\n"
+		"\n"
+		"Aliases for GPIO can be configured in the library config file\n"
+		"\n", name, DEFAULT_USER_BUTTON_ALIAS, DEFAULT_USER_LED_ALIAS, name, name);
 
 	exit(exitval);
 }
@@ -100,32 +111,6 @@ static void register_signals(void)
 }
 
 /*
- * parse_argument() - Parses the given string argument and returns the
- *					  corresponding integer value
- *
- * @argv:	Argument to parse in string format.
- *
- * Return: The parsed integer argument, -1 on error.
- */
-static int parse_argument(char *argv)
-{
-	char *endptr;
-	long value;
-
-	errno = 0;
-	value = strtol(argv, &endptr, 10);
-
-	if ((errno == ERANGE && (value == LONG_MAX || value == LONG_MIN))
-	    || (errno != 0 && value == 0))
-		return -1;
-
-	if (endptr == argv)
-		return ldx_gpio_get_kernel_number(endptr);
-
-	return value;
-}
-
-/*
  * gpio_interrupt_cb() - GPIO callback for interrupts
  *
  * @arg:	GPIO interrupt data (struct gpio_interrupt_cb_data).
@@ -148,7 +133,9 @@ static int gpio_interrupt_cb(void *arg)
 
 int main(int argc, char *argv[])
 {
-	int button, led, i;
+	static char button_ctrl[MAX_CONTROLLER_LEN] = { 0 };
+	static char led_ctrl[MAX_CONTROLLER_LEN] = { 0 };
+	int button_line, led_line, i;
 	gpio_value_t output_value = GPIO_LOW;	/* Should match the GPIO request mode */
 	struct gpio_interrupt_cb_data cb_data;
 	char *name = basename(argv[0]);
@@ -156,17 +143,28 @@ int main(int argc, char *argv[])
 	/* Check input parameters */
 	if (argc == 1) {
 		/* Use default values */
-		button = parse_argument(DEFAULT_USER_BUTTON_ALIAS);
-		led = parse_argument(DEFAULT_USER_LED_ALIAS);
+		ldx_gpio_get_controller(DEFAULT_USER_BUTTON_ALIAS, button_ctrl);
+		button_line = ldx_gpio_get_line(DEFAULT_USER_BUTTON_ALIAS);
+		ldx_gpio_get_controller(DEFAULT_USER_LED_ALIAS, led_ctrl);
+		led_line = ldx_gpio_get_line(DEFAULT_USER_LED_ALIAS);
 	} else if (argc == 3) {
-		/* Parse command line arguments */
-		button = parse_argument(argv[1]);
-		led = parse_argument(argv[2]);
+		/* Parse command line arguments as ALIASES */
+		ldx_gpio_get_controller(argv[1], button_ctrl);
+		button_line = ldx_gpio_get_line(argv[1]);
+		ldx_gpio_get_controller(argv[2], led_ctrl);
+		led_line = ldx_gpio_get_line(argv[2]);
+	} else if (argc == 5) {
+		/* Parse command line arguments as controller/line */
+		strcpy(button_ctrl, argv[1]);
+		button_line = strtol(argv[2], NULL, 10);
+		strcpy(led_ctrl, argv[3]);
+		led_line = strtol(argv[4], NULL, 10);
 	} else {
 		usage_and_exit(name, EXIT_FAILURE);
 	}
 
-	if (button < 0 || led < 0) {
+	if (button_ctrl == NULL || button_line < 0 ||
+		led_ctrl == NULL || led_line < 0) {
 		printf("Unable to parse button and led GPIOs\n");
 		return EXIT_FAILURE;
 	}
@@ -176,17 +174,16 @@ int main(int argc, char *argv[])
 	register_signals();
 
 	/* Request input GPIO */
-	gpio_input =
-		ldx_gpio_request((unsigned int)button, GPIO_IRQ_EDGE_RISING,
-			 REQUEST_SHARED);
+	gpio_input = ldx_gpio_request_by_controller(button_ctrl, button_line,
+						    GPIO_IRQ_EDGE_RISING);
 	if (!gpio_input) {
 		printf("Failed to initialize input GPIO\n");
 		return EXIT_FAILURE;
 	}
 
 	/* Request output GPIO */
-	gpio_output =
-	    ldx_gpio_request((unsigned int)led, GPIO_OUTPUT_LOW, REQUEST_SHARED);
+	gpio_output = ldx_gpio_request_by_controller(led_ctrl, led_line,
+						     GPIO_OUTPUT_LOW);
 	if (!gpio_output) {
 		printf("Failed to initialize output GPIO\n");
 		return EXIT_FAILURE;

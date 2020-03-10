@@ -155,7 +155,6 @@ int main(int argc, char **argv)
 		pwm_chip = parse_argument(argv[1], ARG_PWM_CHIP);
 		pwm_channel = parse_argument(argv[2], ARG_PWM_CHANNEL);
 		pwm_freq = atoi(argv[3]);
-
 	} else {
 		usage_and_exit(name, EXIT_FAILURE);
 	}
