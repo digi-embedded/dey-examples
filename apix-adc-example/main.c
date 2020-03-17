@@ -51,14 +51,25 @@ static void usage_and_exit(char *name, int exitval)
 	fprintf(stdout,
 		"Example application using libdigiapix ADC support\n"
 		"\n"
-		"Usage: %s <adc_chip> <adc_channel> <interval> <number_of_samples> \n\n"
-		"<adc_chip>           ADC chip number or alias\n"
-		"<adc_channel>        ADC channel number or alias\n"
+		"Usage: %s\n"
+		"                     %s is used as ADC alias\n"
+		"                     %d seconds is used as Interval\n"
+		"                     %d is used as Samples\n"
+		"\n"
+		"Usage: %s <adc-alias> <interval> <number_of_samples>\n"
+		"<adc-alias>          ADC alias\n"
+		"<interval>           Time interval for sampling\n"
+		"<number_of_samples>  Number of samples to get\n"
+		"\n"
+		"Usage: %s <adc-chip> <adc-channel> <interval> <number_of_samples>\n"
+		"<adc-chip-number>    ADC chip number\n"
+		"<adc-channel-number> ADC channel number\n"
 		"<interval>           Time interval for sampling\n"
 		"<number_of_samples>  Number of samples to get\n"
 		"\n"
 		"Alias for ADC can be configured in the library config file\n"
-		"\n", name);
+		"\n", name, DEFAULT_ADC_ALIAS, DEFAULT_TIME_INTERVAl,
+		      DEFAULT_NUMBER_OF_SAMPLES, name, name);
 
 	exit(exitval);
 }
@@ -166,6 +177,12 @@ int main(int argc, char *argv[])
 		channel = ldx_adc_get_channel(DEFAULT_ADC_ALIAS);
 		interval = DEFAULT_TIME_INTERVAl;
 		number_of_samples = DEFAULT_NUMBER_OF_SAMPLES;
+	} else if (argc == 4) {
+		/* Parse command line arguments */
+		chip = parse_argument(argv[1], ARG_ADC_CHIP);
+		channel = parse_argument(argv[1], ARG_ADC_CHANNEL);
+		interval = atoi(argv[2]);
+		number_of_samples = atoi(argv[3]);
 	} else if (argc == 5) {
 		/* Parse command line arguments */
 		chip = parse_argument(argv[1], ARG_ADC_CHIP);

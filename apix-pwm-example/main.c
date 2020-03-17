@@ -46,13 +46,19 @@ static void usage_and_exit(char *name, int exitval)
 	fprintf(stdout,
 		"Example application using libdigiapix PWM support\n"
 		"\n"
-		"Usage: %s <pwm-chip> <pwm-freq>\n\n"
-		"<pwm-chip>       PWM chip number or alias\n"
-		"<pwm-channel>    PWM channel number or alias\n"
-		"<pwm-freq>       Frequency to use (Hz)\n"
+		"Usage: %s\n"
+		"                     %s is used as PWM alias\n"
+		"                     %dHz is used as Frequency\n\n"
+		"Usage: %s <pwm-alias> <pwm-freq>\n"
+		"<pwm-alias>          PWM alias\n"
+		"<pwm-freq>           Frequency to use (Hz)\n\n"
+		"Usage: %s <pwm-chip> <pwm-channel> <pwm-freq>\n"
+		"<pwm-chip-number>    PWM chip number\n"
+		"<pwm-channel-number> PWM channel number\n"
+		"<pwm-freq>           Frequency to use (Hz)\n"
 		"\n"
 		"Aliases for PWM can be configured in the library config file\n"
-		"\n", name);
+		"\n", name, DEFAULT_PWM_ALIAS, DEFAULT_PWM_FREQUENCY, name, name);
 
 	exit(exitval);
 }
@@ -141,10 +147,15 @@ int main(int argc, char **argv)
 		pwm_chip = ldx_pwm_get_chip(DEFAULT_PWM_ALIAS);
 		pwm_channel = ldx_pwm_get_channel(DEFAULT_PWM_ALIAS);
 		pwm_freq = DEFAULT_PWM_FREQUENCY;
+	} else if (argc == 3) {
+		pwm_chip = parse_argument(argv[1], ARG_PWM_CHIP);
+		pwm_channel = parse_argument(argv[1], ARG_PWM_CHANNEL);
+		pwm_freq = atoi(argv[2]);
 	} else if (argc == 4) {
 		pwm_chip = parse_argument(argv[1], ARG_PWM_CHIP);
 		pwm_channel = parse_argument(argv[2], ARG_PWM_CHANNEL);
 		pwm_freq = atoi(argv[3]);
+
 	} else {
 		usage_and_exit(name, EXIT_FAILURE);
 	}
