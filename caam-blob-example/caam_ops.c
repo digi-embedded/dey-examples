@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 
 #include "caam_ops.h"
 
