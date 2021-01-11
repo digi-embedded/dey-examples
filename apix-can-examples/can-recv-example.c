@@ -79,7 +79,6 @@ static void cleanup(void)
 		free(canfilter);
 
 	if (can_if) {
-		ldx_can_stop(can_if);
 		ldx_can_free(can_if);
 		running = false;
 	}

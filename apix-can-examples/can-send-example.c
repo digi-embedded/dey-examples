@@ -111,7 +111,6 @@ void ms_sleep(uint32_t ms)
 static void cleanup(void)
 {
 	if (can_if) {
-		ldx_can_stop(can_if);
 		ldx_can_free(can_if);
 		running = false;
 	}
