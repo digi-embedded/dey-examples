@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Digi International Inc.
+ * Copyright (c) 2017-2021 Digi International Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -30,7 +30,7 @@ int main(void)
 	atcab_is_locked(LOCK_ZONE_CONFIG, &is_locked);
 	if (!is_locked) {
 		printf("**WARNING**: the cryptochip is currently not configured. Run "
-		       "ecc-test-main at least once to be able to run this example.\n");
+		       "cryptoauth_test and lock the Config Zone to be able to run this example.\n");
 		atcab_release();
 		return 1;
 	}
