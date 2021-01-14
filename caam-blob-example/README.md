@@ -5,7 +5,7 @@ This example application shows how to encapsulate/decapsulate data to/from CAAM 
 CAAM blobs are a way to protect sensitive data by encrypting their contents.
 You can think of CAAM blobs as data encrypted with an internal unreadable device-specific key which is protected by the hardware.
 Data encapsulated in a CAAM blob can only be decapsulated by the device that created it.
-When creating CAAM blobs, the input data size is limited to 1048527 bytes.
+When creating CAAM blobs, the input data size is limited to 65487 bytes.
 Note that CAAM blobs are slightly bigger than the input data (48 bytes bigger).
 
 A key modifier may be used to further differentiate the key used in a particular blob.
@@ -65,7 +65,7 @@ For more information, see the [Digi Embedded Yocto online documentation](https:/
 
 License
 -------
-Copyright 2019, Digi International Inc.
+Copyright 2019-2021, Digi International Inc.
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice

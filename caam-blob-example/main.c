@@ -1,7 +1,7 @@
 /*
  * main.c
  *
- * Copyright (C) 2019 by Digi International Inc.
+ * Copyright (C) 2019-2021 by Digi International Inc.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -168,6 +168,7 @@ int main(int argc, char *argv[])
 	size_t output_len;
 	uint8_t key_modifier[KEY_MODIFIER_SIZE];
 	int ret = EXIT_SUCCESS;
+	size_t max_input_len = BLOB_MAX_INPUT_SIZE;
 
 	if (argc > 0)
 		program_name = argv[0];
@@ -187,10 +188,20 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	/*
+	 * if we're going to encrypt a file, subtract the blob overhead from
+	 * the maximum allowed size so that the output blob size can fit in the
+	 * CAAM encryption job descriptor
+	 */
+	max_input_len -= op == ENCRYPT ? BLOB_OVERHEAD : 0;
+
 	/* this is a limitation of the current driver implementation */
-	if (input_len >= BLOB_MAX_INPUT_SIZE)
-		fprintf(stderr, "[WARNING] Input is too big, %s may fail\n",
-			op == ENCRYPT ? "encryption" : "decryption");
+	if (input_len > max_input_len) {
+		fprintf(stderr, "[ERROR] Input is too big, continuing may result in unexpected behavior.\n"
+			"[ERROR] The maximum input size for %s is %u bytes.\n",
+			op == ENCRYPT ? "encryption" : "decryption", max_input_len);
+		return EXIT_FAILURE;
+	}
 
 	input_data = mmap(NULL, input_len, PROT_READ,
 			  MAP_PRIVATE | MAP_POPULATE, input_fd, 0);

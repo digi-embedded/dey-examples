@@ -1,7 +1,7 @@
 /*
  * caam_ops.h
  *
- * Copyright (C) 2019 by Digi International Inc.
+ * Copyright (C) 2019-2021, by Digi International Inc.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -32,10 +32,13 @@
 /* Key modifier: 16 bytes for a general memory blob (see SRM 5.8.4.7.1) */
 #define KEY_MODIFIER_SIZE 	16
 
+#define SZ_1K			1024
+
 /*
- * Testing shows that input sizes bigger than this value usually fail.
+ * The input size is stored in 16 bits in the CAAM job descriptor, which means
+ * the upper limit is 64 KiB minus one byte
  */
-#define BLOB_MAX_INPUT_SIZE 	(1024 * 1024 - BLOB_OVERHEAD)
+#define BLOB_MAX_INPUT_SIZE 	(64 * SZ_1K - 1)
 
 int caamblob_encrypt(const uint8_t *data,
 		     size_t size,
