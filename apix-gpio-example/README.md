@@ -9,6 +9,9 @@ whenever an interrupt is generated in the input GPIO.
 
 The GPIOs lines used in this example are mapped as follows in the Digi boards:
 
+ - **ConnectCore 8M Mini DVK**:
+  - User button: MCA_IO10 (User Button 1 in the board)
+  - User led: USER_LED1 (User Led 1 in the board)
  - **ConnectCore 8M Nano DVK**:
    - User button: MCA_IO10 (User Button 1 in the board)
    - User led: USER_LED1 (User Led 1 in the board)
