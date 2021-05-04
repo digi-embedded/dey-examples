@@ -7,6 +7,8 @@ This application enables one ADC channel on the board. After that, the
 application takes periodic samples and prints the raw value and the value in mv.
 
 The ADC lines used in this example are mapped as follows in the Digi boards:
+ - **ConnectCore 8M Mini DVK**: MCA_IO1 (channel 1) at XBEE1_UART_TX. By default
+ this ADC channel is not enabled, you need to modify the device tree.
  - **ConnectCore 8M Nano DVK**: MCA_IO1 (channel 1) at XBEE1_UART_TX. By default
  this ADC channel is not enabled, you need to modify the device tree.
  - **ConnectCore 8X SBC Pro**: ADC_IN0 (Expansion connector, J27, Pin D13).

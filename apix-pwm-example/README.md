@@ -9,6 +9,7 @@ vice-versa.
 
 The PWM lines used in this example are mapped as follows in the Digi boards:
 
+ - **ConnectCore 8M Mini DVK**: MCA PWM0 channel 2 connected to the LED1.
  - **ConnectCore 8M Nano DVK**: MCA PWM0 channel 2 connected to the LED1.
  - **ConnectCore 8X SBC Pro**: MCA PWM2 channel 0 - Pin **A3** of the Expansion connector (J20).
  - **ConnectCore 8X SBC Express**: MCA PWM1 channel 0 - Pin **33** of the Raspberry Pi Expansion connector (J11).
