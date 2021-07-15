@@ -157,6 +157,12 @@ static int adc_sampling_cb(int sample, void *arg)
 	struct adc_sampling_cb_data *data = arg;
 	float sample_mv = 0;
 
+	if (sample < 0) {
+		/* An error happened */
+		printf("Error %d reading ADC sample\n", sample);
+		return EXIT_FAILURE;
+	}
+
 	data->number_of_samples--;
 	sample_mv = ldx_adc_convert_sample_to_mv(data->adc, sample);
 
