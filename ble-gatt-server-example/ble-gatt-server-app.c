@@ -764,7 +764,6 @@ int main(int argc, char *argv[])
 	bdaddr_t src_addr;
 	int dev_id = -1;
 	uint16_t mtu = 0;
-	sigset_t mask;
 
 	setlogmask (LOG_UPTO (LOG_NOTICE));
 
@@ -864,17 +863,7 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}
 
-		sigemptyset(&mask);
-		sigaddset(&mask, SIGINT);
-		sigaddset(&mask, SIGTERM);
-
-		mainloop_set_signal(&mask, signal_cb, NULL, NULL);
-		mainloop_run();
-
-		/* remove the application signals */
-		sigdelset(&mask, SIGTERM);
-		sigdelset(&mask, SIGINT);
-		sigemptyset(&mask);
+		mainloop_run_with_signal(signal_cb, NULL);
 
 		server_destroy(server);
 
