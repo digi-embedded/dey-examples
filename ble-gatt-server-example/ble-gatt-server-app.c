@@ -351,7 +351,7 @@ static bool temperature_notify_cb(void *user_data)
 		bt_gatt_server_send_notification(server->gatt,
                                                  notify_data->handle,
                                                  &notify_value,
-                                                 sizeof(notify_value));
+                                                 sizeof(notify_value), false);
 	}
 
 	return true;
