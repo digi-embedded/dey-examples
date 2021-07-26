@@ -139,8 +139,11 @@ static int parse_argument(char *argv, int arg_type)
 
 int main(int argc, char **argv)
 {
-	int ret, duty_cycle = 10, ascending = 1, pwm_chip, pwm_channel, pwm_freq = 0;
+	int ret, ascending = 1, pwm_chip, pwm_channel, pwm_freq = 0;
 	char *name = basename(argv[0]);
+	int duty_cycle[] = {0, 1, 3, 5, 10, 15, 20, 30, 50, 100};
+	int d = 0;
+	int levels = sizeof(duty_cycle) / sizeof(duty_cycle[0]);
 
 	/* Check if the PWM values are passed in the command line. */
 	if (argc == 1) {
@@ -211,25 +214,19 @@ int main(int argc, char **argv)
 	/* Main application loop.*/
 	while (running) {
 		/* Set the duty cycle. */
-		ret = ldx_pwm_set_duty_cycle_percentage(pwm_line, duty_cycle);
+		ret = ldx_pwm_set_duty_cycle_percentage(pwm_line, duty_cycle[d]);
 		if (ret != PWM_CONFIG_ERROR_NONE) {
 			printf("Failed to set the duty cycle\n");
 			return EXIT_FAILURE;
 		}
 		if (ascending) {
-			duty_cycle += 10;
-			if (duty_cycle == 100) {
-				duty_cycle = 80;
+			if (++d == levels - 1)
 				ascending = 0;
-			}
 		} else {
-			duty_cycle -= 10;
-			if (duty_cycle == 0) {
-				duty_cycle = 20;
+			if (--d == 0)
 				ascending = 1;
-			}
 		}
-		sleep(1);
+		usleep(150000);
 	}
 
 	return EXIT_SUCCESS;
