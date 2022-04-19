@@ -31,8 +31,8 @@ The I2C connections for this example depend on the running platform:
  - **ConnectCore 6UL SBC Pro**: I2C connector of the board (J28).
     - VCC: Pin 3
     - GND: Pin 6
-    - I2C-2 SDA: Pin 2
-    - I2C-2 SCL: Pin 1
+    - I2C-1 SDA: Pin 2
+    - I2C-1 SCL: Pin 1
  - **ConnectCore 6UL SBC Express**: Expansion connector of the board (J8).
     - VCC: Pin 1
     - GND: Pin 6
