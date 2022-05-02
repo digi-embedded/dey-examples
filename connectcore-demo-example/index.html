@@ -935,12 +935,6 @@ Digi Demo - Dashboard
         return "";
     }
 
-    $.ajaxSetup({
-        headers: {
-            "X-CSRFToken": getCookie("csrftoken")
-        }
-    });
-
     $(document).ready(function() {
         $("#banner-link").on({
             "mouseover" : function() {
