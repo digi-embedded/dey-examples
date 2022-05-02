@@ -431,7 +431,9 @@ function roundToGigaBytes(kiloBytes) {
 
 // Returns whether the dashboard page is showing or not.
 function isDashboardShowing() {
-    return window.location.pathname.indexOf("dashboard") > -1;
+    if (window.location.pathname == "/")
+        return true;
+    return window.location.pathname.indexOf("index") > -1;
 }
 
 // Returns whether the management page is showing or not.

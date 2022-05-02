@@ -339,7 +339,7 @@ function drawDevice() {
     // Initialize variables.
     var boardImage = document.getElementById(ID_BOARD_IMAGE);
     // Draw the device board image.
-    $(boardImage).attr("src", "../static/images/" + device.getBoardImage());
+    $(boardImage).attr("src", "./static/images/" + device.getBoardImage());
     boardImage.style.width = device.getBoardImageScale() + "%";
     boardImage.style.maxWidth = device.getBoardImageScale() + "%";
     boardImage.style.height = "auto";
