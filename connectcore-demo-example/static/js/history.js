@@ -74,7 +74,6 @@ function drawTemperatureChart(refresh=false, showProgress=false) {
         $.post(
             "/ajax/history_temperature",
             JSON.stringify({
-                "device_id": getDeviceID(),
                 "interval": temperatureInterval
             }),
             function(response) {
@@ -108,7 +107,6 @@ function drawCPUChart(refresh=false, showProgress=false) {
         $.post(
             "/ajax/history_cpu",
             JSON.stringify({
-                "device_id": getDeviceID(),
                 "interval": cpuInterval
             }),
             function(response) {
@@ -142,7 +140,6 @@ function drawMemoryChart(refresh=false, showProgress=false) {
         $.post(
             "/ajax/history_memory",
             JSON.stringify({
-                "device_id": getDeviceID(),
                 "interval": memoryInterval
             }),
             function(response) {
@@ -222,7 +219,3 @@ function drawChart(id, data, title, units, color=null) {
     chart.draw(dataTable, google.charts.Line.convertOptions(options));
 }
 
-// Returns the device ID.
-function getDeviceID() {
-    return new URLSearchParams(window.location.search).get(ID_DEVICE_ID);
-}

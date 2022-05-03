@@ -42,12 +42,6 @@ const ID_CPU_TEMPERATURE = "cpu_temperature";
 const ID_CPU_UPTIME = "cpu_uptime";
 const ID_CURRENT_DIR = "current_dir";
 const ID_DATA = "data";
-const ID_DATA_USAGE_DEVICES = "data_usage_devices";
-const ID_DATA_USAGE_MONITORS = "data_usage_monitors";
-const ID_DATA_USAGE_TOTAL = "data_usage_total";
-const ID_DATA_USAGE_WEB = "data_usage_web";
-const ID_DATA_USAGE_WEB_SERVICES = "data_usage_web_services";
-const ID_DEVICE_ID = "device_id";
 const ID_DEVICE_NAME = "device_name";
 const ID_DEVICE_TYPE = "device_type";
 const ID_DEVICES = "devices";
@@ -105,7 +99,6 @@ const ID_STREAM = "stream";
 const ID_TIMESTAMP = "timestamp";
 const ID_TYPE = "type";
 const ID_UBOOT_VERSION = "uboot_version";
-const ID_USAGE = "usage";
 const ID_VALUE = "value";
 const ID_VIDEO = "video";
 const ID_VIDEO_RESOLUTION = "video_resolution";
@@ -124,9 +117,7 @@ const VALUE_CANCELED = "canceled";
 const VALUE_FAILED = "failed";
 const VALUE_LEFT = "left";
 const VALUE_OFF = "Off";
-const VALUE_OFFLINE = "Offline";
 const VALUE_ON = "On";
-const VALUE_ONLINE = "Online";
 const VALUE_RIGHT = "right";
 const VALUE_SUCCESSFUL = "successful";
 const VALUE_TOP = "top";
@@ -142,9 +133,6 @@ const ERROR_URL_NOT_FOUND = "Requested URL not found";
 const ERROR_SERVER_ERROR = "Internal server error";
 const ERROR_TITLE = "Error";
 const ERROR_UNKNOWN_ERROR = "Unknown error";
-
-const IMAGE_OFFLINE = "status_offline.png";
-const IMAGE_ONLINE = "status_online.png";
 
 const PATH_IMAGES = "../static/images/";
 
@@ -444,11 +432,6 @@ function isManagementShowing() {
 // Returns whether the history page is showing or not.
 function isHistoryShowing() {
     return window.location.pathname.indexOf("history") > -1;
-}
-
-// Returns the device ID.
-function getDeviceID() {
-    return new URLSearchParams(window.location.search).get(ID_DEVICE_ID);
 }
 
 // Returns the device name.

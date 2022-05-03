@@ -185,9 +185,6 @@ function initCLISession() {
     showConsoleLoading(true);
     $.post(
         "../ajax/cli_init_session",
-        JSON.stringify({
-            "device_id": getDeviceID()
-        }),
         function(data) {
             // Process only if the console is showing.
             if (!isConsoleShowing())
@@ -249,7 +246,6 @@ function sendCLIData(data) {
         $.post(
             "../ajax/cli_data",
             JSON.stringify({
-                "device_id": getDeviceID(),
                 "session_id": cliSessionID,
                 "data": dataToSend
             }),
@@ -309,7 +305,6 @@ function terminateCLIsession() {
     $.post(
         "../ajax/cli_terminate_session",
         JSON.stringify({
-            "device_id": getDeviceID(),
             "session_id": cliSessionID
         }),
         function(data) {
@@ -346,8 +341,8 @@ function processTerminateCLISessionResponse(response) {
 // Subscribes to any CLI session change.
 function subscribeCLISession(sessionID) {
     // Create the web socket.
-    var socketPrefix = window.location.protocol == "https:" ? "wss" : "ws";
-    cliSocket = new WebSocket(socketPrefix + "://" + window.location.host + "/ws/cli/" + device.getDeviceID() + "/" + sessionID);
+    //var socketPrefix = window.location.protocol == "https:" ? "wss" : "ws";
+    //cliSocket = new WebSocket(socketPrefix + "://" + window.location.host + "/ws/cli/" + device.getDeviceID() + "/" + sessionID);
     // Define the callback to be notified when data is received in the web socket.
     cliSocket.onmessage = function(e) {
         if (isDashboardShowing() && term != null && term != "undefined") {

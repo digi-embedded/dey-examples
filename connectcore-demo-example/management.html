@@ -9,7 +9,6 @@ Digi Demo - Management
     <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.3/css/bootstrap-slider.min.css" rel="stylesheet">
 
-    <link rel="stylesheet"  href="./static/css/login.css">
     <link rel="stylesheet"  href="./static/css/general.css">
     <link rel="stylesheet"  href="./static/css/toastr.css">
     <link rel="stylesheet"  href="./static/css/xterm.css">
@@ -20,11 +19,7 @@ Digi Demo - Management
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/1e66c78073.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
-    <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.3/bootstrap-slider.min.js"></script>
-    <script>
-        google.charts.load("current", {"packages":["line"]});
-    </script>
     <script type="text/javascript" src="./static/js/common.js"></script>
     <script type="text/javascript" src="./static/js/devices.js"></script>
     <script type="text/javascript" src="./static/js/jquery.pjax.js"></script>
@@ -43,130 +38,10 @@ Digi Demo - Management
 
         <div class="nav-right-container">
 
-        <div id="data_usage_panel" class="data-usage-panel" style="display: none;">
-            <div class="data-usage-panel-wrapper">
-                <div id="data_usage_loading" class="data-usage-loading">
-                    <div class="data-usage-loading-background"></div>
-                    <img class="data-usage-loading-icon" src="./static/images/loading.gif" alt="Loading..." />
-                    <div class="data-usage-loading-text">Loading data...</div>
-                </div>
-                <div id="data_usage_content" class="data-usage-content">
-                    <div class="data-usage-section">
-                        <div class="data-usage-header">
-                            <div class="data-usage-title">Total account data usage</div>
-                            <div class="fas fa-sync device-card-header-button" onclick="refreshUsageData()"></div>
-                        </div>
-                        <div id="data_usage_total" class="data-usage-total-value">-</div>
-                        <div class="data-usage-graphic-container">
-                            <button id="data_usage_graphic_devices" class="fas data-usage-graphic data-usage-graphic-devices" data-toggle="tooltip" data-placement="bottom" title="Total data usage by devices"></button>
-                            <button id="data_usage_graphic_web" class="fas data-usage-graphic data-usage-graphic-web" data-toggle="tooltip" data-placement="bottom" title="Total data usage by web APIs"></button>
-                        </div>
-                        <div class="data-usage-values-container">
-                            <table>
-                                <tr>
-                                    <td>
-                                        <div class="data-usage-legend data-usage-graphic-devices"></div>
-                                    </td>
-                                    <td>
-                                        <div class="data-usage-legend-text">Devices data usage</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="data-usage-legend data-usage-graphic-web"></div>
-                                    </td>
-                                    <td>
-                                        <div class="data-usage-legend-text">Web APIs data usage</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="data-usage-section">
-                        <div class="data-usage-title">Devices usage</div>
-                        <div class="data-usage-values-container">
-                            <table>
-                                <tr>
-                                    <td>
-                                        <div class="data-usage-value-label-bold">Total devices usage:</div>
-                                    </td>
-                                    <td>
-                                        <div id="data_usage_devices" class="data-usage-value-bold">-</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="data-usage-value-label">Current device usage:</div>
-                                    </td>
-                                    <td>
-                                        <div id="data_usage_current_device" class="data-usage-value">-</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="data-usage-section">
-                        <div class="data-usage-title">Web APIs usage</div>
-                        <div class="data-usage-values-container">
-                            <table>
-                                <tr>
-                                    <td>
-                                        <div class="data-usage-value-label-bold">Total web APIs usage:</div>
-                                    </td>
-                                    <td>
-                                        <div id="data_usage_web" class="data-usage-value-bold">-</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="data-usage-value-label">Web services usage:</div>
-                                    </td>
-                                    <td>
-                                        <div id="data_usage_web_services" class="data-usage-value">-</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="data-usage-value-label">Monitors usage:</div>
-                                    </td>
-                                    <td>
-                                        <div id="data_usage_monitors" class="data-usage-value">-</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div>
             <img src="./static/images/board.png" class="device-title-img" title="Device">
         </div>
         <div id="device-name"></div>
-        <div>
-            <img src="./static/images/status_offline.png" id="device-connection-status" class="device-title-img" title="Offline">
-        </div>
-        <div class="vertical-separator"></div>
-        <div>
-            <button id="devices-list-button" class="btn widget-button" type="button" value="0" onclick="window.open('/','_self');">
-                <img src="./static/images/devices_list_gray.png" id="devices-list-icon" class="devices-list-icon" data-toggle="tooltip" data-placement="bottom" title="Open devices list">
-            </button>
-            <button id="data_usage_button" class="btn widget-button" type="button" value="0" onclick="toggleDataUsagePanel();">
-                <img src="./static/images/data_usage.png" id="data_usage_icon" class="devices-list-icon" data-toggle="tooltip" data-placement="bottom" title="Show data usage">
-            </button>
-        </div>
-        <div class="vertical-separator"></div>
-
-            <div class="dropdown digi-gray" id="profile-container">
-                <button class="btn dropdown-toggle" type="button" id="profileMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img id="profile-logo" class="banner-icon" src="./static/images/profile_gray.png">
-                </button>
-                <div class="dropdown-menu shadow-sm" aria-labelledby="profileMenuButton">
-                    <a class="dropdown-item" href="/access/logout/">Log out</a>
-                </div>
-            </div>
-        </div>
-
         </div>
     </nav>
 
@@ -248,25 +123,6 @@ Digi Demo - Management
                         </div>
                     </div>
                     <div id="loading_wrapper" class="loading-wrapper element-grayed">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">System monitor</h5>
-                                <div>Configure the system monitor service parameters.</div>
-                                <div class="system-monitor-param-container">
-                                    <span class="system-monitor-param-label">Time between samples:</span>
-                                    <input id="sample_rate" class="system-monitor-input" type="text"/>
-                                    <button class="fas fa-question-circle system-monitor-help" title="Time to wait between samples read (in seconds). Must be a positive number greater than 0." data-toggle="tooltip" data-placement="right"></button>
-                                </div>
-                                <div id="sample_rate_error" class="system-monitor-error"></div>
-                                <div class="system-monitor-param-container">
-                                    <span class="system-monitor-param-label">Samples to buffer:</span>
-                                    <input id="num_samples_upload" class="system-monitor-input" type="text"/>
-                                    <button class="fas fa-question-circle system-monitor-help" title="Number of samples of each parameter to gather before uploading them to Digi Remote Manager. Must be a positive number greater than 0." data-toggle="tooltip" data-placement="right"></button>
-                                </div>
-                                <div id="samples_buffer_error" class="system-monitor-error"></div>
-                                <div id="save_button" class="device-card-button system-monitor-save system-monitor-save-disabled" onclick="saveSystemMonitor()">Save</div>
-                            </div>
-                        </div>
                         <div class="card shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title">Reboot device</h5>
@@ -364,13 +220,6 @@ Digi Demo - Management
         filesLoaded = false;
         // Initialize page.
         initializeManagementPage();
-        // Register system monitor input changed.
-        $("#sample_rate").on("input", function(event) {
-            validateSystemMonitor(event.target.value);
-        });
-        $("#num_samples_upload").on("input", function(event) {
-            validateSystemMonitor();
-        });
     });
     </script>
 
@@ -380,20 +229,6 @@ Digi Demo - Management
     </div>
 
     <script>
-    function getCookie(cName) {
-        if (document.cookie.length > 0) {
-            cStart = document.cookie.indexOf(cName + "=");
-            if (cStart != -1) {
-                cStart = cStart + cName.length + 1;
-                cEnd = document.cookie.indexOf(";", cStart);
-                if (cEnd == -1)
-                    cEnd = document.cookie.length;
-                return unescape(document.cookie.substring(cStart, cEnd));
-            }
-        }
-        return "";
-    }
-
     $(document).ready(function() {
         $("#banner-link").on({
             "mouseover" : function() {
@@ -412,33 +247,6 @@ Digi Demo - Management
     </script>
 
     <!-- Local JS files and functions -->
-
-<script>
-$( document ).ready(function() {
-    $("#profile-container").on({
-        "mouseover" : function() {
-            $("#profile-logo").attr("src", "./static/images/profile_green.png");
-            if (!$("#profile-container").hasClass("digi-green")) {
-                $("#profile-container").addClass("digi-green");
-            }
-            if ($("#profile-container").hasClass("digi-gray")) {
-                $("#profile-container").removeClass("digi-gray");
-            }
-        },
-        "mouseout" : function() {
-            $("#profile-logo").attr("src", "./static/images/profile_gray.png");
-            if (!$("#profile-container").hasClass("digi-gray")) {
-                $("#profile-container").addClass("digi-gray");
-            }
-            if ($("#profile-container").hasClass("digi-green")) {
-                $("#profile-container").removeClass("digi-green");
-            }
-        }
-    });
-});
-</script>
-
-    <!-- Local JS files and functions -->
     <script type="text/javascript" src="./static/js/sidebar.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8mm-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8m-nano.js"></script>
@@ -450,14 +258,11 @@ $( document ).ready(function() {
     <script type="text/javascript" src="./static/js/xterm-addon-fit.js"></script>
     <script type="text/javascript" src="./static/js/console.js"></script>
     <script type="text/javascript" src="./static/js/file-system.js"></script>
-    <script type="text/javascript" src="./static/js/data-usage.js"></script>
     <script>
     $(document).ready(function() {
         // Don't show the loading spinner at the beginning. Initial page
         // load is full, so not relying on AJAX.
         $("#loading").hide();
-
-        verifyParameters();
 
         // Set up PJAX.
         if ($.support.pjax) {
@@ -480,7 +285,6 @@ $( document ).ready(function() {
             $(document).on("pjax:complete", function() {
                 $("#loading").hide();
                 $("#pjax-container").show();
-                verifyParameters();
             });
         }
 
@@ -498,27 +302,6 @@ $( document ).ready(function() {
         // Set the name of the selected device.
         $("#device-name").html("DEY device".toUpperCase());
 
-        // Change the color of the devices icon when hovering.
-        $("#devices-list-button").on({
-            "mouseover" : function() {
-                $("#devices-list-icon").attr("src", "./static/images/devices_list_green.png");
-            },
-            "mouseout" : function() {
-                $("#devices-list-icon").attr("src", "./static/images/devices_list_gray.png");
-            }
-        });
-        // Change the color of the data usage icon when hovering.
-        $("#data_usage_button").on({
-            "mouseover" : function() {
-                $("#data_usage_icon").attr("src", "./static/images/data_usage_green.png");
-            },
-            "mouseout" : function() {
-                $("#data_usage_icon").attr("src", "./static/images/data_usage.png");
-            }
-        });
-
-        // Check the device connection status.
-        checkDeviceConnectionStatus();
     });
     </script>
 

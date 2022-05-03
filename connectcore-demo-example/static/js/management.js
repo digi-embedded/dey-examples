@@ -22,9 +22,6 @@ const ID_FIRMWARE_TAB_FILESET = "firmware_tab_fileset";
 const ID_FIRMWARE_TAB_FILESET_HEADER = "firmware_tab_fileset_header";
 const ID_FIRMWARE_TAB_UPLOAD = "firmware_tab_upload";
 const ID_FIRMWARE_TAB_UPLOAD_HEADER = "firmware_tab_upload_header";
-const ID_NUM_SAMPLES_UPLOAD_ERROR = "samples_buffer_error";
-const ID_SAMPLE_RATE_ERROR = "sample_rate_error";
-const ID_SAVE_BUTTON = "save_button";
 const ID_SELECT_FIRMWARE_BUTTON = "select_firmware_button";
 const ID_UPDATE_FIRMWARE_BUTTON = "update_firmware_button";
 const ID_UPDATE_FIRMWARE_FILE = "firmware_file";
@@ -46,11 +43,6 @@ const CLASS_PROGRESS_BAR_ERROR = "update-firmware-progress-bar-error";
 const CLASS_PROGRESS_BAR_INFO = "update-firmware-progress-bar-info";
 const CLASS_PROGRESS_BAR_SUCCESS = "update-firmware-progress-bar-success";
 const CLASS_SAVE_BUTTON_DISABLED = "system-monitor-save-disabled";
-const CLASS_SYSTEM_MONITOR_INPUT_ERROR = "system-monitor-input-error";
-
-const ERROR_FIELD_EMPTY = "Field cannot be empty";
-const ERROR_FIELD_NUMBER = "Value must be a positive number";
-const ERROR_FIELD_POSITIVE = "Value must be greater than 0";
 
 const TITLE_CONFIRM_CANCEL_UPDATE = "Cancel firmware update";
 const TITLE_CONFIRM_FIRMWARE_UPDATE = "Confirm firmware update";
@@ -69,11 +61,9 @@ const MESSAGE_DEVICE_REBOOTING = "The device is rebooting. Please wait...";
 const MESSAGE_LOADING_INFORMATION = "Loading device information...";
 const MESSAGE_LOADING_FILES = "Loading files...";
 const MESSAGE_NO_FILE_SELECTED = "No file selected";
-const MESSAGE_SAVING_SYSTEM_MONITOR = "Saving system monitor settings...";
 const MESSAGE_SENDING_FIRMWARE_UPDATE_REQUEST = "Sending firmware update request...";
 const MESSAGE_SENDING_REBOOT = "Sending reboot request...";
 const MESSAGE_SENDING_UPLOAD_REQUEST = "Sending firmware upload request...";
-const MESSAGE_SYSTEM_MONITOR_SAVED = "System monitor settings saved successfully";
 const MESSAGE_UPLOAD_COMPLETE = "Firmware file upload complete";
 const MESSAGE_UPDATING_FIRMWARE = "Updating firmware...";
 const MESSAGE_UPLOADING_FIRMWARE = "Uploading firmware file...";
@@ -135,9 +125,6 @@ function readDeviceInfoManagement() {
     // Send request to retrieve device information.
     $.post(
         "../ajax/get_device_info",
-        JSON.stringify({
-            "device_id": getDeviceID()
-        }),
         function(data) {
             if (!isManagementShowing())
                 return;
@@ -163,63 +150,10 @@ function processDeviceInfoManagementResponse(response) {
     if (!checkErrorResponse(response, false)) {
         // Fill device info.
         fillDeviceInfo(response);
-        // Read system monitor information.
-        readSystemMonitorInfo();
     } else {
         readingManagementInfo = false;
         // Hide the loading panel.
         showLoadingPopup(false);
-    }
-}
-
-// Gets the information of the system monitor.
-function readSystemMonitorInfo() {
-    // Execute only in the management page.
-    if (!isManagementShowing())
-        return;
-    // Hide the info popup.
-    showInfoPopup(false);
-    // Show the loading popup.
-    showLoadingPopup(true, MESSAGE_LOADING_INFORMATION);
-    // Send request to retrieve device information.
-    $.post(
-        "../ajax/get_sample_rate",
-        JSON.stringify({
-            "device_id": getDeviceID()
-        }),
-        function(data) {
-            readingManagementInfo = false;
-            // Process only in the management page.
-            if (!isManagementShowing())
-                return;
-            // Hide the loading panel.
-            showLoadingPopup(false);
-            // Process device information answer.
-            processSystemMonitorInfoResponse(data);
-        }
-    ).fail(function(response) {
-        // Flag reading variable.
-        readingManagementInfo = false;
-        // Process only in the management page.
-        if (!isManagementShowing())
-            return;
-        // Hide the loading panel.
-        showLoadingPopup(false);
-        // Process error.
-        processAjaxErrorResponse(response);
-    });
-}
-
-// Processes the response of the system monitor info request.
-function processSystemMonitorInfoResponse(response) {
-    // Check if there was any error in the request.
-    if (!checkErrorResponse(response, false)) {
-        // Fill system monitor info.
-        fillSystemMonitorInfo(response);
-        // Flag device info read.
-        managementInfoRead = true;
-        // Check if there is a firmware update running.
-        checkFirmwareUpdateRunning();
     }
 }
 
@@ -231,123 +165,6 @@ function fillDeviceInfo(deviceData) {
     updateFieldValue(ID_KERNEL_VERSION, deviceData[ID_KERNEL_VERSION]);
     // Set U-Boot version.
     updateFieldValue(ID_UBOOT_VERSION, deviceData[ID_UBOOT_VERSION]);
-}
-
-// Fills system monitor information.
-function fillSystemMonitorInfo(response) {
-    // Initialize variables.
-    var sampleRateInput = document.getElementById(ID_SAMPLE_RATE);
-    var samplesBufferInput = document.getElementById(ID_NUM_SAMPLES_UPLOAD);
-    // Set the sample rate.
-    if (sampleRateInput != null && sampleRateInput != "undefined")
-        sampleRateInput.value = response[ID_SAMPLE_RATE];
-    // Set the number of samples to upload.
-    if (samplesBufferInput != null && samplesBufferInput != "undefined")
-        samplesBufferInput.value = response[ID_NUM_SAMPLES_UPLOAD];
-    // Validate system monitor.
-    validateSystemMonitor();
-}
-
-// Validates the system monitor values.
-function validateSystemMonitor() {
-    // Initialize vars.
-    var saveButton = document.getElementById(ID_SAVE_BUTTON);
-    var sampleRateValid = validateSystemMonitorField(ID_SAMPLE_RATE, ID_SAMPLE_RATE_ERROR);
-    var samplesBufferValid = validateSystemMonitorField(ID_NUM_SAMPLES_UPLOAD, ID_NUM_SAMPLES_UPLOAD_ERROR);
-    // Check errors.
-    if (!sampleRateValid || !samplesBufferValid) {
-        if (!saveButton.classList.contains(CLASS_SAVE_BUTTON_DISABLED))
-            saveButton.classList.add(CLASS_SAVE_BUTTON_DISABLED);
-    } else {
-        if (saveButton.classList.contains(CLASS_SAVE_BUTTON_DISABLED))
-            saveButton.classList.remove(CLASS_SAVE_BUTTON_DISABLED);
-    }
-}
-
-// Validates the given system monitor field.
-function validateSystemMonitorField(fieldID, errorID) {
-    // Initialize vars.
-    var field = document.getElementById(fieldID);
-    var fieldError = document.getElementById(errorID);
-    var isValid = true;
-    var error = "";
-    // Sanity checks.
-    if (field == null || fieldError == null)
-        return false;
-    // Check if value is valid.
-    var value = field.value;
-    if (value.length == 0) {
-        isValid = false;
-        error = ERROR_FIELD_EMPTY;
-    } else if (!value.match(REGEX_INTEGER)) {
-        isValid = false;
-        error = ERROR_FIELD_NUMBER;
-    } else if (parseInt(value) <= 0) {
-        isValid = false;
-        error = ERROR_FIELD_POSITIVE;
-    }
-    // Update controls.
-    if (isValid) {
-        if (field.classList.contains(CLASS_FILE_SYSTEM_DIR_NAME_INPUT_ERROR))
-            field.classList.remove(CLASS_FILE_SYSTEM_DIR_NAME_INPUT_ERROR);
-        fieldError.innerHTML = "&nbsp;";
-        fieldError.style.display = "none";
-    } else {
-        if (!field.classList.contains(CLASS_FILE_SYSTEM_DIR_NAME_INPUT_ERROR))
-            field.classList.add(CLASS_FILE_SYSTEM_DIR_NAME_INPUT_ERROR);
-        fieldError.innerHTML = error;
-        fieldError.style.display = "block";
-    }
-    return isValid;
-}
-
-// Saves the system monitor settings.
-function saveSystemMonitor() {
-    // Initialize vars.
-    var sampleRateInput = document.getElementById(ID_SAMPLE_RATE);
-    var samplesBufferInput = document.getElementById(ID_NUM_SAMPLES_UPLOAD);
-    // Sanity checks.
-    if (sampleRateInput == null || samplesBufferInput == null)
-        return;
-    // Execute only in the management page.
-    if (!isManagementShowing())
-        return;
-    // Hide the info popup.
-    showInfoPopup(false);
-    // Show the loading popup.
-    showLoadingPopup(true, MESSAGE_SAVING_SYSTEM_MONITOR);
-    // Send request to set system monitor settings.
-    $.post(
-        "../ajax/set_sample_rate",
-        JSON.stringify({
-            "device_id": getDeviceID(),
-            "sample_rate": sampleRateInput.value,
-            "num_samples_upload": samplesBufferInput.value
-        }),
-        function(data) {
-            // Process only in the management page.
-            if (!isManagementShowing())
-                return;
-            // Hide the loading panel.
-            showLoadingPopup(false);
-            // Process device information answer.
-            processSaveSystemMonitorResponse(data);
-        }
-    ).fail(function(response) {
-        // Process only in the management page.
-        if (!isManagementShowing())
-            return;
-        // Hide the loading panel.
-        showLoadingPopup(false);
-        // Process error.
-        processAjaxErrorResponse(response);
-    });
-}
-
-// Processes the save system monitor request response.
-function processSaveSystemMonitorResponse(response) {
-    if (!checkErrorResponse(response, false))
-        toastr.success(MESSAGE_SYSTEM_MONITOR_SAVED);
 }
 
 // Asks the user to confirm the reboot action.
@@ -372,9 +189,6 @@ function rebootDevice() {
     // Send request to reboot the device.
     $.post(
         "../ajax/reboot_device",
-        JSON.stringify({
-            "device_id": getDeviceID()
-        }),
         function(data) {
             // Process only in the management page.
             if (!isManagementShowing())
@@ -487,7 +301,6 @@ function uploadFirmwareFile() {
     // Prepare data.
     var formData = new FormData();
     formData.append("file_set", DEMO_FILE_SET);
-    formData.append("path", getDeviceID());
     formData.append("file_name", firmwareFile.name);
     formData.append("file", firmwareFile);
     // Register websocket to receive upload progress.
@@ -553,7 +366,7 @@ function processUploadFirmwareFileResponse(response) {
         var firmwareFileElement = document.getElementById(ID_UPDATE_FIRMWARE_FILE);
         var firmwareFile = firmwareFileElement.files[0];
         // Send the update request.
-        updateFirmware(DEMO_FILE_SET + "/" + getDeviceID() + "/" + firmwareFile.name);
+        //updateFirmware(DEMO_FILE_SET + "/" + getDeviceID() + "/" + firmwareFile.name);
     }
 }
 
@@ -586,7 +399,6 @@ function updateFirmware(filePath) {
     $.post(
         "../ajax/update_firmware",
         JSON.stringify({
-            "device_id": getDeviceID(),
             "file": filePath
         }),
         function(data) {
@@ -665,9 +477,6 @@ function checkFirmwareUpdateStatus() {
     // Send request to check firmware update status.
     $.post(
         "../ajax/check_firmware_update_status",
-        JSON.stringify({
-            "device_id": getDeviceID()
-        }),
         function(data) {
             // Process only in the management page.
             if (!isManagementShowing())
@@ -724,9 +533,6 @@ function checkFirmwareUpdateRunning() {
     // Send request to check firmware update running.
     $.post(
         "../ajax/check_firmware_update_running",
-        JSON.stringify({
-            "device_id": getDeviceID()
-        }),
         function(data) {
             // Process only in the management page.
             if (!isManagementShowing())
@@ -780,9 +586,6 @@ function checkFirmwareUpdateProgress() {
     // Send request to check firmware update progress.
     $.post(
         "../ajax/check_firmware_update_progress",
-        JSON.stringify({
-            "device_id": getDeviceID()
-        }),
         function(data) {
             // Process only in the management page.
             if (!isManagementShowing())
@@ -862,9 +665,6 @@ function cancelFirmwareUpdateProcess() {
     // Send request to cancel firmware update.
     $.post(
         "../ajax/cancel_firmware_update",
-        JSON.stringify({
-            "device_id": getDeviceID()
-        }),
         function(data) {
             // Process only in the management page.
             if (!isManagementShowing())

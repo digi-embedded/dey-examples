@@ -140,7 +140,7 @@ class CCIMX8MNANO extends ConnectCoreDevice {
     SUPPORTS_VIDEO_BRIGHTNESS = false;
 
     // Constructor.
-    constructor(deviceID, deviceData) {
-        super(CCIMX8MNANO.DEVICE_TYPE, CCIMX8MNANO.PLATFORM_NAME, deviceID, deviceData);
+    constructor(deviceData) {
+        super(CCIMX8MNANO.DEVICE_TYPE, CCIMX8MNANO.PLATFORM_NAME, deviceData);
     }
 }

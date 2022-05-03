@@ -166,7 +166,7 @@ function initDevice() {
     // Flag initializing.
     initializingDevice = true;
     // Check device state.
-    if (deviceInitialized && device.getDeviceID() == getDeviceID()) {
+    if (deviceInitialized) {
         // Draw the device.
         drawDevice();
         // Read device status.
@@ -176,11 +176,14 @@ function initDevice() {
             positionComponents();
             setInfoPanelsVisible(false);
         }, 500);
+        initializingDevice = false;
     } else {
         // Flag the device as not initialized.
         deviceInitialized = false;
         // Read all device info.
         readDeviceInfo();
+        ledStatus = VALUE_UNKNOWN;
+        setLEDValue(USER_LED, false);
     }
 }
 
@@ -196,9 +199,6 @@ function readDeviceInfo() {
     // Send request to retrieve device information.
     $.post(
         "../ajax/get_device_info",
-        JSON.stringify({
-            "device_id": getDeviceID()
-        }),
         function(data) {
             // Process only in the dashboard page.
             if (!isDashboardShowing()) {
@@ -252,11 +252,8 @@ function readDeviceStatus() {
     // Show the loading popup.
     showLoadingPopup(true, MESSAGE_READING_DEVICE_STATUS);
     // Send request to retrieve device status.
-    $.post(
+    /*$.post(
         "../ajax/get_device_status",
-        JSON.stringify({
-            "device_id": getDeviceID()
-        }),
         function(data) {
             // Process only in the dashboard page.
             if (!isDashboardShowing()) {
@@ -274,7 +271,11 @@ function readDeviceStatus() {
             return;
         // Process error.
         processAjaxErrorResponse(response);
-    });
+    });*/
+    // Hide the loading panel of the device.
+    showLoadingPopup(false);
+    // Hide the info panel of the device.
+    showInfoPopup(false);
 }
 
 // Processes the response of the device status request.
@@ -287,9 +288,6 @@ function processDeviceStatusResponse(response) {
     }
     // Update the device status values.
     updateDataPointsValues(response);
-    // Set LED value to a known status.
-    ledStatus = VALUE_UNKNOWN;
-    setLEDValue(USER_LED, false);
     // Show the help popup if needed.
     var helpShown = sessionStorage.getItem(ID_HELP_POPUP_SHOWN);
     if (helpShown == null || helpShown == "false") {
@@ -304,20 +302,20 @@ function createDevice(deviceData) {
     device = null;
     switch (deviceData[ID_DEVICE_TYPE]) {
         case CCIMX8MMINI.DEVICE_TYPE:
-            device = new CCIMX8MMINI(getDeviceID(), deviceData);
+            device = new CCIMX8MMINI(deviceData);
             break;
         case CCIMX8MNANO.DEVICE_TYPE:
-            device = new CCIMX8MNANO(getDeviceID(), deviceData);
+            device = new CCIMX8MNANO(deviceData);
             break;
         case CCIMX8X.DEVICE_TYPE:
-            device = new CCIMX8X(getDeviceID(), deviceData);
+            device = new CCIMX8X(deviceData);
             break;
     }
     if (device != null) {
         // Draw the device.
         drawDevice();
         // Automatically receive updates.
-        subscribeDataPoints();
+        //subscribeDataPoints();
         // Set device as initialized.
         deviceInitialized = true;
         // Device created successfully.
@@ -345,10 +343,6 @@ function drawDevice() {
     boardImage.style.height = "auto";
     // Set the device name.
     updateFieldValue(ID_PLATFORM_NAME, device.getPlatformName());
-    // Set the sample rate.
-    updateFieldValue(ID_SAMPLE_RATE, device.getSampleRate());
-    // Set the number of samples to upload.
-    updateFieldValue(ID_NUM_SAMPLES_UPLOAD, device.getNumSamplesUpload());
     // Initialize the device component panels.
     initializeComponents();
     // Position device components.
@@ -557,8 +551,6 @@ function positionComponent(component, boardWidth, boardHeight, headerHeight, das
 
 // Updates the device information values.
 function updateInfoValues() {
-    // Set Device ID.
-    updateFieldValue(ID_DEVICE_ID, device.getDeviceID());
     // Set serial number.
     updateFieldValue(ID_SERIAL_NUMBER, device.getSerialNumber());
     // Set DEY version.
@@ -837,7 +829,6 @@ function brightnessChanged(newValue) {
     $.post(
         "../ajax/set_video_brightness",
         JSON.stringify({
-            "device_id": getDeviceID(),
             "value": newValue
         }),
         function(data) {
@@ -888,7 +879,6 @@ function volumeChanged(newValue) {
     $.post(
         "../ajax/set_audio_volume",
         JSON.stringify({
-            "device_id": getDeviceID(),
             "value": newValue
         }),
         function(data) {
@@ -953,7 +943,6 @@ function setLEDValue(ledName, ledValue) {
     $.post(
         "../ajax/set_led_value",
         JSON.stringify({
-            "device_id": getDeviceID(),
             "led_name": ledName,
             "value": ledValue
         }),
@@ -1043,3 +1032,4 @@ function subscribeDataPoints() {
         }
     };
 }
+

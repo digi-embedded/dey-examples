@@ -140,7 +140,7 @@ class CCIMX8X extends ConnectCoreDevice {
     SUPPORTS_VIDEO_BRIGHTNESS = false;
 
     // Constructor.
-    constructor(deviceID, deviceData) {
-        super(CCIMX8X.DEVICE_TYPE, CCIMX8X.PLATFORM_NAME, deviceID, deviceData);
+    constructor(deviceData) {
+        super(CCIMX8X.DEVICE_TYPE, CCIMX8X.PLATFORM_NAME, deviceData);
     }
 }

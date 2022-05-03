@@ -246,7 +246,6 @@ function listDirectory(directory) {
     $.post(
         "../ajax/fs_list_directory",
         JSON.stringify({
-            "device_id": getDeviceID(),
             "directory": path
         }),
         function(data) {
@@ -329,7 +328,6 @@ function downloadFile(fileName) {
     showFileSystemLoading(true);
     // Prepare data.
     var data = JSON.stringify({
-            "device_id": getDeviceID(),
             "path": path
         });
     // Send request
@@ -440,7 +438,6 @@ function removeFile(fileName, isFile) {
     $.post(
         "../ajax/fs_remove_file",
         JSON.stringify({
-            "device_id": getDeviceID(),
             "path": path,
             "is_file": isFile
         }),
@@ -487,7 +484,6 @@ function uploadFile(file) {
     showFileSystemLoading(true);
     // Prepare data.
     var formData = new FormData();
-    formData.append("device_id", getDeviceID());
     formData.append("path", path);
     formData.append("file", file);
     // Send request.
@@ -619,7 +615,6 @@ function createDirectory(directoryName) {
     $.post(
         "../ajax/fs_create_dir",
         JSON.stringify({
-            "device_id": getDeviceID(),
             "path": path
         }),
         function(data) {

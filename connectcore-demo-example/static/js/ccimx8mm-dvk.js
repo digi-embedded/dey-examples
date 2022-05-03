@@ -24,7 +24,7 @@ class CCIMX8MMINI extends ConnectCoreDevice {
     BOARD_IMAGE_SCALE = 85;
 
     CPU_COMPONENT_VISIBLE = true;
-    CPU_COMPONENT_HAS_PANEL = true;    
+    CPU_COMPONENT_HAS_PANEL = true;
     CPU_COMPONENT_HAS_ARROW = true;
     CPU_COMPONENT_PANEL_ALWAYS_VISIBLE = false;
     CPU_COMPONENT_PANEL_ORIENTATION = VALUE_TOP;
@@ -140,7 +140,7 @@ class CCIMX8MMINI extends ConnectCoreDevice {
     SUPPORTS_VIDEO_BRIGHTNESS = false;
 
     // Constructor.
-    constructor(deviceID, deviceData) {
-        super(CCIMX8MMINI.DEVICE_TYPE, CCIMX8MMINI.PLATFORM_NAME, deviceID, deviceData);
+    constructor(deviceData) {
+        super(CCIMX8MMINI.DEVICE_TYPE, CCIMX8MMINI.PLATFORM_NAME, deviceData);
     }
 }

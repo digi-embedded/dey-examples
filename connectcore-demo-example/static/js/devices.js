@@ -15,33 +15,6 @@
  */
 
 // Constants.
-const CLASS_ADD_DEVICE_DIALOG_BUTTON_DISABLED = "add-device-button-disabled";
-const CLASS_ADD_DEVICE_DIALOG_INPUT_ERROR = "add-device-input-error";
-const CLASS_DEVICE_SELECTED = "devices-list-entry-selected";
-
-const ERROR_DEVICE_ID_EMPTY = "A Device ID or MAC Address must be provided.";
-const ERROR_DEVICE_ID_INVALID = "A device id format is 00000000-00000000-00000000-00000000, while a mac address format is 00:00:00:00:00:00 (optional colon separators)";
-const ERROR_INVALID_PROVISION_VALUE = "Provided provision value was not valid.";
-
-const ID_ADD_DEVICE_DIALOG = "add_device_dialog";
-const ID_ADD_DEVICE_DIALOG_BUTTON = "add_device_button";
-const ID_ADD_DEVICE_DIALOG_ERROR = "add_device_error";
-const ID_ADD_DEVICE_DIALOG_INPUT = "add_device_input";
-const ID_CONTINUE_BUTTON = "continue-button";
-const ID_DEVICES_LIST = "devices-list";
-const ID_REFRESH_BUTTON = "refresh-button";
-
-const MESSAGE_LOADING_DEVICES = "Loading devices..."
-const MESSAGE_REGISTERING_DEVICE = "Registering device..."
-
-const PROVISION_TYPE_ID = "id";
-const PROVISION_TYPE_MAC = "mac";
-const PROVISION_TYPE_IMEI = "imei";
-
-const REGEX_DEVICE_ID = "^(?:[a-fA-F0-9]{8}-){3}[a-fA-F0-9]{8}$";
-const REGEX_DEVICE_MAC = "^(?:[a-fA-F0-9]{2}:?){5}[a-fA-F0-9]{2}$";
-const REGEX_DEVICE_IMEI = "^[0-9]{15}$";
-
 const TEMPLATE_COMPONENT_DATA = "" +
     "{" +
     "   \"" + ID_VISIBLE + "\" : {0}," +
@@ -57,290 +30,6 @@ const TEMPLATE_COMPONENT_DATA = "" +
     "   \"" + ID_AREA_WIDTH + "\" : {10}," +
     "   \"" + ID_AREA_HEIGHT + "\" : {11}" +
     "}"
-const TEMPLATE_DEVICE_LIST_ENTRY = "" +
-    "<div id='@@ID@@' onclick='selectDevice(\"@@ID@@\")' class='devices-list-entry'>" +
-    "    <table>" +
-    "        <thead>" +
-    "            <tr>" +
-    "                <td rowspan='2'><img class='device-list-entry-status' src='/static/images/@@STATUS_IMAGE@@'></td>" +
-    "                <td><span class='device-list-entry-name'>@@TYPE@@</span></td>" +
-    "            </tr>" +
-    "            <tr>" +
-    "                <td><span class='device-list-entry-id'>@@ID@@</span></td>" +
-    "            <tr>" +
-    "        </thead>" +
-    "    </table>" +
-    "</div>";
-
-// Variables.
-var devices = [];
-
-// Lists DRM devices.
-function listDevices() {
-    // Disable the refresh button.
-    document.getElementById(ID_REFRESH_BUTTON).disabled = true;
-    // Disable the continue button.
-    document.getElementById(ID_CONTINUE_BUTTON).disabled = true;
-    // Clear the devices list
-    clearDevices();
-    // Hide info dialog.
-    showInfoPopup(false);
-    // Show loading dialog.
-    showLoadingPopup(true, MESSAGE_LOADING_DEVICES);
-    // Send the request.
-    $.post(
-        "../ajax/get_devices",
-        function(data) {
-            // Hide the loading panel.
-            showLoadingPopup(false);
-            // Process answer.
-            processListDevicesAnswer(data);
-            // Enable the refresh button.
-            document.getElementById(ID_REFRESH_BUTTON).disabled = false;
-            // Update continue button.
-            updateContinueButton();
-        }
-    ).fail(function(response) {
-        // Hide the loading panel.
-        showLoadingPopup(false);
-        // Process error.
-        processAjaxErrorResponse(response);
-        // Enable the refresh button.
-        document.getElementById(ID_REFRESH_BUTTON).disabled = false;
-    });
-}
-
-// Processes the answer of the list devices request.
-function processListDevicesAnswer(response) {
-    // Check if there was any error in the request.
-    if (checkErrorResponse(response, false)) {
-        // Do not continue.
-        return;
-    }
-    // Get the devices from the JSON response.
-    let readDevices = response[ID_DEVICES];
-    // Check if the list of devices contains any device.
-    if (readDevices == null || readDevices.length == 0)
-        return;
-    // Process devices.
-    for (let device of readDevices) {
-        // Add a new device entry to the list of devices.
-        devices.push(device);
-        let deviceDivContent = TEMPLATE_DEVICE_LIST_ENTRY;
-        deviceDivContent = deviceDivContent.replace(/@@ID@@/g, device[ID_ID]);
-        deviceDivContent = deviceDivContent.replace(/@@TYPE@@/g, device[ID_TYPE]);
-        if (device[ID_ONLINE] == true)
-            deviceDivContent = deviceDivContent.replace(/@@STATUS_IMAGE@@/g, IMAGE_ONLINE);
-        else
-            deviceDivContent = deviceDivContent.replace(/@@STATUS_IMAGE@@/g, IMAGE_OFFLINE);
-        let deviceDiv = document.createElement("div");
-        deviceDiv.innerHTML = deviceDivContent;
-        $("#" + ID_DEVICES_LIST).append(deviceDiv);
-    }
-}
-
-// Clears the list of devices.
-function clearDevices() {
-    unselectDevices();
-    devices = [];
-    $("#" + ID_DEVICES_LIST).html("");
-}
-
-// Selects the given device
-function selectDevice(deviceID) {
-    // Unselect all devices.
-    unselectDevices();
-    // Set selected style to the selected device div.
-    if (document.getElementById(deviceID) != null)
-        document.getElementById(deviceID).classList.add(CLASS_DEVICE_SELECTED);
-    // Save selected device.
-    for (i = 0; i < devices.length; i++) {
-        device = devices[i];
-        if (device[ID_ID] == deviceID)
-            selectedDevice = device;
-    }
-    // Configure continue button.
-    updateContinueButton();
-}
-
-// Unselects all the devices.
-function unselectDevices() {
-    // Clear selected style from all device divs.
-    for (i = 0; i < devices.length; i++) {
-        device = devices[i];
-        if (document.getElementById(device[ID_ID]) != null)
-            document.getElementById(device[ID_ID]).classList.remove(CLASS_DEVICE_SELECTED);
-    }
-    // Remove selected device.
-    selectedDevice = null;
-    // Configure continue button.
-    updateContinueButton();
-}
-
-// Updates the continue button state.
-function updateContinueButton() {
-    // Initialize variables.
-    var continueButton = document.getElementById(ID_CONTINUE_BUTTON);
-    // Check if there is any selected device.
-    if (selectedDevice != null) {
-        continueButton.disabled = false;
-        continueButton.onclick = function() {openSelectedDevice();};
-    } else {
-        continueButton.disabled = true;
-        continueButton.onclick = function() { };
-    }
-}
-
-// Opens the selected device
-function openSelectedDevice() {
-    // Avoid double click.
-    document.getElementById(ID_CONTINUE_BUTTON).disabled = true;
-    // Show loading dialog.
-    showLoadingPopup(true);
-    // Navigate to device dashboard page.
-    window.open("../dashboard/?device_id=" + selectedDevice[ID_ID] + "&device_name=" + selectedDevice[ID_TYPE], "_self");
-}
-
-// Opens the "Add device" dialog.
-function openAddDeviceDialog() {
-    // Initialize variables.
-    var addDeviceInputElement = document.getElementById(ID_ADD_DEVICE_DIALOG_INPUT);
-    var addDeviceButtonElement = document.getElementById(ID_ADD_DEVICE_DIALOG_BUTTON);
-    var addDeviceErrorElement = document.getElementById(ID_ADD_DEVICE_DIALOG_ERROR);
-    // Reset dialog state.
-    addDeviceInputElement.value = "";
-    addDeviceErrorElement.innerHTML = "&nbsp;";
-    addDeviceErrorElement.style.visibility = "hidden";
-    if (!addDeviceButtonElement.classList.contains(CLASS_ADD_DEVICE_DIALOG_BUTTON_DISABLED))
-        addDeviceButtonElement.classList.add(CLASS_ADD_DEVICE_DIALOG_BUTTON_DISABLED);
-    if (addDeviceInputElement.classList.contains(CLASS_ADD_DEVICE_DIALOG_INPUT_ERROR))
-        addDeviceInputElement.classList.remove(CLASS_ADD_DEVICE_DIALOG_INPUT_ERROR);
-    // Show panel.
-    showAddDeviceDialog(true);
-}
-
-// Closes the "Add device" dialog.
-function closeAddDeviceDialog() {
-    showAddDeviceDialog(false);
-}
-
-// Shows/hides the "Add device" dialog.
-function showAddDeviceDialog(visible) {
-    // Initialize variables.
-    var addDeviceDialogElement = document.getElementById(ID_ADD_DEVICE_DIALOG);
-    var addDeviceErrorElement = document.getElementById(ID_ADD_DEVICE_DIALOG_ERROR);
-    // Apply visible state.
-    if (visible)
-        addDeviceDialogElement.style.visibility = "visible";
-    else {
-        addDeviceDialogElement.style.visibility = "hidden";
-        addDeviceErrorElement.style.visibility = "hidden";
-    }
-}
-
-// Validates the device ID.
-function validateDeviceID(deviceID) {
-    // Initialize variables.
-    var addDeviceInputElement = document.getElementById(ID_ADD_DEVICE_DIALOG_INPUT);
-    var addDeviceButtonElement = document.getElementById(ID_ADD_DEVICE_DIALOG_BUTTON);
-    var addDeviceErrorElement = document.getElementById(ID_ADD_DEVICE_DIALOG_ERROR);
-    var isValid = true;
-    var error = ERROR_DEVICE_ID_INVALID;
-    // Check if the device ID is valid.
-    if (deviceID == null || deviceID == "") {
-        isValid = false;
-        error = ERROR_DEVICE_ID_EMPTY;
-    } else
-        isValid = deviceID.match(REGEX_DEVICE_ID) || deviceID.match(REGEX_DEVICE_MAC) || deviceID.match(REGEX_DEVICE_IMEI);
-    // Update controls.
-    if (isValid) {
-        if (addDeviceButtonElement.classList.contains(CLASS_ADD_DEVICE_DIALOG_BUTTON_DISABLED))
-            addDeviceButtonElement.classList.remove(CLASS_ADD_DEVICE_DIALOG_BUTTON_DISABLED);
-        if (addDeviceInputElement.classList.contains(CLASS_ADD_DEVICE_DIALOG_INPUT_ERROR))
-            addDeviceInputElement.classList.remove(CLASS_ADD_DEVICE_DIALOG_INPUT_ERROR);
-        addDeviceErrorElement.innerHTML = "&nbsp;";
-        addDeviceErrorElement.style.visibility = "hidden";
-    } else {
-        if (!addDeviceButtonElement.classList.contains(CLASS_ADD_DEVICE_DIALOG_BUTTON_DISABLED))
-            addDeviceButtonElement.classList.add(CLASS_ADD_DEVICE_DIALOG_BUTTON_DISABLED);
-        if (!addDeviceInputElement.classList.contains(CLASS_ADD_DEVICE_DIALOG_INPUT_ERROR))
-            addDeviceInputElement.classList.add(CLASS_ADD_DEVICE_DIALOG_INPUT_ERROR);
-        addDeviceErrorElement.innerHTML = error;
-        addDeviceErrorElement.style.visibility = "visible";
-    }
-}
-
-// Handles what happens when the "Register device" button is pressed.
-function onRegisterDevice() {
-    // Initialize variables.
-    var addDeviceInputElement = document.getElementById(ID_ADD_DEVICE_DIALOG_INPUT);
-    var provisionValue = addDeviceInputElement.value;
-    var provisionType = "";
-    // Determine provision type.
-    if (provisionValue.match(REGEX_DEVICE_ID))
-        provisionType = PROVISION_TYPE_ID;
-    else if (provisionValue.match(REGEX_DEVICE_MAC))
-        provisionType = PROVISION_TYPE_MAC;
-    else if (provisionValue.match(REGEX_DEVICE_IMEI))
-        provisionType = PROVISION_TYPE_IMEI;
-    else {
-        toastr.error(ERROR_INVALID_PROVISION_VALUE);
-        return;
-    }
-    // Register the device.
-    registerDevice(provisionValue, provisionType);
-}
-
-// Registers the given device ID.
-function registerDevice(provisionValue, provisionType) {
-    // Disable the refresh button.
-    document.getElementById(ID_REFRESH_BUTTON).disabled = true;
-    // Disable the continue button.
-    document.getElementById(ID_CONTINUE_BUTTON).disabled = true;
-    // Close the add device dialog.
-    closeAddDeviceDialog();
-    // Hide info dialog.
-    showInfoPopup(false);
-    // Show loading dialog.
-    showLoadingPopup(true, MESSAGE_REGISTERING_DEVICE);
-    // Send the request.
-    $.post(
-        "../ajax/register_device",
-        JSON.stringify({
-            "provision_value": provisionValue,
-            "provision_type": provisionType
-        }),
-        function(data) {
-            // Hide the loading panel.
-            showLoadingPopup(false);
-            // Process answer.
-            processRegisterDeviceAnswer(data);
-        }
-    ).fail(function(response) {
-        // Hide the loading panel.
-        showLoadingPopup(false);
-        // Process error.
-        processAjaxErrorResponse(response);
-        // Enable the refresh button.
-        document.getElementById(ID_REFRESH_BUTTON).disabled = false;
-        // Refresh the continue button.
-        updateContinueButton();
-    });
-}
-
-// Processes the answer of the register device request.
-function processRegisterDeviceAnswer(answer) {
-    // Check if there was any error in the request.
-    if (checkErrorResponse(answer, false)) {
-        // Enable the refresh button.
-        document.getElementById(ID_REFRESH_BUTTON).disabled = false;
-        // Refresh the continue button.
-        updateContinueButton();
-    } else {
-        // Update the device list.
-        listDevices();
-    }
-}
 
 // Class that represents a ConnectCore device.
 class ConnectCoreDevice {
@@ -482,7 +171,6 @@ class ConnectCoreDevice {
     // Device information.
     #deviceType;
     #platformName;
-    #deviceID;
     #serialNumber;
     #ubootVersion;
     #kernelVersion;
@@ -504,10 +192,9 @@ class ConnectCoreDevice {
     #numSamplesUpload;
 
     // Class constructor.
-    constructor(deviceType, platformName, deviceID, deviceData) {
+    constructor(deviceType, platformName, deviceData) {
         this.#deviceType = deviceType;
         this.#platformName = platformName;
-        this.#deviceID = deviceID;
         this.#initDevice(deviceData);
     }
 
@@ -547,11 +234,6 @@ class ConnectCoreDevice {
     // Returns the device serial number.
     getSerialNumber() {
         return this.#serialNumber;
-    }
-
-    // Returns the device ID.
-    getDeviceID() {
-        return this.#deviceID;
     }
 
     // Returns the board image file name.
