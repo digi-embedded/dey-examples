@@ -60,6 +60,8 @@ const ID_WIFI_BT_PANEL_AREA = "wifi_bt_panel_area";
 const ID_WIFI_BT_PANEL_ARROW = "wifi_bt_panel_arrow";
 const ID_WIFI_BT_PANEL_ICON = "wifi_bt_panel_icon";
 
+const PORT = "9090";
+
 const IFACE_BT = "hci0/";
 const IFACE_ETHERNET = "eth0/";
 const IFACE_WIFI = "wlan0/";
@@ -196,7 +198,7 @@ function readDeviceInfo() {
     showLoadingPopup(true, MESSAGE_READING_DEVICE_INFO);
     // Send request to retrieve device information.
     $.post(
-        "../ajax/get_device_info",
+        "http://" + getServerAddress() + "/ajax/get_device_info",
         function(data) {
             // Process only in the dashboard page.
             if (!isDashboardShowing()) {
@@ -250,8 +252,8 @@ function readDeviceStatus() {
     // Show the loading popup.
     showLoadingPopup(true, MESSAGE_READING_DEVICE_STATUS);
     // Send request to retrieve device status.
-    /*$.post(
-        "../ajax/get_device_status",
+    $.post(
+        "http://" + getServerAddress() + "/ajax/get_device_status",
         function(data) {
             // Process only in the dashboard page.
             if (!isDashboardShowing()) {
@@ -269,7 +271,7 @@ function readDeviceStatus() {
             return;
         // Process error.
         processAjaxErrorResponse(response);
-    });*/
+    });
     // Hide the loading panel of the device.
     showLoadingPopup(false);
     // Hide the info panel of the device.
@@ -312,8 +314,6 @@ function createDevice(deviceData) {
     if (device != null) {
         // Draw the device.
         drawDevice();
-        // Automatically receive updates.
-        //subscribeDataPoints();
         // Set device as initialized.
         deviceInitialized = true;
         // Device created successfully.
@@ -544,6 +544,8 @@ function positionComponent(component, boardWidth, boardHeight, headerHeight, das
 
 // Updates the device information values.
 function updateInfoValues() {
+    // Set the device type.
+    updateFieldValue("device-name", device.getDeviceType().toUpperCase());
     // Set serial number.
     updateFieldValue(ID_SERIAL_NUMBER, device.getSerialNumber());
     // Set DEY version.
@@ -820,7 +822,7 @@ function brightnessChanged(newValue) {
     videoSlider.disable();
     // Send request to change the video brightness value.
     $.post(
-        "../ajax/set_video_brightness",
+        "http://" + getServerAddress() + "/ajax/set_video_brightness",
         JSON.stringify({
             "value": newValue
         }),
@@ -870,7 +872,7 @@ function volumeChanged(newValue) {
     audioSlider.disable();
     // Send request to change the audio volume value.
     $.post(
-        "../ajax/set_audio_volume",
+        "http://" + getServerAddress() + "/ajax/set_audio_volume",
         JSON.stringify({
             "value": newValue
         }),
@@ -934,7 +936,7 @@ function setLEDValue(ledName, ledValue) {
     showLoadingPopup(true, MESSAGE_TOGGLING_LED_VALUE);
     // Send request to change the LED status.
     $.post(
-        "../ajax/set_led_value",
+        "http://" + getServerAddress() + "/ajax/set_led_value",
         JSON.stringify({
             "led_name": ledName,
             "value": ledValue
@@ -1005,24 +1007,11 @@ function changeSampleRate() {
     window.open("../management/?device_id=" + getDeviceID() + "&device_name=" + getDeviceName(), "_self");
 }
 
-// Subscribes to any datapoint change.
-function subscribeDataPoints() {
-    // Sanity checks.
-    if (dataPointsSocket != null)
-        return;
-    // Create the web socket.
-    var socketPrefix = window.location.protocol == "https:" ? "wss" : "ws";
-    dataPointsSocket = new WebSocket(socketPrefix + "://" + window.location.host + "/ws/datapoints/" + device.getDeviceID());
-    // Define the callback to be notified when data is received in the web socket.
-    dataPointsSocket.onmessage = function(e) {
-        if (isDashboardShowing()) {
-            // Initialize variables.
-            var event = JSON.parse(e.data);
-            var stream = event[ID_STREAM];
-            var value = event[ID_VALUE];
-            // Update the datapoint value.
-            updateDataPointValue(stream, value);
-        }
-    };
-}
+// Returns the server address.
+function getServerAddress() {
+    var host = window.location.hostname;
+    if (!Boolean(host))
+        host = "127.0.0.1";
 
+    return host + ":" + PORT;
+}
