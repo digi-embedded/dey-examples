@@ -15,6 +15,7 @@
 # PERFORMANCE OF THIS SOFTWARE.
 
 import argparse
+import cgi
 import http.server
 import json
 import logging
@@ -139,6 +140,153 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
             # Send the JSON value.
             self.wfile.write(json.dumps(status).encode(encoding="utf_8"))
+        elif re.search("/ajax/fs_list_directory", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            path = json.loads(data.decode("utf-8")).get("directory", None)
+
+            log.debug("List directory: %s", path)
+
+            if not path or not os.path.exists(path):
+                error = "Invalid path" if not path else "No such file or directory"
+                log.error("Error listing directory '%s': %s", path, error)
+                self.wfile.write(json.dumps({"error": error}).encode(encoding="utf_8"))
+                return
+
+            work_path = os.path.realpath(path)
+            content = []
+
+            dir_list = {
+                "current_dir": path,
+                "files": content,
+            }
+
+            # Add item '..'
+            if os.path.dirname(work_path) != work_path:
+                content.append({
+                    "type": "dir",
+                    "name": os.path.join(path, ".."),
+                    "last_modified": os.stat(os.path.join(path, "..")),
+                })
+
+            dir_contents = os.listdir(work_path)
+            dir_contents.sort()
+            for item in dir_contents:
+                item_path = os.path.join(path, item)
+                item_work_path = os.path.realpath(item_path)
+                st = os.stat(item_work_path)
+                item = {
+                    "type": "dir" if os.path.isdir(item_work_path) else "file",
+                    "name": os.path.join(path, item),
+                    "last_modified": st[stat.ST_MTIME],
+                }
+                if os.path.isfile(item_work_path):
+                    item["size"] = st[stat.ST_SIZE]
+                content.append(item)
+
+            # Send the JSON value.
+            self.wfile.write(json.dumps(dir_list).encode(encoding="utf_8"))
+        elif re.search("/ajax/fs_remove_file", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            path = json.loads(data.decode("utf-8")).get("path", None)
+
+            log.debug("Remove file: %s", path)
+
+            if not path or not os.path.exists(path):
+                error = "Invalid path" if not path else "No such file or directory"
+                log.error("Error removing file '%s': %s", path, error)
+                self.wfile.write(json.dumps({"error": error}).encode(encoding="utf_8"))
+                return
+
+            try:
+                os.remove(path)
+                self.wfile.write("{}".encode(encoding="utf_8"))
+            except OSError as e:
+                self.wfile.write(json.dumps({"error": e.strerror}).encode(encoding="utf_8"))
+                log.error("Error removing file '%s': %s", e.filename, e.strerror)
+                return
+
+        elif re.search("/ajax/fs_create_dir", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            path = json.loads(data.decode("utf-8")).get("directory", None)
+
+            log.debug("Create directory: %s", path)
+
+            if not path:
+                log.error("Error creating directory '%s': Invalid directory", path)
+                self.wfile.write(json.dumps({"error": "Invalid directory"}).encode(encoding="utf_8"))
+                return
+
+            try:
+                os.makedirs(path, exist_ok=True)
+            except OSError as e:
+                self.wfile.write(json.dumps({"error": e.strerror}).encode(encoding="utf_8"))
+                log.error("Error creating directory '%s': %s", path, e.strerror)
+                return
+
+            self.wfile.write("{}".encode(encoding="utf_8"))
+        elif re.search("/ajax/fs_download_file", self.path) is not None:
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            path = json.loads(data.decode("utf-8")).get("path", None)
+
+            log.debug("Download file: %s", path)
+
+            if not path:
+                self._set_headers(200)
+                log.error("Error downloading file '%s': Invalid path", path)
+                self.wfile.write(json.dumps({"error": "Invalid path"}).encode(encoding="utf_8"))
+                return
+
+            work_path = os.path.realpath(path)
+            try:
+                 with open(work_path, "rb") as f:
+                    contents = f.read()
+            except OSError as e:
+                self._set_headers(200)
+                log.error("Error downloading file '%s': %s", path, e.strerror)
+                self.wfile.write(json.dumps({"error": e.strerror}).encode(encoding="utf_8"))
+                return
+
+            self.send_response(200)
+            self.send_header("Content-type", "application/octet-stream")
+            self.end_headers()
+            self.wfile.write(contents)
+        elif re.search("/ajax/fs_upload_file", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Get the data.
+            ctype, pdict = cgi.parse_header(self.headers['content-type'])
+            if "boundary" in pdict:
+                pdict["boundary"] = pdict["boundary"].encode()
+            data = cgi.parse_multipart(self.rfile, pdict)
+            path = data.get("path", [None])[0]
+            f_data = data.get("file", [bytes()])[0]
+
+            log.debug("Upload file: %s", path)
+            if not path or os.path.exists(path):
+                error = "Invalid path" if not path else "File already exists"
+                log.error("Error uploading file '%s': %s", path, error)
+                self.wfile.write(json.dumps({"error": error}).encode(encoding="utf_8"))
+                return
+
+            work_path = os.path.realpath(path)
+            try:
+                with open(work_path, "xb") as f:
+                    f.write(f_data)
+                self.wfile.write("{}".encode(encoding="utf_8"))
+            except OSError as e:
+                log.error("Error uploading file '%s': %s", path, e.strerror)
+                self.wfile.write(json.dumps({"error": e.strerror}).encode(encoding="utf_8"))
         else:
             # Forbidden.
             self._set_headers(403)

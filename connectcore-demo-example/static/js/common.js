@@ -136,12 +136,28 @@ const ERROR_UNKNOWN_ERROR = "Unknown error";
 
 const PATH_IMAGES = "../static/images/";
 
+const PORT = "9090";
+
 String.prototype.format = function() {
     var formatted = this;
     for (var arg in arguments)
         formatted = formatted.replace("{" + arg + "}", arguments[arg]);
     return formatted;
 };
+
+// Returns the server address.
+function getServerAddress() {
+    var host = window.location.hostname;
+    if (!Boolean(host))
+        host = "127.0.0.1";
+
+    return host + ":" + PORT;
+}
+
+function is_local_access() {
+    var host = window.location.hostname;
+    return !Boolean(host) || host == "127.0.0.1" || host == "localhost";
+}
 
 // Shows/hides a front popup over the given background element.
 function showPopup(backElementID, frontElementID, visible) {

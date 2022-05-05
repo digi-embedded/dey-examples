@@ -60,8 +60,6 @@ const ID_WIFI_BT_PANEL_AREA = "wifi_bt_panel_area";
 const ID_WIFI_BT_PANEL_ARROW = "wifi_bt_panel_arrow";
 const ID_WIFI_BT_PANEL_ICON = "wifi_bt_panel_icon";
 
-const PORT = "9090";
-
 const IFACE_BT = "hci0/";
 const IFACE_ETHERNET = "eth0/";
 const IFACE_WIFI = "wlan0/";
@@ -1005,13 +1003,4 @@ function updateLEDStatus() {
 function changeSampleRate() {
     // Navigate to management page.
     window.open("../management/?device_id=" + getDeviceID() + "&device_name=" + getDeviceName(), "_self");
-}
-
-// Returns the server address.
-function getServerAddress() {
-    var host = window.location.hostname;
-    if (!Boolean(host))
-        host = "127.0.0.1";
-
-    return host + ":" + PORT;
 }

@@ -29,7 +29,9 @@ const ID_FILE_SYSTEM_ITEMS_HEADER = "filesystem_items_header";
 const ID_FILE_SYSTEM_LOADING = "filesystem_loading";
 const ID_FILE_SYSTEM_PANEL = "filesystem_panel";
 const ID_FILE_SYSTEM_REMOVE_FILE_BUTTON = "filesystem_remove_file_button";
+const ID_FILE_SYSTEM_UPLOAD_FILE_BUTTON = "filesystem_upload_file_button";
 const ID_FILE_SYSTEM_TOOLBAR = "filesystem_toolbar";
+const ID_FILE_SYSTEM_TOOLBAR_BUTTONS_CONTAINER = "filesystem_toolbar_buttons_container";
 const ID_FILE_TO_UPLOAD = "file_to_upload";
 
 const CLASS_FA_FILE = "fa-file";
@@ -98,6 +100,11 @@ function openFileSystem() {
     // Show the file system.
     var fileSystemContainer = document.getElementById(ID_FILE_SYSTEM_PANEL);
     fileSystemContainer.style.visibility = "visible";
+    if (is_local_access()) {
+        document.getElementById(ID_FILE_SYSTEM_DOWNLOAD_FILE_BUTTON).style.display = "none";
+        document.getElementById(ID_FILE_SYSTEM_UPLOAD_FILE_BUTTON).style.display = "none";
+        document.getElementById(ID_FILE_SYSTEM_TOOLBAR_BUTTONS_CONTAINER).style.width = "90px";
+    }
     // List root directory.
     listDirectory(ROOT_DIRECTORY);
 }
@@ -244,7 +251,7 @@ function listDirectory(directory) {
     showFileSystemLoading(true);
     // Send request.
     $.post(
-        "../ajax/fs_list_directory",
+        "http://" + getServerAddress() + "/ajax/fs_list_directory",
         JSON.stringify({
             "directory": path
         }),
@@ -333,7 +340,7 @@ function downloadFile(fileName) {
     // Send request
     $.ajax({
         type: 'POST',
-        url: "../ajax/fs_download_file",
+        url: "http://" + getServerAddress() + "/ajax/fs_download_file",
         data: data,
         cache: false,
         async: true,
@@ -436,7 +443,7 @@ function removeFile(fileName, isFile) {
     showFileSystemLoading(true);
     // Send request.
     $.post(
-        "../ajax/fs_remove_file",
+        "http://" + getServerAddress() + "/ajax/fs_remove_file",
         JSON.stringify({
             "path": path,
             "is_file": isFile
@@ -489,7 +496,7 @@ function uploadFile(file) {
     // Send request.
     $.ajax({
         type: 'POST',
-        url: "../ajax/fs_upload_file",
+        url: "http://" + getServerAddress() + "/ajax/fs_upload_file",
         data: formData,
         cache: false,
         async: true,
@@ -613,7 +620,7 @@ function createDirectory(directoryName) {
     showFileSystemLoading(true);
     // Send request.
     $.post(
-        "../ajax/fs_create_dir",
+        "http://" + getServerAddress() + "/ajax/fs_create_dir",
         JSON.stringify({
             "path": path
         }),
