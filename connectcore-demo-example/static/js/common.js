@@ -127,12 +127,18 @@ const CLASS_D_NONE = "d-none";
 const CLASS_DISABLED_DIV = "disabled-div";
 const CLASS_ELEMENT_GRAYED = "element-grayed";
 const CLASS_SELECTED = "selected";
+const CLASS_VALUE_ANIMATION = "value-animation";
+const CLASS_VALUE_UPDATED = "value-updated";
 
 const ERROR_ABORTED = "Operation aborted";
 const ERROR_URL_NOT_FOUND = "Requested URL not found";
 const ERROR_SERVER_ERROR = "Internal server error";
 const ERROR_TITLE = "Error";
 const ERROR_UNKNOWN_ERROR = "Unknown error";
+
+const PREFIX_STREAM = "system_monitor/";
+const STREAM_CPU_LOAD = PREFIX_STREAM + "cpu_load";
+const STREAM_MEMORY_FREE = PREFIX_STREAM + "free_memory";
 
 const PATH_IMAGES = "../static/images/";
 
@@ -144,6 +150,25 @@ String.prototype.format = function() {
         formatted = formatted.replace("{" + arg + "}", arguments[arg]);
     return formatted;
 };
+
+// Updates the value of the given element ID.
+function updateValueWithEffect(elementID, value) {
+    // Initialize variables.
+    var htmlElement = document.getElementById(elementID);
+    // Sanity checks.
+    if (htmlElement == null || htmlElement == "undefined" || value == null)
+        return;
+    // Apply value and classes.
+    htmlElement.classList.add(CLASS_VALUE_UPDATED);
+    htmlElement.innerText = value;
+    htmlElement.classList.add(CLASS_VALUE_ANIMATION);
+    setTimeout(function() {
+        htmlElement.classList.remove(CLASS_VALUE_UPDATED);
+        setTimeout(function() {
+            htmlElement.classList.remove(CLASS_VALUE_ANIMATION);
+        }, 3000);
+    }, 2000);
+}
 
 // Returns the server address.
 function getServerAddress() {
@@ -445,9 +470,9 @@ function isManagementShowing() {
     return window.location.pathname.indexOf("management") > -1;
 }
 
-// Returns whether the history page is showing or not.
-function isHistoryShowing() {
-    return window.location.pathname.indexOf("history") > -1;
+// Returns whether the multimedia page is showing or not.
+function isMultimediaShowing() {
+    return window.location.pathname.indexOf("multimedia") > -1;
 }
 
 // Returns the device name.

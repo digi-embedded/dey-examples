@@ -66,16 +66,12 @@ const IFACE_WIFI = "wlan0/";
 
 const USER_LED = "user_led";
 
-const PREFIX_STREAM = "system_monitor/";
-
-const STREAM_CPU_LOAD = PREFIX_STREAM + "cpu_load";
 const STREAM_CPU_FREQUENCY = PREFIX_STREAM + "frequency";
 const STREAM_CPU_TEMPERATURE = PREFIX_STREAM + "cpu_temperature";
 const STREAM_CPU_UPTIME = PREFIX_STREAM + "uptime";
 const STREAM_ETHERNET_READ_BYTES = PREFIX_STREAM + IFACE_ETHERNET + "rx_bytes";
 const STREAM_ETHERNET_SENT_BYTES = PREFIX_STREAM + IFACE_ETHERNET + "tx_bytes";
 const STREAM_ETHERNET_STATE = PREFIX_STREAM + IFACE_ETHERNET + "state";
-const STREAM_MEMORY_FREE = PREFIX_STREAM + "free_memory";
 const STREAM_LED_STATUS = PREFIX_STREAM + "led_status";
 const STREAM_MEMORY_USED = PREFIX_STREAM + "used_memory";
 const STREAM_WIFI_READ_BYTES = PREFIX_STREAM + IFACE_WIFI + "rx_bytes";
@@ -94,8 +90,6 @@ const CLASS_LED_PANEL_AREA_ON = "led-panel-area-on";
 const CLASS_PANEL_AREA_SELECTED = "panel-area-selected";
 const CLASS_PANEL_AREA_ICON_SELECTED = "panel-area-icon-selected";
 const CLASS_PANEL_TOOLTIP = "panel-tooltip";
-const CLASS_VALUE_ANIMATION = "value-animation";
-const CLASS_VALUE_UPDATED = "value-updated";
 
 const MESSAGE_CHANGING_VIDEO_BRIGHTNESS = "Changing video brightness...";
 const MESSAGE_CHANGING_AUDIO_VOLUME = "Changing audio volume...";
@@ -544,7 +538,7 @@ function positionComponent(component, boardWidth, boardHeight, headerHeight, das
 // Updates the device information values.
 function updateInfoValues() {
     // Set the device type.
-    updateFieldValue("device-name", device.getDeviceType().toUpperCase());
+    updateFieldValue(ID_DEVICE_NAME, device.getDeviceType().toUpperCase());
     // Set serial number.
     updateFieldValue(ID_SERIAL_NUMBER, device.getSerialNumber());
     // Set DEY version.
@@ -644,25 +638,6 @@ function updateDataPointValue(streamID, value) {
             updateValueWithEffect(ID_BT_SENT_DATA, sizeToHumanRead(value));
             break;
     }
-}
-
-// Updates the value of the given element ID.
-function updateValueWithEffect(elementID, value) {
-    // Initialize variables.
-    var htmlElement = document.getElementById(elementID);
-    // Sanity checks.
-    if (htmlElement == null || htmlElement == "undefined" || value == null)
-        return;
-    // Apply value and classes.
-    htmlElement.classList.add(CLASS_VALUE_UPDATED);
-    htmlElement.innerText = value;
-    htmlElement.classList.add(CLASS_VALUE_ANIMATION);
-    setTimeout(function() {
-        htmlElement.classList.remove(CLASS_VALUE_UPDATED);
-        setTimeout(function() {
-            htmlElement.classList.remove(CLASS_VALUE_ANIMATION);
-        }, 3000);
-    }, 2000);
 }
 
 // Toggles the visibility of the given component information panel.
