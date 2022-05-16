@@ -59,6 +59,7 @@ const ID_ETHERNET_STATE = "ethernet_state";
 const ID_FILES = "files";
 const ID_FLASH_MEMORY = "flash_memory";
 const ID_FLASH_SIZE = "flash_size";
+const ID_FW_STORE_PATH = "fw_store_path";
 const ID_HAS_ARROW = "has-arrow";
 const ID_HAS_PANEL = "has-panel";
 const ID_ICON = "icon";

@@ -16,10 +16,6 @@
 
 // Constants.
 const ID_REBOOT_BUTTON = "reboot_button";
-const ID_CANCEL_FIRMWARE_UPDATE_BUTTON = "cancel_update_firmware_button";
-const ID_FILESET_ITEMS_CONTAINER = "fileset_items_container";
-const ID_FIRMWARE_TAB_FILESET = "firmware_tab_fileset";
-const ID_FIRMWARE_TAB_FILESET_HEADER = "firmware_tab_fileset_header";
 const ID_FIRMWARE_TAB_UPLOAD = "firmware_tab_upload";
 const ID_FIRMWARE_TAB_UPLOAD_HEADER = "firmware_tab_upload_header";
 const ID_SELECT_FIRMWARE_BUTTON = "select_firmware_button";
@@ -35,16 +31,11 @@ const ID_UPDATE_RUNNING = "update_running";
 const CLASS_FIRMWARE_TAB = "firmware-tab";
 const CLASS_FIRMWARE_TAB_HEADER = "firmware-tab-header";
 const CLASS_FIRMWARE_TAB_HEADER_ACTIVE = "firmware-tab-header-active";
-const CLASS_FILESET_ENTRY_NAME = "fileset-entry-name";
-const CLASS_FILESET_ENTRY_PATH = "fileset-entry-path";
-const CLASS_FILESET_ENTRY_SELECTED = "fileset-entry-selected";
 const CLASS_MANAGEMENT_BUTTON_DISABLED = "management-button-disabled";
 const CLASS_PROGRESS_BAR_ERROR = "update-firmware-progress-bar-error";
 const CLASS_PROGRESS_BAR_INFO = "update-firmware-progress-bar-info";
 const CLASS_PROGRESS_BAR_SUCCESS = "update-firmware-progress-bar-success";
-const CLASS_SAVE_BUTTON_DISABLED = "system-monitor-save-disabled";
 
-const TITLE_CONFIRM_CANCEL_UPDATE = "Cancel firmware update";
 const TITLE_CONFIRM_FIRMWARE_UPDATE = "Confirm firmware update";
 const TITLE_CONFIRM_REBOOT = "Confirm reboot";
 const TITLE_DEVICE_REBOOTING = "Device Rebooting";
@@ -52,9 +43,7 @@ const TITLE_FIRMWARE_UPDATE_ERROR = "Firmware update failed!";
 const TITLE_FIRMWARE_UPDATE_IN_PROGRESS = "Firmware update in progress...";
 const TITLE_FIRMWARE_UPDATE_SUCCESS = "Firmware update succeeded!";
 
-const MESSAGE_CANCELING_FIRMWARE_UPDATE = "Canceling firmware update...";
 const MESSAGE_CHECKING_FIRMWARE_UPDATE_STATUS = "Checking firmware update...";
-const MESSAGE_CONFIRM_CANCEL_UPDATE = "This action will cancel the ongoing firmware update process. Do you want to continue?";
 const MESSAGE_CONFIRM_FIRMWARE_UPDATE = "This action will update the device firmware. Do you want to continue?";
 const MESSAGE_CONFIRM_REBOOT = "This action will reboot the device and connection will be lost. Do you want to continue?";
 const MESSAGE_DEVICE_REBOOTING = "The device is rebooting. Please wait...";
@@ -68,22 +57,9 @@ const MESSAGE_UPLOAD_COMPLETE = "Firmware file upload complete";
 const MESSAGE_UPDATING_FIRMWARE = "Updating firmware...";
 const MESSAGE_UPLOADING_FIRMWARE = "Uploading firmware file...";
 
-const REGEX_INTEGER = '^[0-9]+$';
-
 const UPDATE_ERROR = "error";
 const UPDATE_INFO = "info";
 const UPDATE_SUCCESS = "success";
-
-const DEMO_FILE_SET = "ConnectCoreDemo";
-
-const TEMPLATE_FILESET_FILE = "" +
-    "<div id='file_{0}' class='fileset-entry' title='{1}' onclick='selectFilesetEntry(\"file_{2}\")'>" +
-    "    <div class='fas fa-file fa-lg fileset-entry-icon'></div>" +
-    "    <div class='fileset-entry-name'>{3}</div>" +
-    "    <div class='fileset-entry-path'>{4}</div>" +
-    "    <div class='fileset-entry-size'>{5}</div>" +
-    "    <div class='fileset-entry-last-modified'>{6}</div>" +
-    "</div>";
 
 const FIRMWARE_UPDATE_CHECK_INTERVAL = 10000;
 
@@ -93,10 +69,8 @@ var managementInfoRead = false;
 var deviceRebooting = false;
 var updatingFirmware = false;
 var firmwareUpdateTimer = null;
-var uploadProgressSocket = null;
 var uploadFirmwareAjaxRequest = null;
-var filesLoaded = false;
-var selectedFilesetEntry = null;
+var fwStorageDir = "/home/root/";
 
 // Initializes the management page.
 function initializeManagementPage() {
@@ -124,10 +98,14 @@ function readDeviceInfoManagement() {
     showLoadingPopup(true, MESSAGE_LOADING_INFORMATION);
     // Send request to retrieve device information.
     $.post(
-        "../ajax/get_device_info",
+        "http://" + getServerAddress() + "/ajax/get_device_info",
         function(data) {
+            readingManagementInfo = false;
+            // Process only in the management page.
             if (!isManagementShowing())
                 return;
+            // Hide the loading panel.
+            showLoadingPopup(false);
             // Process device information answer.
             processDeviceInfoManagementResponse(data);
         }
@@ -150,15 +128,18 @@ function processDeviceInfoManagementResponse(response) {
     if (!checkErrorResponse(response, false)) {
         // Fill device info.
         fillDeviceInfo(response);
-    } else {
-        readingManagementInfo = false;
-        // Hide the loading panel.
-        showLoadingPopup(false);
+        fwStorageDir = response[ID_FW_STORE_PATH];
+        // Flag device info read.
+        managementInfoRead = true;
+        // Check if there is a firmware update running.
+        checkFirmwareUpdateRunning();
     }
 }
 
 // Fills device information.
 function fillDeviceInfo(deviceData) {
+    // Set the device type.
+    updateFieldValue(ID_DEVICE_NAME, deviceData[ID_DEVICE_TYPE].toUpperCase());
     // Set DEY version.
     updateFieldValue(ID_DEY_VERSION, deviceData[ID_DEY_VERSION]);
     // Set Kernel version.
@@ -188,7 +169,7 @@ function rebootDevice() {
     showLoadingPopup(true, MESSAGE_SENDING_REBOOT);
     // Send request to reboot the device.
     $.post(
-        "../ajax/reboot_device",
+        "http://" + getServerAddress() + "/ajax/reboot_device",
         function(data) {
             // Process only in the management page.
             if (!isManagementShowing())
@@ -209,43 +190,78 @@ function rebootDevice() {
     });
 }
 
+function onConnectivity(cb) {
+    $.get("http://" + getServerAddress() + "/ping", function() {
+        cb();
+    }).fail(function() {
+        onConnectivity(cb);
+    });
+}
+
+function showRebootInfo() {
+    // Show info dialog.
+    showInfoPopup(true, TITLE_DEVICE_REBOOTING, "Waiting for connectivity after reboot <span class=\"dots\"></span>");
+    deviceRebooting = true;
+    managementInfoRead = false;
+    prevDeviceConnectionStatus = false;
+
+    var dotsInterval = setInterval(function() {
+        var dots = $("#info_popup .dots");
+        dots.text(dots.text() === "..." ? "" : dots.text() + ".");
+    }, 2000);
+
+    setTimeout(function() {
+        onConnectivity(function() {
+            clearInterval(dotsInterval);
+            showInfoPopup(false);
+            showPopup(ID_LOADING_WRAPPER, "rebooted_dialog", true);
+        });
+    }, 2000);
+}
+
 // Processes the response of the reboot device request.
 function processRebootDeviceResponse(response) {
     // Check if there was any error in the request.
-    if (!checkErrorResponse(response, false)) {
-        // Show info dialog.
-        showInfoPopup(true, TITLE_DEVICE_REBOOTING, MESSAGE_DEVICE_REBOOTING);
-        deviceRebooting = true;
-        managementInfoRead = false;
-        // TODO: This should not be necessary when implementing device connection monitor.
-        prevDeviceConnectionStatus = false;
-    }
+    if (!checkErrorResponse(response, false))
+        showRebootInfo();
 }
 
 // Opens the firmware file browser.
 function openFirmwareBrowser() {
-    document.getElementById(ID_UPDATE_FIRMWARE_FILE).click();
+    if (is_local_access())
+        openFileSystem(showButtons=false, filters=".swu");
+    else
+        document.getElementById(ID_UPDATE_FIRMWARE_FILE).click();
 }
 
 // Reads the device status.
-function firmwareFileChanged() {
+function firmwareFileChanged(fileName="") {
     // Execute only in the management page.
     if (!isManagementShowing())
         return;
+    closeFileSystem();
     // Initialize variables.
     var firmwareFileElement = document.getElementById(ID_UPDATE_FIRMWARE_FILE);
     var firmwareFileLabelElement = document.getElementById(ID_UPDATE_FIRMWARE_FILE_LABEL);
     // Hide progress bar.
     showFirmwareUpdateProgress(false);
-    if (firmwareFileElement.files.length == 0) {
+    if (fileName == "" && firmwareFileElement.files.length == 0) {
         // No file selected.
         firmwareFileLabelElement.innerHTML = MESSAGE_NO_FILE_SELECTED;
         enableManagementButton(ID_UPDATE_FIRMWARE_BUTTON, false);
         return;
     }
-    var firmwareFile = firmwareFileElement.files[0];
+    var firmwareFile = "";
+    // Build file path.
+    if (is_local_access()) {
+        firmwareFile = currentDirectory + fileName;
+        // Hide the loading status.
+        showFileSystemLoading(false);
+    } else {
+        firmwareFile = firmwareFileElement.files[0].name;
+    }
     // Update firmware file name.
-    firmwareFileLabelElement.innerHTML = firmwareFile.name;
+    firmwareFileLabelElement.innerHTML = firmwareFile;
     // Enable button.
     enableManagementButton(ID_UPDATE_FIRMWARE_BUTTON, true);
 }
@@ -270,19 +286,13 @@ function askUpdateFirmware() {
             showFirmwareUpdateProgress(true);
             // Disable management page controls.
             enableManagementPageControls(false);
-            // Enable cancel button.
-            enableManagementButton(ID_CANCEL_FIRMWARE_UPDATE_BUTTON, true);
             // Check active tab.
             if (activeTab == ID_FIRMWARE_TAB_UPLOAD) {
-                // Upload firmware.
-                uploadFirmwareFile();
-            } else if (activeTab == ID_FIRMWARE_TAB_FILESET) {
-                // Build file path.
-                var filesetEntryElement = document.getElementById(selectedFilesetEntry);
-                var fileName = filesetEntryElement.getElementsByClassName(CLASS_FILESET_ENTRY_NAME)[0].innerHTML;
-                var filePath = filesetEntryElement.getElementsByClassName(CLASS_FILESET_ENTRY_PATH)[0].innerHTML;
-                // Update firmware.
-                updateFirmware(DEMO_FILE_SET + "/" + filePath + "/" + fileName);
+                if (!is_local_access())
+                    // Upload firmware.
+                    uploadFirmwareFile();
+                else
+                    updateFirmware(document.getElementById(ID_UPDATE_FIRMWARE_FILE_LABEL).innerHTML);
             }
         },
         function() {
@@ -300,15 +310,13 @@ function uploadFirmwareFile() {
     setFirmwareUpdateProgressInfo(0, MESSAGE_UPLOADING_FIRMWARE);
     // Prepare data.
     var formData = new FormData();
-    formData.append("file_set", DEMO_FILE_SET);
-    formData.append("file_name", firmwareFile.name);
+    formData.append("path", fwStorageDir + firmwareFile.name);
     formData.append("file", firmwareFile);
-    // Register websocket to receive upload progress.
-    subscribeUploadFileProgress(firmwareFile.name);
-    // Send request
-    uploadFirmwareAjaxRequest = $.ajax({
+    formData.append("overwrite", true);
+    // Send request.
+    $.ajax({
         type: 'POST',
-        url: "../ajax/upload_firmware",
+        url: "http://" + getServerAddress() + "/ajax/fs_upload_file",
         data: formData,
         cache: false,
         async: true,
@@ -318,9 +326,6 @@ function uploadFirmwareFile() {
         success: function(response) {
             // Reset request variable.
             uploadFirmwareAjaxRequest = null;
-            // Close progress socket.
-            if (uploadProgressSocket != null && uploadProgressSocket != "undefined")
-                uploadProgressSocket.close();
             // Process only in the management page.
             if (!isManagementShowing())
                 return;
@@ -330,9 +335,6 @@ function uploadFirmwareFile() {
         error: function(response) {
             // Reset request variable.
             uploadFirmwareAjaxRequest = null;
-            // Close progress socket.
-            if (uploadProgressSocket != null && uploadProgressSocket != "undefined")
-                uploadProgressSocket.close();
             // Process only in the management page.
             if (!isManagementShowing())
                 return;
@@ -366,26 +368,7 @@ function processUploadFirmwareFileResponse(response) {
         var firmwareFileElement = document.getElementById(ID_UPDATE_FIRMWARE_FILE);
         var firmwareFile = firmwareFileElement.files[0];
         // Send the update request.
-        //updateFirmware(DEMO_FILE_SET + "/" + getDeviceID() + "/" + firmwareFile.name);
-    }
-}
-
-// Subscribes to firmware update progress.
-function subscribeUploadFileProgress(fileName) {
-    // Create the web socket.
-    var socketPrefix = window.location.protocol == "https:" ? "wss" : "ws";
-    uploadProgressSocket = new WebSocket(socketPrefix + "://" + window.location.host + "/ws/file_upload_progress/" + fileName);
-    // Define the callback to be notified when firmware update progress is received.
-    uploadProgressSocket.onmessage = function(e) {
-        // Process only in the management page.
-        if (!isManagementShowing()) {
-            // Close the socket.
-            uploadProgressSocket.close();
-            return;
-        }
-        // Update progress.
-        var data = JSON.parse(e.data);
-        setFirmwareUpdateProgressInfo(data[ID_PROGRESS], MESSAGE_UPLOADING_FIRMWARE);
+        updateFirmware(fwStorageDir + firmwareFile.name);
     }
 }
 
@@ -393,11 +376,9 @@ function subscribeUploadFileProgress(fileName) {
 function updateFirmware(filePath) {
     // Update status.
     setFirmwareUpdateProgressInfo(0, MESSAGE_SENDING_UPLOAD_REQUEST);
-    // Disable the cancel button.
-    enableManagementButton(ID_CANCEL_FIRMWARE_UPDATE_BUTTON, false);
     // Send request to update the firmware.
     $.post(
-        "../ajax/update_firmware",
+        "http://" + getServerAddress() + "/ajax/update_firmware",
         JSON.stringify({
             "file": filePath
         }),
@@ -435,8 +416,6 @@ function processUpdateFirmwareResponse(response) {
         // Enable the page controls.
         enableManagementPageControls(true);
     } else {
-        // Enable the cancel button.
-        enableManagementButton(ID_CANCEL_FIRMWARE_UPDATE_BUTTON, true);
         // Update progress status.
         setFirmwareUpdateProgressInfo(100, MESSAGE_SENDING_FIRMWARE_UPDATE_REQUEST);
         // Start timer to check firmware update status periodically.
@@ -476,7 +455,7 @@ function checkFirmwareUpdateStatus() {
     }
     // Send request to check firmware update status.
     $.post(
-        "../ajax/check_firmware_update_status",
+        "http://" + getServerAddress() + "/ajax/check_firmware_update_status",
         function(data) {
             // Process only in the management page.
             if (!isManagementShowing())
@@ -488,8 +467,13 @@ function checkFirmwareUpdateStatus() {
         // Process only in the management page.
         if (!isManagementShowing())
             return;
-        // Process error.
-        processAjaxErrorResponse(response);
+        $.get("http://" + getServerAddress() + "/ping", function() {
+            // Process error.
+            processAjaxErrorResponse(response);
+        }).fail(function() {
+            if (!deviceRebooting)
+                showRebootInfo();
+        });
     });
 }
 
@@ -516,6 +500,7 @@ function processCheckFirmwareUpdateStatusResponse(response) {
                 managementInfoRead = false;
                 // Set update as successful.
                 setFirmwareUpdateProgressSuccess(response[ID_MESSAGE]);
+                showRebootInfo();
             }
         }
     }
@@ -532,7 +517,7 @@ function checkFirmwareUpdateRunning() {
     showLoadingPopup(true, MESSAGE_CHECKING_FIRMWARE_UPDATE_STATUS);
     // Send request to check firmware update running.
     $.post(
-        "../ajax/check_firmware_update_running",
+        "http://" + getServerAddress() + "/ajax/check_firmware_update_running",
         function(data) {
             // Process only in the management page.
             if (!isManagementShowing())
@@ -561,8 +546,6 @@ function processCheckFirmwareUpdateRunningResponse(response) {
         updatingFirmware = true;
         // Disable page controls.
         enableManagementPageControls(false);
-        // Enable cancel button.
-        enableManagementButton(ID_CANCEL_FIRMWARE_UPDATE_BUTTON, true);
         // Show firmware update progress.
         showFirmwareUpdateProgress(true);
         // Update the firmware update progress.
@@ -585,7 +568,7 @@ function checkFirmwareUpdateProgress() {
     showLoadingPopup(false);
     // Send request to check firmware update progress.
     $.post(
-        "../ajax/check_firmware_update_progress",
+        "http://" + getServerAddress() + "/ajax/check_firmware_update_progress",
         function(data) {
             // Process only in the management page.
             if (!isManagementShowing())
@@ -611,212 +594,6 @@ function processCheckFirmwareUpdateProgressResponse(response) {
     }
 }
 
-// Asks user to cancel the firmware update process
-function askCancelFirmwareUpdate() {
-    showConfirmDialog(TITLE_CONFIRM_CANCEL_UPDATE, MESSAGE_CONFIRM_CANCEL_UPDATE,
-        function() {
-            cancelFirmwareUpdate();
-        },
-        function() {
-            // Do nothing.
-        }
-    );
-}
-
-// Cancels an ongoing firmware update.
-function cancelFirmwareUpdate() {
-    // Sanity checks
-    if (!isManagementShowing() || !updatingFirmware)
-        return;
-    // Check the type of the firmware update.
-    if (uploadFirmwareAjaxRequest != null)
-        cancelFirmwareUploadProcess();
-    else
-        cancelFirmwareUpdateProcess();
-}
-
-// Cancels the firmware upload process.
-function cancelFirmwareUploadProcess() {
-    // Sanity checks
-    if (!isManagementShowing())
-        return;
-    // Send request to cancel firmware upload.
-    uploadProgressSocket.send("cancel");
-    // Abort AJAX request.
-    uploadFirmwareAjaxRequest.abort();
-    uploadFirmwareAjaxRequest = null;
-    // Flag the update variable.
-    updatingFirmware = false;
-    // Enable page controls.
-    enableManagementPageControls(true);
-    // Hide he firmware update progress.
-    showFirmwareUpdateProgress(false);
-}
-
-// Cancels the remote firmware update process.
-function cancelFirmwareUpdateProcess() {
-    // Sanity checks
-    if (!isManagementShowing())
-        return;
-    // Disable cancel button.
-    enableManagementButton(ID_CANCEL_FIRMWARE_UPDATE_BUTTON, false);
-    // Show loading popup.
-    showLoadingPopup(true, MESSAGE_CANCELING_FIRMWARE_UPDATE);
-    // Send request to cancel firmware update.
-    $.post(
-        "../ajax/cancel_firmware_update",
-        function(data) {
-            // Process only in the management page.
-            if (!isManagementShowing())
-                return;
-            // Hide loading popup.
-            showLoadingPopup(false);
-            // Process cancel firmware update answer.
-            processCancelFirmwareUpdateResponse(data);
-        }
-    ).fail(function(response) {
-        // Process only in the management page.
-        if (!isManagementShowing())
-            return;
-        // Hide loading popup.
-        showLoadingPopup(false);
-        // Process error.
-        processAjaxErrorResponse(response);
-        // Enable cancel button again.
-        enableManagementButton(ID_CANCEL_FIRMWARE_UPDATE_BUTTON, true);
-    });
-}
-
-// Processes the response of the cancel firmware update request.
-function processCancelFirmwareUpdateResponse(response) {
-    // Check if there was any error in the request.
-    if (checkErrorResponse(response, false)) {
-        // Enable cancel button again.
-        enableManagementButton(ID_CANCEL_FIRMWARE_UPDATE_BUTTON, true);
-    } else {
-        // Flag the update variable.
-        updatingFirmware = false;
-        // Enable page controls.
-        enableManagementPageControls(true);
-        // Hide firmware update progress.
-        showFirmwareUpdateProgress(false);
-        // Stop the firmware update timer.
-        stopFirmwareUpdateTimer();
-    }
-}
-
-// Clears the fileset file list.
-function clearFilesetList() {
-    // Initialize variables.
-    var filesetEntriesContainerElement = document.getElementById(ID_FILESET_ITEMS_CONTAINER);
-    // Clear the fileset file list.
-    if (filesetEntriesContainerElement != null && filesetEntriesContainerElement != "undefined") {
-        while (filesetEntriesContainerElement.firstChild)
-            filesetEntriesContainerElement.removeChild(filesetEntriesContainerElement.lastChild);
-    }
-}
-
-// Refresh the fileset list of files.
-function refreshFilesetFiles() {
-    // Sanity checks
-    if (!isManagementShowing())
-        return;
-    // Flag files loaded.
-    filesLoaded = false;
-    // Reset fileset files.
-    listFilesetFiles(DEMO_FILE_SET);
-}
-
-// Lists all the files of a fileset.
-function listFilesetFiles(fileSet) {
-    // Sanity checks
-    if (!isManagementShowing() || filesLoaded)
-        return;
-    // Unselect all fileset entries.
-    unselectFilesetEntries();
-    // Clear the fileset list.
-    clearFilesetList();
-    // Show loading popup.
-    showLoadingPopup(true, MESSAGE_LOADING_FILES);
-    // Send request to list files.
-    $.post(
-        "../ajax/list_fileset_files",
-        JSON.stringify({
-            "file_set": fileSet
-        }),
-        function(data) {
-            // Process only in the management page.
-            if (!isManagementShowing())
-                return;
-            // Hide loading popup.
-            showLoadingPopup(false);
-            // Process answer.
-            processListFilesetFilesResponse(data);
-        }
-    ).fail(function(response) {
-        // Process only in the management page.
-        if (!isManagementShowing())
-            return;
-        // Hide loading popup.
-        showLoadingPopup(false);
-        // Process error.
-        processAjaxErrorResponse(response);
-    });
-}
-
-// Processes the response of the list fileset files request.
-function processListFilesetFilesResponse(response) {
-    // Check if there was any error in the request.
-    if (!checkErrorResponse(response, false)) {
-        // Parse the files contained in the fileset.
-        var files = response[ID_FILES];
-        // Add the files to the list.
-        if (files != null && files != "undefined") {
-            var filesetEntriesContainerElement = document.getElementById(ID_FILESET_ITEMS_CONTAINER);
-            for (var entry of response[ID_FILES]) {
-                var name = entry[ID_NAME];
-                var entryDiv = document.createElement("div");
-                entryDiv.innerHTML = TEMPLATE_FILESET_FILE.format(name, name, name, name, entry[ID_PATH],
-                        sizeToHumanRead(entry[ID_SIZE]), transformDate(entry[ID_LAST_MODIFIED]));
-                filesetEntriesContainerElement.appendChild(entryDiv);
-            }
-        }
-        // Flag fileset list variable.
-        filesLoaded = true;
-    }
-}
-
-// Selects a file from the fileset list
-function selectFilesetEntry(entryID) {
-    // Unselect all entries.
-    unselectFilesetEntries();
-    // Set selected style to the selected div.
-    var entryElement = document.getElementById(entryID)
-    if (entryElement != null) {
-        entryElement.classList.add(CLASS_FILESET_ENTRY_SELECTED);
-        selectedFilesetEntry = entryID;
-        // Enable update firmware button.
-        enableManagementButton(ID_UPDATE_FIRMWARE_BUTTON, true);
-        // Hide firmware update progress.
-        showFirmwareUpdateProgress(false);
-    }
-}
-
-// Unselects all the fileset entries.
-function unselectFilesetEntries() {
-    // Initialize variables.
-    var fileSystemEntriesDiv = document.getElementById(ID_FILESET_ITEMS_CONTAINER);
-    var children = fileSystemEntriesDiv.children;
-    // Remove selected class from all entries.
-    for (var i = 0; i < children.length; i++) {
-        var entry = children[i].children[0];
-        entry.classList.remove(CLASS_FILESET_ENTRY_SELECTED);
-    }
-    selectedFilesetEntry = null;
-    // Disable firmware update button.
-    enableManagementButton(ID_UPDATE_FIRMWARE_BUTTON, false);
-}
-
 // Enables/disables the management page controls.
 function enableManagementPageControls(enable) {
     // Reboot button.
@@ -829,32 +606,16 @@ function enableManagementPageControls(enable) {
             enableManagementButton(ID_UPDATE_FIRMWARE_BUTTON, false);
         else
             enableManagementButton(ID_UPDATE_FIRMWARE_BUTTON, enable);
-    } else if (activeTab == ID_FIRMWARE_TAB_FILESET) {
-        if (!filesLoaded || selectedFilesetEntry == null)
-            enableManagementButton(ID_UPDATE_FIRMWARE_BUTTON, false);
-        else
-            enableManagementButton(ID_UPDATE_FIRMWARE_BUTTON, enable);
     }
-    // Cancel update button.
-    if (isFirmwareUpdateRunning() && enable)
-        enableManagementButton(ID_CANCEL_FIRMWARE_UPDATE_BUTTON, enable);
-    else
-        enableManagementButton(ID_CANCEL_FIRMWARE_UPDATE_BUTTON, false);
     // Tabs.
     var tabUploadElement = document.getElementById(ID_FIRMWARE_TAB_UPLOAD);
     var tabUploadHeaderElement = document.getElementById(ID_FIRMWARE_TAB_UPLOAD_HEADER);
-    var tabFilesetElement = document.getElementById(ID_FIRMWARE_TAB_FILESET);
-    var tabFilesetHeaderElement = document.getElementById(ID_FIRMWARE_TAB_FILESET_HEADER);
     if (enable) {
         tabUploadElement.classList.remove((CLASS_DISABLED_DIV));
         tabUploadHeaderElement.classList.remove((CLASS_DISABLED_DIV));
-        tabFilesetElement.classList.remove((CLASS_DISABLED_DIV));
-        tabFilesetHeaderElement.classList.remove((CLASS_DISABLED_DIV));
     } else {
         tabUploadElement.classList.add((CLASS_DISABLED_DIV));
         tabUploadHeaderElement.classList.add((CLASS_DISABLED_DIV));
-        tabFilesetElement.classList.add((CLASS_DISABLED_DIV));
-        tabFilesetHeaderElement.classList.add((CLASS_DISABLED_DIV));
     }
 }
 
@@ -875,12 +636,9 @@ function enableManagementButton(buttonID, enable) {
 function getActiveFirmwareUpdateTab() {
     // Initialize variables.
     var tabUploadHeaderElement = document.getElementById(ID_FIRMWARE_TAB_UPLOAD_HEADER);
-    var tabFilesetHeaderElement = document.getElementById(ID_FIRMWARE_TAB_FILESET_HEADER);
     // Check the active tab.
     if (tabUploadHeaderElement.classList.contains(CLASS_FIRMWARE_TAB_HEADER_ACTIVE))
         return ID_FIRMWARE_TAB_UPLOAD;
-    else if (tabFilesetHeaderElement.classList.contains(CLASS_FIRMWARE_TAB_HEADER_ACTIVE))
-        return ID_FIRMWARE_TAB_FILESET;
     else
         return null;
 }
@@ -923,15 +681,6 @@ function showFirmwareTab(tabID) {
         showFirmwareUpdateProgress(false);
         // Perform additional actions on each tab.
         switch(tabID) {
-            case ID_FIRMWARE_TAB_FILESET:
-                if (filesLoaded && selectedFilesetEntry != null) {
-                    // Enable firmware update button.
-                    enableManagementButton(ID_UPDATE_FIRMWARE_BUTTON, true);
-                } else if (!filesLoaded) {
-                    // Refresh fileset entries.
-                    listFilesetFiles(DEMO_FILE_SET);
-                }
-                break;
             case ID_FIRMWARE_TAB_UPLOAD:
                 // Check if there is a file in the file input.
                 var firmwareFileElement = document.getElementById(ID_UPDATE_FIRMWARE_FILE);
@@ -998,8 +747,16 @@ function updateFirmwareUpdateProgress(status, progress, title=null, message=null
                     break;
             }
             // Update the progress bar percent.
-            progressBarElement.style.width = progress + "%";
-            progressBarElement.innerHTML = progress + "%";
+            if (progress != "?") {
+                progressBarElement.style.width = progress + "%";
+                progressBarElement.innerHTML = progress + "%";
+            } else {
+                let html = progressBarElement.innerHTML;
+                if (html.startsWith("."))
+                    progressBarElement.innerHTML = html + ".";
+                else
+                    progressBarElement.innerHTML = ".";
+            }
         }
         // Update the progress title.
         var progressTitleElement = document.getElementById(ID_UPDATE_FIRMWARE_PROGRESS_TITLE);

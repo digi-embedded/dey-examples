@@ -17,6 +17,7 @@
 // Constants.
 const ID_CURRENT_DIRECTORY = "current_directory";
 const ID_FILE_SYSTEM_CONTAINER = "filesystem_container";
+const ID_FILE_SYSTEM_CREATE_DIR_BUTTON = "filesystem_create_directory_button";
 const ID_FILE_SYSTEM_DIR_NAME = "filesystem_directory_name";
 const ID_FILE_SYSTEM_DIR_NAME_BUTTON = "filesystem_directory_name_button";
 const ID_FILE_SYSTEM_DIR_NAME_ERROR = "filesystem_directory_name_error";
@@ -29,6 +30,7 @@ const ID_FILE_SYSTEM_ITEMS_HEADER = "filesystem_items_header";
 const ID_FILE_SYSTEM_LOADING = "filesystem_loading";
 const ID_FILE_SYSTEM_PANEL = "filesystem_panel";
 const ID_FILE_SYSTEM_REMOVE_FILE_BUTTON = "filesystem_remove_file_button";
+const ID_FILE_SYSTEM_SELECT_FILE_BUTTON = "filesystem_select_file_button";
 const ID_FILE_SYSTEM_UPLOAD_FILE_BUTTON = "filesystem_upload_file_button";
 const ID_FILE_SYSTEM_TOOLBAR = "filesystem_toolbar";
 const ID_FILE_SYSTEM_TOOLBAR_BUTTONS_CONTAINER = "filesystem_toolbar_buttons_container";
@@ -52,18 +54,18 @@ const PREFIX_FS = "fs_";
 const REGEX_DIRECTORY_NAME = '^[^\\s^\x00-\x1f\\?*:"";<>|\\/.][^\x00-\x1f\\?*:"";<>|\\/]*[^\\s^\x00-\x1f\\?*:"";<>|\\/.]+$';
 
 const TEMPLATE_DIRECTORY = "" +
-    "<div id='fs_{0}' class='filesystem-entry' title='{1}' onclick='listDirectory(\"{2}\")'>" +
+    "<div id='fs_{0}' class='filesystem-entry' title='{1}' onclick='listDirectory(\"{2}\", filters=\"{3}\")'>" +
     "    <div class='fas fa-folder fa-lg filesystem-entry-icon'></div>" +
-    "    <div class='filesystem-entry-name'>{3}</div>" +
+    "    <div class='filesystem-entry-name'>{4}</div>" +
     "    <div class='filesystem-entry-size'></div>" +
-    "    <div class='filesystem-entry-last-modified'>{4}</div>" +
+    "    <div class='filesystem-entry-last-modified'>{5}</div>" +
     "</div>";
 const TEMPLATE_FILE = "" +
-    "<div id='fs_{0}' class='filesystem-entry' title='{1}' onclick='selectFileSystemEntry(\"fs_{2}\")' ondblclick='downloadFile(\"{3}\")'>" +
+    "<div id='fs_{0}' class='filesystem-entry' title='{1}' onclick='selectFileSystemEntry(\"fs_{2}\", filters=\"{3}\")' ondblclick='downloadFile(\"{4}\")'>" +
     "    <div class='fas fa-file fa-lg filesystem-entry-icon'></div>" +
-    "    <div class='filesystem-entry-name'>{4}</div>" +
-    "    <div class='filesystem-entry-size'>{5}</div>" +
-    "    <div class='filesystem-entry-last-modified'>{6}</div>" +
+    "    <div class='filesystem-entry-name'>{5}</div>" +
+    "    <div class='filesystem-entry-size'>{6}</div>" +
+    "    <div class='filesystem-entry-last-modified'>{7}</div>" +
     "</div>";
 
 const ERROR_DIR_NAME_EMPTY = "Directory name cannot be empty.";
@@ -77,7 +79,7 @@ var selectedFileSystemEntry = null;
 var filesystemResizeObserver = null;
 
 // Opens the file system panel.
-function openFileSystem() {
+function openFileSystem(showButtons=true, filters="") {
     // Check if the file system is showing.
     if (isFileSystemShowing())
         return;
@@ -100,19 +102,23 @@ function openFileSystem() {
     // Show the file system.
     var fileSystemContainer = document.getElementById(ID_FILE_SYSTEM_PANEL);
     fileSystemContainer.style.visibility = "visible";
-    if (is_local_access()) {
+    if (!showButtons || is_local_access()) {
         document.getElementById(ID_FILE_SYSTEM_DOWNLOAD_FILE_BUTTON).style.display = "none";
         document.getElementById(ID_FILE_SYSTEM_UPLOAD_FILE_BUTTON).style.display = "none";
-        document.getElementById(ID_FILE_SYSTEM_TOOLBAR_BUTTONS_CONTAINER).style.width = "90px";
+        document.getElementById(ID_FILE_SYSTEM_TOOLBAR_BUTTONS_CONTAINER).style.width = "auto";
+    }
+    if (!showButtons) {
+        document.getElementById(ID_FILE_SYSTEM_CREATE_DIR_BUTTON).style.display = "none";
+        document.getElementById(ID_FILE_SYSTEM_REMOVE_FILE_BUTTON).style.display = "none";
     }
     // List root directory.
-    listDirectory(ROOT_DIRECTORY);
+    listDirectory(ROOT_DIRECTORY, filters=filters);
 }
 
 // Returns whether the file system window is open or not.
 function isFileSystemShowing() {
     // Sanity checks.
-    if (!isDashboardShowing())
+    if (!isDashboardShowing() && !isManagementShowing())
         return false;
     // Initialize variables.
     var fileSystemContainer = document.getElementById(ID_FILE_SYSTEM_PANEL);
@@ -178,26 +184,63 @@ function clearFileSystemEntries() {
 }
 
 // Enables/disabled the file system buttons.
-function enableFileSystemButtons(enable) {
+function enableFileSystemButtons(enable, filters="") {
     // Initialize variables.
     var downloadButton = document.getElementById(ID_FILE_SYSTEM_DOWNLOAD_FILE_BUTTON);
     var removeButton = document.getElementById(ID_FILE_SYSTEM_REMOVE_FILE_BUTTON);
+    var selectFwButton = document.getElementById(ID_FILE_SYSTEM_SELECT_FILE_BUTTON);
     // Apply enable state.
     if (!enable) {
-        downloadButton.disabled = true;
-        removeButton.disabled = true;
-        downloadButton.classList.add(CLASS_FILE_SYSTEM_BUTTON_DISABLED)
-        removeButton.classList.add(CLASS_FILE_SYSTEM_BUTTON_DISABLED)
+        if (removeButton) {
+            removeButton.disabled = true;
+            removeButton.classList.add(CLASS_FILE_SYSTEM_BUTTON_DISABLED);
+        }
+        if (downloadButton) {
+            downloadButton.disabled = true;
+            downloadButton.classList.add(CLASS_FILE_SYSTEM_BUTTON_DISABLED);
+        }
+        if (selectFwButton) {
+            selectFwButton.disabled = true;
+            selectFwButton.classList.add(CLASS_FILE_SYSTEM_BUTTON_DISABLED);
+        }
     } else {
-        downloadButton.disabled = false;
-        removeButton.disabled = false;
-        downloadButton.classList.remove(CLASS_FILE_SYSTEM_BUTTON_DISABLED)
-        removeButton.classList.remove(CLASS_FILE_SYSTEM_BUTTON_DISABLED)
+        if (removeButton) {
+            removeButton.disabled = false;
+            removeButton.classList.remove(CLASS_FILE_SYSTEM_BUTTON_DISABLED);
+        }
+        if (downloadButton) {
+            downloadButton.disabled = false;
+            downloadButton.classList.remove(CLASS_FILE_SYSTEM_BUTTON_DISABLED);
+        }
+        if (selectFwButton) {
+            enable = false;
+            if (filters) {
+                var filePath = selectedFileSystemEntry.substring(PREFIX_FS.length);
+                var filter_list = filters.split(",");
+                for (var i = 0; i < filter_list.length; i++) {
+                    if (filePath.endsWith(filter_list[i])) {
+                        enable = true;
+                        break;
+                    }
+                }
+            }
+            if (!filters || enable) {
+                selectFwButton.disabled = false;
+                selectFwButton.classList.remove(CLASS_FILE_SYSTEM_BUTTON_DISABLED);
+            }
+        }
     }
 }
 
+// Downloads the selected file.
+function selectFirmwareFile() {
+    // Build file path.
+    var filePath = selectedFileSystemEntry.substring(PREFIX_FS.length);
+    firmwareFileChanged(filePath);
+}
+
 // Selects the given file system entry.
-function selectFileSystemEntry(entryID) {
+function selectFileSystemEntry(entryID, filters="") {
     // Unselect all entries.
     unselectFileSystemEntries();
     // Set selected style to the selected device div.
@@ -207,7 +250,7 @@ function selectFileSystemEntry(entryID) {
     // Save selected entry.
     selectedFileSystemEntry = entryID;
     // Enable buttons.
-    enableFileSystemButtons(true);
+    enableFileSystemButtons(true, filters=filters);
 }
 
 // Unselects all the file system entries.
@@ -227,7 +270,7 @@ function unselectFileSystemEntries() {
 }
 
 // Lists the contents of the given directory.
-function listDirectory(directory) {
+function listDirectory(directory, filters="") {
     // Build path.
     var path = currentDirectory;
     if (path == null || currentDirectory == directory)
@@ -253,14 +296,15 @@ function listDirectory(directory) {
     $.post(
         "http://" + getServerAddress() + "/ajax/fs_list_directory",
         JSON.stringify({
-            "directory": path
+            "directory": path,
+            "filters": filters,
         }),
         function(data) {
             // Process only if the file system window is showing.
             if (!isFileSystemShowing())
                 return;
             // Process answer.
-            processListDirectoryResponse(data);
+            processListDirectoryResponse(data, filters=filters);
         }
     ).fail(function(response) {
         // Process only if the file system window is showing.
@@ -274,7 +318,7 @@ function listDirectory(directory) {
 }
 
 // Processes the list directory response.
-function processListDirectoryResponse(response) {
+function processListDirectoryResponse(response, filters="") {
     // Check if there was any error in the request.
     if (checkErrorResponse(response, false)) {
         // Hide the loading status.
@@ -307,10 +351,10 @@ function processListDirectoryResponse(response) {
             }
             var entryDiv = document.createElement("div");
             if (entry[ID_TYPE] == FS_TYPE_FILE)
-                entryDiv.innerHTML = TEMPLATE_FILE.format(name, name, name, name, name,
+                entryDiv.innerHTML = TEMPLATE_FILE.format(name, name, name, filters, name, name,
                         sizeToHumanRead(entry[ID_SIZE]), lastModified);
             else if (entry[ID_TYPE] == FS_TYPE_DIRECTORY)
-                entryDiv.innerHTML = TEMPLATE_DIRECTORY.format(name, name, name, name, lastModified);
+                entryDiv.innerHTML = TEMPLATE_DIRECTORY.format(name, name, name, filters, name, lastModified);
             if (entryDiv.innerHTML != null && entryDiv.innerHTML != "")
                 fileSystemEntriesDiv.appendChild(entryDiv);
         }

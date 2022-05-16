@@ -22,6 +22,7 @@ import logging
 import os
 import platform
 import re
+import shutil
 import signal
 import socketserver
 import stat
@@ -53,6 +54,7 @@ stop_event = Event()
 last_cpu_work = 0
 last_cpu_total = 0
 led_status = {}
+fw_process = None
 
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -71,8 +73,14 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         """
         Override.
         """
-        # Forbidden.
-        self._set_headers(403)
+        if re.search("/ping", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Send the JSON value.
+            self.wfile.write("{}".encode(encoding="utf_8"))
+        else:
+            # Forbidden.
+            self._set_headers(403)
 
     def do_POST(self):
         """
@@ -101,6 +109,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 "memory_total": mem_info.get("MemTotal", NOT_AVAILABLE) if mem_info else NOT_AVAILABLE,
                 "flash_size": get_storage_size(),
                 "video_resolution": get_video_resolution(),
+                "fw_store_path": get_fw_store_path(),
                 "bluetooth_mac": get_bt_mac("hci0"),
                 "wifi_mac": read_file("/sys/class/net/wlan0/address").strip().upper() if "wlan0" in list_net_ifaces() else ZERO_MAC,
                 "wifi_ip": get_iface_ip("wlan0") if "wlan0" in list_net_ifaces() else ZERO_IP,
@@ -202,8 +211,9 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             # Get the JSON data.
             data = self.rfile.read(int(self.headers["Content-Length"]))
             path = json.loads(data.decode("utf-8")).get("directory", None)
+            filters = json.loads(data.decode("utf-8")).get("filters", None)
 
-            log.debug("List directory: %s", path)
+            log.debug("List directory: %s (filters %s)", path, filters)
 
             if not path or not os.path.exists(path):
                 error = "Invalid path" if not path else "No such file or directory"
@@ -212,27 +222,15 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
             work_path = os.path.realpath(path)
-            content = []
+            tmp_list = []
 
-            dir_list = {
-                "current_dir": path,
-                "files": content,
-            }
-
-            # Add item '..'
-            if os.path.dirname(work_path) != work_path:
-                content.append({
-                    "type": "dir",
-                    "name": os.path.join(path, ".."),
-                    "last_modified": os.stat(os.path.join(path, "..")),
-                })
-
-            dir_contents = os.listdir(work_path)
-            dir_contents.sort()
-            for item in dir_contents:
+            for item in os.listdir(work_path):
                 item_path = os.path.join(path, item)
                 item_work_path = os.path.realpath(item_path)
                 st = os.stat(item_work_path)
+                if not os.path.isdir(item_work_path):
+                    if not filter_by_extension(item_path, filters):
+                        continue
                 item = {
                     "type": "dir" if os.path.isdir(item_work_path) else "file",
                     "name": os.path.join(path, item),
@@ -240,10 +238,20 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 }
                 if os.path.isfile(item_work_path):
                     item["size"] = st[stat.ST_SIZE]
-                content.append(item)
+                tmp_list.append(item)
+
+            f_list = sorted(tmp_list, key=lambda item: (item["type"], os.path.basename(item["name"])))
+
+            # Add item '..'
+            if os.path.dirname(work_path) != work_path:
+                f_list.insert(0, {
+                    "type": "dir",
+                    "name": os.path.join(path, ".."),
+                    "last_modified": os.stat(os.path.join(path, "..")),
+                })
 
             # Send the JSON value.
-            self.wfile.write(json.dumps(dir_list).encode(encoding="utf_8"))
+            self.wfile.write(json.dumps({"current_dir": path, "files": f_list}).encode(encoding="utf_8"))
         elif re.search("/ajax/fs_remove_file", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
@@ -326,10 +334,23 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             data = cgi.parse_multipart(self.rfile, pdict)
             path = data.get("path", [None])[0]
             f_data = data.get("file", [bytes()])[0]
+            overwrite = data.get("overwrite", [False])[0]
+            error = None
 
-            log.debug("Upload file: %s", path)
-            if not path or os.path.exists(path):
-                error = "Invalid path" if not path else "File already exists"
+            log.debug("Upload file: %s (overwrite %s)", path, overwrite)
+
+            if not path:
+                error = "Invalid path"
+            elif os.path.exists(path):
+                if not overwrite:
+                    error = "File already exists"
+                else:
+                    try:
+                        os.remove(path)
+                    except OSError as e:
+                        error = e.strerror
+
+            if error:
                 log.error("Error uploading file '%s': %s", path, error)
                 self.wfile.write(json.dumps({"error": error}).encode(encoding="utf_8"))
                 return
@@ -342,6 +363,88 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             except OSError as e:
                 log.error("Error uploading file '%s': %s", path, e.strerror)
                 self.wfile.write(json.dumps({"error": e.strerror}).encode(encoding="utf_8"))
+        elif re.search("/ajax/reboot_device", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+
+            log.debug("Reboot device")
+
+            # Send the JSON value.
+            self.wfile.write("{}".encode(encoding="utf_8"))
+
+            exec_cmd("reboot")
+        elif re.search("/ajax/update_firmware", self.path) is not None:
+            global fw_process
+
+            # Set the response headers.
+            self._set_headers(200)
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            path = json.loads(data.decode("utf-8")).get("file", None)
+
+            log.debug("Update firmware with file %s", path)
+
+            if is_dual_system():
+                cmd = "firmware-update-dual.sh %s" % path
+            else:
+                if not path.startswith(get_fw_store_path()):
+                    # Move the package to /mnt/update
+                    update_path = os.path.join(get_fw_store_path(), os.path.basename(path))
+                    if os.path.exists(update_path):
+                        os.remove(update_path)
+                    shutil.move(path, update_path)
+                    path = update_path
+                cmd = "update-firmware --reboot-timeout=1 %s" % path
+
+            log.debug("Update cmd: %s", cmd)
+
+            try:
+                fw_process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                                              stderr=subprocess.STDOUT,
+                                              shell=True, text=True)
+                self.wfile.write("{}".encode(encoding="utf_8"))
+            except OSError as e:
+                log.error("Error updating firmware '%s': %s", path, e.strerror)
+                self.wfile.write(json.dumps({"error": e.strerror}).encode(encoding="utf_8"))
+                fw_process = None
+            except subprocess.SubprocessError as e:
+                log.error("Error updating firmware '%s': %s", path, e.stdout)
+                self.wfile.write(json.dumps({"error": e.stdout}).encode(encoding="utf_8"))
+                fw_process = None
+
+            if is_dual_system() and os.path.exists(path):
+                os.remove(path)
+        elif re.search("/ajax/check_firmware_update_running", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+
+            is_running = (fw_process.poll() is not None) if fw_process else False
+
+            log.debug("Update firmware is running %s", is_running)
+
+            self.wfile.write(json.dumps({"update-running": is_running}).encode(encoding="utf_8"))
+        elif re.search("/ajax/check_firmware_update_status", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+
+            status = "successful"
+            if fw_process:
+                ret = fw_process.poll()
+                if ret is None:
+                    status = "active"
+                elif ret != 0:
+                    status = "failed"
+
+            log.debug("Update firmware status %s", status)
+
+            self.wfile.write(json.dumps({"status": status}).encode(encoding="utf_8"))
+        elif re.search("/ajax/check_firmware_update_progress", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            progress = 100
+            if fw_process and fw_process.poll() is None:
+                progress = "?"
+            self.wfile.write(json.dumps({"progress": progress, "message": "Updating firmare"}).encode(encoding="utf_8"))
         else:
             # Forbidden.
             self._set_headers(403)
@@ -366,6 +469,27 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-type", "application/json")
         self.end_headers()
+
+
+def filter_by_extension(name, filters):
+    """
+    Returns whether the provided name ends with one of the provided filters.
+
+    Args:
+        name (String): Name of the file to check.
+        filters (String): Comma-separated extensions.
+
+    Returns:
+        Boolean: True if the file ends with one of the filters, False otherwise.
+    """
+    if not filters:
+        return True
+
+    for ext in filters.split(","):
+        if name.endswith(ext):
+            return True
+
+    return False;
 
 
 def get_uptime():
@@ -471,6 +595,30 @@ def get_video_resolution():
         return "-"
 
     return res.split(":")[1].strip()
+
+
+def is_dual_system():
+    """
+    Returns wherther is a dual system.
+
+    Returns:
+        Boolean: True for dual systems, False otherwise.
+    """
+    res = exec_cmd("fdisk -l | grep recovery")
+    return res[0] != 0
+
+
+def get_fw_store_path():
+    """
+    Returns the path to store an image before an update.
+
+    Returns:
+        String: Absolute path to store a firmware image.
+    """
+    if is_dual_system():
+        return "/home/root/"
+
+    return "/mnt/update/"
 
 
 def get_mem_info():
