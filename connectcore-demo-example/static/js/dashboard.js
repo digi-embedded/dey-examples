@@ -22,8 +22,6 @@ const ID_AUDIO_PANEL_ICON = "audio_panel_icon";
 const ID_AUDIO_SLIDER_CONTAINER = "audio_volume";
 const ID_BOARD_IMAGE = "board_image";
 const ID_BOARD_IMAGE_CONTAINER = "board_image_container";
-const ID_CONSOLE_PANEL_AREA = "console_panel_area";
-const ID_CONSOLE_PANEL_ICON = "console_panel_icon";
 const ID_CPU_PANEL = "cpu_panel";
 const ID_CPU_PANEL_AREA = "cpu_panel_area";
 const ID_CPU_PANEL_ARROW = "cpu_panel_arrow";
@@ -381,11 +379,6 @@ function initializeComponents() {
     var ethernetPanelIcon = document.getElementById(ID_ETHERNET_PANEL_ICON);
     var ethernetInfo = {"panel": ethernetPanel, "arrow": ethernetPanelArrow, "area": ethernetPanelArea, "icon": ethernetPanelIcon, "data": device.getEthernetComponentData()};
     components[ID_ETHERNET] = ethernetInfo;
-    // Console component.
-    var consolePanelArea = document.getElementById(ID_CONSOLE_PANEL_AREA);
-    var consolePanelIcon = document.getElementById(ID_CONSOLE_PANEL_ICON);
-    var consoleInfo = {"area": consolePanelArea, "icon": consolePanelIcon, "data": device.getConsoleComponentData()};
-    components[ID_CONSOLE] = consoleInfo;
     // Video component.
     var videoPanel = document.getElementById(ID_VIDEO_PANEL);
     var videoPanelArrow = document.getElementById(ID_VIDEO_PANEL_ARROW);
