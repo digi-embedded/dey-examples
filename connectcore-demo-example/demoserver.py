@@ -52,6 +52,7 @@ log = logging.getLogger(APP_NAME)
 stop_event = Event()
 last_cpu_work = 0
 last_cpu_total = 0
+led_status = {}
 
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -126,6 +127,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 "system_monitor/uptime": get_uptime(),
                 "system_monitor/free_memory": mem_free,
                 "system_monitor/used_memory": mem_used,
+                "system_monitor/led_status": get_led_status("USER_LED"),
                 "system_monitor/hci0/state": bt_data.get("state", 0),
                 "system_monitor/hci0/rx_bytes": bt_data.get("rx_bytes", 0),
                 "system_monitor/hci0/tx_bytes": bt_data.get("tx_bytes", 0),
@@ -140,6 +142,32 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
             # Send the JSON value.
             self.wfile.write(json.dumps(status).encode(encoding="utf_8"))
+        elif re.search("/ajax/set_led_value", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            led = json.loads(data.decode("utf-8")).get("led_name", None)
+            value = json.loads(data.decode("utf-8")).get("value", None)
+
+            log.debug("Set LED %s to %s", led, value)
+
+            if not led or value is None:
+                error = "Invalid LED name" if not led else "Invalid LED value"
+                log.error("Error setting LED '%s': %s", led, error)
+                self.wfile.write(json.dumps({"error": error}).encode(encoding="utf_8"))
+                return
+
+            error = set_led_status(led, value)
+
+            # Send the JSON value.
+            if error:
+                log.error("Error setting LED '%s': %s", led, error)
+                self.wfile.write(json.dumps({"error": error}).encode(encoding="utf_8"))
+                return
+
+            self.wfile.write("{}".encode(encoding="utf_8"))
         elif re.search("/ajax/fs_list_directory", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
@@ -595,6 +623,80 @@ def get_bt_data(iface_name):
         data["tx_bytes"] = m.group(1) if m else 0
 
     return data
+
+
+def get_led_status(name):
+    """
+    Get the LED value.
+
+    Args:
+        name (String): LED name in '/etc/libdigiapix.conf', if not the format
+            must be '<chip> <led>', i.e, 'mca-gpio 12'.
+
+    Returns:
+        Boolean: True if LED is on, False otherwise.
+    """
+    value = led_status.get(name, None)
+    if value is None:
+        value = led_status.get(name.lower(), False)
+    return value
+
+
+def set_led_status(name, value):
+    """
+    Set the LED value.
+
+    Args:
+        name (String): LED name in '/etc/libdigiapix.conf', if not the format
+            must be '<chip> <led>', i.e, 'mca-gpio 12'.
+        value (Boolean): True to switch on the LED, False otherwise.
+
+    Returns:
+        String: An empty string if success, the error description if fails.
+    """
+    chip, led = get_led_by_alias(name)
+    if not chip or not led:
+        cmd = "gpioset %s=%s" % (name, "1" if value else "0")
+    else:
+        cmd = "gpioset %s %s=%s" % (chip, led, "1" if value else "0")
+
+    res = exec_cmd(cmd)
+    if res[0] != 0:
+        return res[1]
+
+    led_status[name] = value
+
+    return ""
+
+
+def get_led_by_alias(alias):
+    """
+    Get LED chip and line.
+
+    Args:
+        alias (String): LED name in '/etc/libdigiapix.conf'.
+
+    Returns:
+        Tuple (String, String): LED chip name and line. If not found, both are None.
+    """
+    apix_info = read_file("/etc/libdigiapix.conf")
+    if apix_info == NOT_AVAILABLE:
+        return None, None
+
+    apix_values = {}
+    for line in apix_info.splitlines():
+        key, val = line.partition("=")[::2]
+        apix_values[key.strip()] = val.strip()
+
+    led_loc = apix_values.get(alias, None)
+    if not led_loc:
+        led_loc = apix_values.get(alias.upper(), None)
+
+    if not led_loc:
+        log.debug("LED alias '%s' not found", alias)
+        return None, None
+    else:
+        return led_loc.split(",")
 
 
 def read_proc_file(path):

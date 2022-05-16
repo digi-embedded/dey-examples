@@ -76,6 +76,7 @@ const STREAM_ETHERNET_READ_BYTES = PREFIX_STREAM + IFACE_ETHERNET + "rx_bytes";
 const STREAM_ETHERNET_SENT_BYTES = PREFIX_STREAM + IFACE_ETHERNET + "tx_bytes";
 const STREAM_ETHERNET_STATE = PREFIX_STREAM + IFACE_ETHERNET + "state";
 const STREAM_MEMORY_FREE = PREFIX_STREAM + "free_memory";
+const STREAM_LED_STATUS = PREFIX_STREAM + "led_status";
 const STREAM_MEMORY_USED = PREFIX_STREAM + "used_memory";
 const STREAM_WIFI_READ_BYTES = PREFIX_STREAM + IFACE_WIFI + "rx_bytes";
 const STREAM_WIFI_SENT_BYTES = PREFIX_STREAM + IFACE_WIFI + "tx_bytes";
@@ -603,6 +604,11 @@ function updateDataPointValue(streamID, value) {
             break;
         case STREAM_CPU_UPTIME:
             updateValueWithEffect(ID_CPU_UPTIME, secondsToTime(value));
+            break;
+        case STREAM_LED_STATUS:
+            // updateLEDStatus() toggles the value of ledStatus
+            ledStatus = !value;
+            updateLEDStatus();
             break;
         case STREAM_MEMORY_FREE:
             updateValueWithEffect(ID_MEMORY_FREE, kiloBytesToMegaBytes(value));
