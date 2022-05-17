@@ -100,6 +100,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 "mca_fw_version": mca_versions[0],
                 "memory_total": mem_info.get("MemTotal", NOT_AVAILABLE) if mem_info else NOT_AVAILABLE,
                 "flash_size": get_storage_size(),
+                "video_resolution": get_video_resolution(),
                 "bluetooth_mac": get_bt_mac("hci0"),
                 "wifi_mac": read_file("/sys/class/net/wlan0/address").strip().upper() if "wlan0" in list_net_ifaces() else ZERO_MAC,
                 "wifi_ip": get_iface_ip("wlan0") if "wlan0" in list_net_ifaces() else ZERO_IP,
@@ -456,6 +457,20 @@ def get_storage_size():
         return int(resize_to(int(size) * 512, SIZE_KB))
     except ValueError:
         return -1
+
+
+def get_video_resolution():
+    """
+    Gets the video resolution.
+
+    Returns:
+        String: Video resolution.
+    """
+    res = read_file("/sys/class/graphics/fb0/modes")
+    if res == NOT_AVAILABLE:
+        return "-"
+
+    return res.split(":")[1].strip()
 
 
 def get_mem_info():
