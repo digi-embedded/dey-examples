@@ -910,7 +910,10 @@ function processSetAudioVolumeResponse(response) {
         audioSlider.setValue(volume);
     } else {
         // Save new volume value.
-        volume = audioSlider.getValue();
+        volume = response["value"];
+        if (volume == null)
+            volume = audioSlider.getValue();
+        audioSlider.setValue(volume);
     }
     // Hide the loading panel of the device.
     showLoadingPopup(false);

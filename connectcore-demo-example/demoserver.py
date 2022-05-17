@@ -168,6 +168,32 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
             self.wfile.write("{}".encode(encoding="utf_8"))
+        elif re.search("/ajax/set_audio_volume", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            value = json.loads(data.decode("utf-8")).get("value", None)
+
+            log.debug("Set audio volume to %s", value)
+
+            if value is None or value > 100 or value < 0:
+                error = "Invalid volume value"
+                log.error("Error setting audio volume to '%s%%': %s", value, error)
+                self.wfile.write(json.dumps({"error": error}).encode(encoding="utf_8"))
+                return
+
+            vol, error = set_audio_volume(value)
+
+            # Send the JSON value.
+            if error:
+                log.error("Error setting audio volume to '%s%%': %s", value, error)
+                self.wfile.write(json.dumps({"error": error}).encode(encoding="utf_8"))
+                return
+
+            # Send the JSON value.
+            self.wfile.write(json.dumps({"value": vol}).encode(encoding="utf_8"))
         elif re.search("/ajax/fs_list_directory", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
@@ -697,6 +723,37 @@ def get_led_by_alias(alias):
         return None, None
     else:
         return led_loc.split(",")
+
+
+def set_audio_volume(value):
+    """
+    Configures the audio volume.
+
+    Args:
+        value (Integer): Volume to set in percentage.
+
+    Returns:
+        Tuple (Integer, String): Current volume value and error string if fails.
+    """
+    res = exec_cmd("amixer set Headphone %d%%" % value)
+    if res[0] != 0:
+        return -1, res[1]
+
+    tmp = res[1].split("Front Right:")
+    if len(tmp) < 1:
+        return -1, "Unable to get current volume"
+
+    m = re.search("\[(.+?)%\]", tmp[1])
+    if not m:
+        return -1, "Unable to get current volume"
+
+    if len(m.groups()) < 1:
+        return -1, "Unable to get current volume"
+
+    try:
+        return int(m.group(1)), ""
+    except ValueError:
+        return -1, "Unable to get current volume"
 
 
 def read_proc_file(path):
