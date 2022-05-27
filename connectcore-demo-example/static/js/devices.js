@@ -221,6 +221,11 @@ class ConnectCoreDevice {
         this.#numSamplesUpload = deviceData[ID_NUM_SAMPLES_UPLOAD];
     }
 
+    refreshIPs(eth_ip, wifi_ip) {
+        this.#ethernetIP = eth_ip;
+        this.#wifiIP = wifi_ip;
+    }
+
     // Returns the device type.
     getDeviceType() {
         return this.#deviceType;

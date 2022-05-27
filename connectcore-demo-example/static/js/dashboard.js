@@ -235,10 +235,51 @@ function processDeviceInfoResponse(response) {
     readDeviceStatus();
 }
 
+function refreshDevice() {
+    // Execute only in the dashboard page.
+    if (!isDashboardShowing() || device == null)
+        return;
+
+    if (!deviceInitialized) {
+        // Hide the info popup.
+        showInfoPopup(false);
+        // Show the loading popup.
+        showLoadingPopup(true, MESSAGE_READING_DEVICE_INFO);
+        // Send request to retrieve device information.
+        $.post(
+            "http://" + getServerAddress() + "/ajax/get_device_info",
+            function(data) {
+                // Process only in the dashboard page.
+                if (!isDashboardShowing()) {
+                    initializingDevice = false;
+                    return;
+                }
+                // Check if there was any error in the request.
+                if (checkErrorResponse(data, true)) {
+                    // Do not continue with device status.
+                    initializingDevice = false;
+                    return;
+                }
+                device.refreshIPs(data[ID_ETHERNET_IP], data[ID_WIFI_IP]);
+                updateInfoValues();
+            }
+        ).fail(function(response) {
+            // Stop device initialization.
+            initializingDevice = false;
+            // Process only in the dashboard page.
+            if (!isDashboardShowing())
+                return;
+            // Process error.
+            processAjaxErrorResponse(response);
+        });
+    }
+    readDeviceStatus();
+}
+
 // Reads the device status.
 function readDeviceStatus() {
     // Execute only in the dashboard page.
-    if (!isDashboardShowing())
+    if (!isDashboardShowing() || device == null)
         return;
     // Hide the info popup.
     showInfoPopup(false);
@@ -279,6 +320,13 @@ function processDeviceStatusResponse(response) {
         initializingDevice = false;
         return;
     }
+
+    // Check if IP values are initialized.
+    if ((response[STREAM_ETHERNET_STATE] == 1 && device.getEthernetIP() == "0.0.0.0")
+            || (response[STREAM_WIFI_STATE] == 1 && device.getWifiIP() == "0.0.0.0")) {
+        deviceInitialized = false;
+    }
+
     // Update the device status values.
     updateDataPointsValues(response);
     // Show the help popup if needed.
