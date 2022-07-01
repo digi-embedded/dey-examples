@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+Digi Demo - Management
+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./static/css/stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="./static/css/cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <link href="./static/css/cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.3/css/bootstrap-slider.min.css" rel="stylesheet">
+    <link href="./static/css/fontawesome5.15.4/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet"  href="./static/css/general.css">
+    <link rel="stylesheet"  href="./static/css/toastr.css">
+
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="./static/js/code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="./static/js/cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="./static/js/stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="./static/js/cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+    <script src="./static/js/cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.3/bootstrap-slider.min.js"></script>
+    <script type="text/javascript" src="./static/js/common.js"></script>
+    <script type="text/javascript" src="./static/js/devices.js"></script>
+    <script type="text/javascript" src="./static/js/jquery.pjax.js"></script>
+    <script type="text/javascript" src="./static/js/jquery.matchHeight-min.js"></script>
+    <script type="text/javascript" src="./static/js/toastr.min.js"></script>
+</head>
+<body>
+    <nav id="topBar" class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="nav-container">
+            <a id="banner-link" class="navbar-brand align-middle" href="/">
+                <div class="d-flex align-items-baseline">
+                    <img id="banner-logo" class="banner-icon" src="./static/images/Digi_logo_banner.png">
+                    <p id="banner-text">ConnectCore Demo</p>
+                </div>
+            </a>
+
+        <div class="nav-right-container">
+
+        <div>
+            <img src="./static/images/board.png" class="device-title-img" title="Device">
+        </div>
+        <div id="device-name">DEY DEVICE</div>
+        </div>
+    </nav>
+
+    <div class="bg-light" id="body-row">
+
+        <!-- Sidebar https://www.codeply.com/go/3e0RAjccRO/bootstrap-4-collapsing-sidebar-menu# -->
+        <div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
+            <!-- d-* hides the Sidebar in smaller devices. Its items can be kept on the Navbar 'Menu' -->
+            <div id="sidebar-contents">
+                <!-- Bootstrap List Group -->
+
+            <ul id="sections" data-pjax class="list-group">
+                <li>
+                    <a data-pjax href="index.html" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="digi-menu-icon fas fa-tachometer-alt fa-fw fa-lg mr-3"></span>
+                            <span class="menu-collapsed">Dashboard</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a data-pjax href="multimedia.html" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="digi-menu-icon fas fa-film fa-fw fa-lg mr-3"></span>
+                            <span class="menu-collapsed">Multimedia</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a data-pjax href="management.html" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="digi-menu-icon fas fa-cog fa-fw fa-lg mr-3"></span>
+                            <span class="menu-collapsed">Management</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+
+                <ul id="collapsator" class="list-group">
+                    <a href="#top" data-toggle="sidebar-collapse" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span id="collapse-icon" class="digi-menu-icon fas fa-fw fa-lg mr-3"></span>
+                            <span id="collapse-text" class="menu-collapsed">Collapse</span>
+                        </div>
+                    </a>
+                </ul>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+
+        <div id="loading">
+            <img id="loading-image" src="./static/images/loading.gif" alt="Loading..." />
+        </div>
+        <div id="pjax-container">
+
+<!--            <input type="file" id="firmware_file" style="display:none" onchange="firmwareFileChanged()" accept=".swu,.json,.txt"/>-->
+            <input type="file" id="firmware_file" style="display:none" onchange="firmwareFileChanged()" accept=".swu"/>
+            <div class="row justify-content-lg-center">
+                <div class="col-lg-12 col-xl-12">
+                    <div id="loading_popup" class="popup popup-loading shadow">
+                        <img class="popup-item" src="./static/images/loading.gif" alt="Loading..." />
+                        <div id="loading_popup_message" class="popup-text">Loading information...</div>
+                    </div>
+                    <div id="info_popup" class="popup popup-info shadow d-none">
+                        <div id="info_popup_title" class="popup-title">Error</div>
+                        <div id="info_popup_message" class="popup-text">-</div>
+                    </div>
+                    <div id="confirm_dialog" class="confirm-dialog d-none">
+                        <div class="device-card-header">
+                            <span class="fas fa-question-circle fa-lg mr-2"></span>
+                            <span id="confirm_dialog_title"></span>
+                            <div class="fas fa-window-close fa-lg device-card-header-button" onclick="showPopup(ID_LOADING_WRAPPER, ID_CONFIRM_DIALOG, false)"></div>
+                        </div>
+                        <div id="confirm_dialog_message" class="confirm-dialog-message"></div>
+                        <div class="confirm-dialog-buttons-container">
+                            <div id="confirm_dialog_no_button" class="device-card-button confirm-dialog-button">No</div>
+                            <div id="confirm_dialog_yes_button" class="device-card-button confirm-dialog-button">Yes</div>
+                        </div>
+                    </div>
+                    <div id="rebooted_dialog" class="popup popup-info shadow d-none">
+                        <div class="popup-title"><p><i class="fa fa-check success-message fa-lg"></i> Device rebooted</p></div>
+                        <div class="popup-text">Reload the page to continue.</div>
+                        <div class="confirm-dialog-buttons-container" style="padding-top: 30px;">
+                            <div id="reload_button" class="device-card-button confirm-dialog-button" onclick="document.location.replace('index.html')">Reload</div>
+                        </div>
+                    </div>
+                    <div id="loading_wrapper" class="loading-wrapper element-grayed">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Reboot device</h5>
+                                <div>Click <b>REBOOT</b> to restart your device.</div>
+                                <div id="reboot_button" class="device-card-button reboot-button" onclick="askReboot()">REBOOT</div>
+                            </div>
+                        </div>
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Firmware update</h5>
+                                <table style="margin: 15px;">
+                                    <tr>
+                                        <td style="width: 180px; vertical-align: top;">
+                                            <span class="device-card-content-text">Current DEY version:</span>
+                                        </td>
+                                        <td>
+                                            <span id="dey_version" class="device-card-content-value">-</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="vertical-align: top;">
+                                            <span class="device-card-content-text">Current kernel version:</span>
+                                        </td>
+                                        <td>
+                                            <span id="kernel_version" class="device-card-content-value">-</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="vertical-align: top;">
+                                            <span class="device-card-content-text">Current U-Boot version:</span>
+                                        </td>
+                                        <td>
+                                            <span id="uboot_version" class="device-card-content-value">-</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="firmware-tabs">
+                                    <div id="firmware_tab_upload_header" class="firmware-tab-header firmware-tab-header-active" onclick="showFirmwareTab(ID_FIRMWARE_TAB_UPLOAD)">
+                                        <span class="fas fa-upload fa-lg"></span>
+                                        <span class="firmware-tab-text">Upload file</span>
+                                    </div>
+                                </div>
+                                <div class="firmware-tab-container">
+                                    <div id="firmware_tab_upload" class="firmware-tab firmware-tab-upload">
+                                        <div>Upload and install a firmware file from your computer.</div>
+                                        <div class="firmware-file-container">
+                                            <div id="select_firmware_button" class="device-card-button browse-firmware-button" onclick="openFirmwareBrowser()">Choose file...</div>
+                                            <div id="firmware_file_label" class="firmware-file-label">No file chosen</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="update_firmware_progress" class="update-firmware-progress">
+                                    <div id="update_firmware_progress_title" class="update-firmware-progress-title">Firmware update in progress...</div>
+                                    <div class="progress update-firmware-progress-bar">
+                                        <div id="update_firmware_progress_bar" class="progress-bar progress-bar-striped update-firmware-progress-bar update-firmware-progress-bar-info update-firmware-progress-bar-hover" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:40%">40%</div>
+                                    </div>
+                                    <span id="update_firmware_progress_message" class="update-firmware-progress-status">Waiting for firmware update...</span>
+                                </div>
+                                <div>
+                                    <div id="update_firmware_button" class="device-card-button update-firmware-button management-button-disabled" onclick="askUpdateFirmware()">Update Firmware</div>
+                                </div>
+                            </div> <!-- card body -->
+                        </div> <!-- card shadow -->
+                        <div id="filesystem_panel" class="filesystem-panel">
+                            <div class="filesystem-background"></div>
+                            <div id="filesystem_container" class="filesystem-container">
+                                <div id="filesystem_header" class="device-card-header">
+                                    <span class="fas fa-folder-open fa-lg mr-2"></span>
+                                    <span>Device's file system</span>
+                                    <div class="fas fa-window-close fa-lg device-card-header-button" onclick="closeFileSystem()"></div>
+                                </div>
+                                <div id="filesystem_hover_background" class="filesystem-hover-background"></div>
+                                <div id="filesystem_dir_name_panel" class="filesystem-dir-name-panel">
+                                    <div class="filesystem-dir-name-background"></div>
+                                    <div class="filesystem-dir-name-container">
+                                        <div class="device-card-header">
+                                            <span class="fas fa-folder-plus fa-lg mr-2"></span>
+                                            <span>Create new directory</span>
+                                            <div class="fas fa-window-close fa-lg device-card-header-button" onclick="closeDirectoryNamePanel()"></div>
+                                        </div>
+                                        <div class="filesystem-dir-name-label">Enter the new directory name</div>
+                                        <input id="filesystem_directory_name" class="filesystem-dir-name-input" type="text"/>
+                                        <div id="filesystem_directory_name_error" class="filesystem-dir-name-error"></div>
+                                        <div id="filesystem_directory_name_button" class="device-card-button filesystem-dir-name-button filesystem-dir-name-button-disabled" onclick="onCreateDirectory()">Create directory</div>
+                                    </div>
+                                </div>
+                                <div id="filesystem_toolbar" class="filesystem-toolbar">
+                                    <div class="filesystem-current-directory-container">
+                                        <div class="filesystem-current-directory-label">Current dir:</div>
+                                        <div id="current_directory" class="filesystem-current-directory"></div>
+                                    </div>
+                                    <div id="filesystem_toolbar_buttons_container" class="filesystem-toolbar-buttons-container">
+                                        <div id="filesystem_select_file_button" class="filesystem-button fas fa-bolt fa-2x" onclick="selectFirmwareFile()" title="Select firmware file"></div>
+                                        <div id="filesystem_create_directory_button" class="filesystem-button fas fa-folder-plus fa-2x" onclick="openDirectoryNamePanel()" title="Create directory"></div>
+                                        <div id="filesystem_upload_file_button" class="filesystem-button fas fa-upload fa-2x" onclick="openFileBrowser()" title="Upload file"></div>
+                                        <div id="filesystem_download_file_button" class="filesystem-button fas fa-file-download fa-2x" onclick="downloadSelectedFile()" title="Download file"></div>
+                                        <div id="filesystem_remove_file_button" class="filesystem-button fas fa-trash fa-2x" onclick="askRemoveFile()" title="Remove file"></div>
+                                    </div>
+                                </div>
+                                <div id="filesystem_items_header" class="filesystem-items-header">
+                                    <div class="filesystem-entry-icon"></div>
+                                    <div class="filesystem-entry-name">Name</div>
+                                    <div class="filesystem-entry-size">Size</div>
+                                    <div class="filesystem-entry-last-modified">Last modified</div>
+                                </div>
+                                <div id="filesystem_items_container" class="filesystem-items-container"></div>
+                                <div id="filesystem_loading" class="popup shadow" style="top: 33%">
+                                    <img class="popup-item" src="./static/images/loading.gif" alt="Loading..." />
+                                    <div class="popup-text">Loading...</div>
+                                </div>
+                            </div> <!-- filesystem_container -->
+                        </div> <!-- filesystem_panel -->
+                    </div> <!-- loading wrapper -->
+                </div> <!-- col -->
+            </div> <!-- row justify -->
+
+
+    <script>
+    $(document).ready(function() {
+        // Reset variables.
+        readingManagementInfo = false;
+        managementInfoRead = false;
+        deviceRebooting = false;
+        updatingFirmware = false;
+        firmwareUpdateTimer = null;
+        selectedFilesetEntry = null;
+        filesLoaded = false;
+        // Initialize page.
+        initializeManagementPage();
+    });
+    </script>
+
+        </div> <!-- pjax-container -->
+
+        </div> <!-- container fluid -->
+    </div> <!--bg light -->
+
+    <script>
+    $(document).ready(function() {
+        $("#banner-link").on({
+            "mouseover" : function() {
+                $("#banner-logo").attr("src", "./static/images/Digi_logo_banner_gray.png");
+            },
+            "mouseout" : function() {
+                $("#banner-logo").attr("src", "./static/images/Digi_logo_banner.png");
+            }
+        });
+    });
+
+    // Enable the tooltip library.
+    $(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+    </script>
+
+    <!-- Local JS files and functions -->
+    <script type="text/javascript" src="./static/js/sidebar.js"></script>
+    <script type="text/javascript" src="./static/js/ccimx8mm-dvk.js"></script>
+    <script type="text/javascript" src="./static/js/ccimx8m-nano.js"></script>
+    <script type="text/javascript" src="./static/js/ccimx8x-sbc-pro.js"></script>
+    <script type="text/javascript" src="./static/js/dashboard.js"></script>
+    <script type="text/javascript" src="./static/js/multimedia.js"></script>
+    <script type="text/javascript" src="./static/js/management.js"></script>
+    <script type="text/javascript" src="./static/js/file-system.js"></script>
+    <script>
+    $(document).ready(function() {
+        // Don't show the loading spinner at the beginning. Initial page
+        // load is full, so not relying on AJAX.
+        $("#loading").hide();
+
+        // Set up PJAX.
+        if ($.support.pjax) {
+            $.pjax.defaults.timeout = 20000;
+            $.pjax.defaults.fragment = "#pjax-container";
+            $(document).pjax("a[data-pjax]", "#pjax-container");
+
+            $(document).on("pjax:beforeSend", function() {
+                // Do not load new content if there are unsaved changes.
+                if ($("#save-schedule").length && !$("#save-schedule").attr("disabled") && !confirm("There are unsaved changes. Do you want to exit?"))
+                    return false;
+            });
+
+            $(document).on("pjax:send", function(e) {
+                setSelectedSection(e.currentTarget.activeElement);
+                $("#pjax-container").hide();
+                $("#loading").show();
+            });
+
+            $(document).on("pjax:complete", function() {
+                $("#loading").hide();
+                $("#pjax-container").show();
+            });
+        }
+
+        // Append the URL parameters to the section links.
+        var params = new URLSearchParams(window.location.search).toString();
+        if (params) {
+            $("#sections li").each(function(i, n) {
+                n.children[0].href += "?" + params;
+            });
+        }
+
+        // Set the selected section.
+        setSelectedSection();
+    });
+    </script>
+
+
+</body>
+</html>
+
