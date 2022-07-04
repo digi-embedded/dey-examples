@@ -38,6 +38,9 @@ APP_NAME = "Demo server"
 
 PORT = 9090
 
+EMMC_SIZE_FILE = "/sys/class/mmc_host/mmc0/mmc0:0001/block/mmcblk0/size"
+NAND_SIZE_FILE = "/proc/mtd"
+
 SIZE_KB = "KB"
 SIZE_MB = "MB"
 SIZE_GB = "GB"
@@ -576,13 +579,51 @@ def get_storage_size():
     Returns:
         Integer: The internal storage size, -1 if fails.
     """
-    size = read_file("/sys/class/mmc_host/mmc0/mmc0:0001/block/mmcblk0/size")
+    if os.path.exists(NAND_SIZE_FILE):
+        return get_nand_size()
+    if os.path.exists(EMMC_SIZE_FILE):
+        return get_emmc_size()
+    return -1
+
+
+def get_emmc_size():
+    """
+    Gets the internal eMMC storage size in KB.
+
+    Returns:
+        Integer: The internal eMMC storage size, -1 if fails.
+    """
+    size = read_file(EMMC_SIZE_FILE)
     if size == NOT_AVAILABLE:
         return -1
     try:
         return int(resize_to(int(size) * 512, SIZE_KB))
     except ValueError:
         return -1
+
+
+def get_nand_size():
+    """
+    Gets the internal NAND storage size in KB.
+
+    Returns:
+        Integer: The internal NAND storage size, -1 if fails.
+    """
+    total_size = 0
+    mtd_contents = read_file(NAND_SIZE_FILE)
+    if mtd_contents == NOT_AVAILABLE:
+        return -1
+    for line in mtd_contents.splitlines():
+        if line.startswith("mtd"):
+            fields = line.split()
+            if len(fields) < 4:
+                continue
+            try:
+                total_size += int(fields[1], 16)
+            except ValueError:
+                return -1
+
+    return total_size / 1024  # kB
 
 
 def get_video_resolution():
