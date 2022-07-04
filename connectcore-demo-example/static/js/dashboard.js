@@ -658,6 +658,7 @@ function updateDataPointsValues(response) {
     // Iterate the streams in the response.
     for (var key in response)
         updateDataPointValue(key, response[key]);
+    positionComponents();
 }
 
 // Updates the given data stream value.

@@ -16,6 +16,7 @@
 
 import argparse
 import cgi
+import errno
 import http.server
 import json
 import logging
@@ -637,7 +638,7 @@ def get_video_resolution():
     if res == NOT_AVAILABLE:
         return "-"
 
-    return res.split(":")[1].strip()
+    return res.splitlines()[0].split(":")[1].strip()
 
 
 def is_dual_system():
