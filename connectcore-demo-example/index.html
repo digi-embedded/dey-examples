@@ -541,16 +541,16 @@ Digi Demo - Dashboard
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div id="ethernet_panel_area" class="panel-area panel-tooltip" onclick="toggleInfoPanelVisibility('ethernet')">
-                                                <span class="panel-tooltip-text">Ethernet stats</span>
-                                                <span id="ethernet_panel_icon" class="fas fa-ethernet panel-area-icon"></span>
+                                            <div id="ethernet0_panel_area" class="panel-area panel-tooltip" onclick="toggleInfoPanelVisibility('ethernet0')">
+                                                <span id="ethernet0_tooltip" class="panel-tooltip-text">Ethernet 0 stats</span>
+                                                <span id="ethernet0_panel_icon" class="fas fa-ethernet panel-area-icon"></span>
                                             </div>
-                                            <div id="ethernet_panel" class="device-card ethernet-panel shadow-sm">
-                                                <span id="ethernet_panel_arrow" class="panel-arrow"></span>
+                                            <div id="ethernet0_panel" class="device-card ethernet-panel shadow-sm">
+                                                <span id="ethernet0_panel_arrow" class="panel-arrow"></span>
                                                 <div class="device-card-header">
                                                     <span class="fas fa-ethernet fa-lg mr-2"></span>
-                                                    <span>Ethernet stats</span>
-                                                    <div class="fas fa-window-close fa-lg device-card-header-button" onclick="setInfoPanelVisible('ethernet', false)"></div>
+                                                    <span id="ethernet0_title">Ethernet 0 stats</span>
+                                                    <div class="fas fa-window-close fa-lg device-card-header-button" onclick="setInfoPanelVisible('ethernet0', false)"></div>
                                                 </div>
                                                 <div class="device-card-content">
                                                     <table>
@@ -559,7 +559,7 @@ Digi Demo - Dashboard
                                                                 <span class="device-card-content-text">Status:</span>
                                                             </td>
                                                             <td>
-                                                                <span id="ethernet_state" class="device-card-content-value">-</span>
+                                                                <span id="ethernet0_state" class="device-card-content-value">-</span>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -567,7 +567,7 @@ Digi Demo - Dashboard
                                                                 <span class="device-card-content-text">MAC address:</span>
                                                             </td>
                                                             <td>
-                                                                <span id="ethernet_mac" class="device-card-content-value">-</span>
+                                                                <span id="ethernet0_mac" class="device-card-content-value">-</span>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -575,7 +575,7 @@ Digi Demo - Dashboard
                                                                 <span class="device-card-content-text">IP address:</span>
                                                             </td>
                                                             <td>
-                                                                <span id="ethernet_ip" class="device-card-content-value">-</span>
+                                                                <span id="ethernet0_ip" class="device-card-content-value">-</span>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -583,7 +583,7 @@ Digi Demo - Dashboard
                                                                 <span class="device-card-content-text">Sent data:</span>
                                                             </td>
                                                             <td>
-                                                                <span id="ethernet_sent_data" class="device-card-content-value">-</span>
+                                                                <span id="ethernet0_sent_data" class="device-card-content-value">-</span>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -591,7 +591,63 @@ Digi Demo - Dashboard
                                                                 <span class="device-card-content-text">Received data:</span>
                                                             </td>
                                                             <td>
-                                                                <span id="ethernet_received_data" class="device-card-content-value">-</span>
+                                                                <span id="ethernet0_received_data" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div id="ethernet1_panel_area" class="panel-area panel-tooltip" onclick="toggleInfoPanelVisibility('ethernet1')">
+                                                <span class="panel-tooltip-text">Ethernet 1 stats</span>
+                                                <span id="ethernet1_panel_icon" class="fas fa-ethernet panel-area-icon"></span>
+                                            </div>
+                                            <div id="ethernet1_panel" class="device-card ethernet-panel shadow-sm">
+                                                <span id="ethernet1_panel_arrow" class="panel-arrow"></span>
+                                                <div class="device-card-header">
+                                                    <span class="fas fa-ethernet fa-lg mr-2"></span>
+                                                    <span>Ethernet 1 stats</span>
+                                                    <div class="fas fa-window-close fa-lg device-card-header-button" onclick="setInfoPanelVisible('ethernet1', false)"></div>
+                                                </div>
+                                                <div class="device-card-content">
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">Status:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet1_state" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">MAC address:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet1_mac" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">IP address:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet1_ip" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">Sent data:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet1_sent_data" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">Received data:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet1_received_data" class="device-card-content-value">-</span>
                                                             </td>
                                                         </tr>
                                                     </table>

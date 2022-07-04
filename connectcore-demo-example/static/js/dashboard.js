@@ -31,10 +31,16 @@ const ID_DEVICE_INFO_TOGGLE_BUTTON = "device_info_toggle_button";
 const ID_DEVICE_INFO_PANEL_HEADER = "device_info_panel_header";
 const ID_DEVICE_INFO_PANEL_CONTAINER = "device_info_panel_container";
 const ID_DEVICE_TOOLBAR = "device_toolbar";
-const ID_ETHERNET_PANEL = "ethernet_panel";
-const ID_ETHERNET_PANEL_AREA = "ethernet_panel_area";
-const ID_ETHERNET_PANEL_ARROW = "ethernet_panel_arrow";
-const ID_ETHERNET_PANEL_ICON = "ethernet_panel_icon";
+const ID_ETHERNET0_PANEL = "ethernet0_panel";
+const ID_ETHERNET0_PANEL_AREA = "ethernet0_panel_area";
+const ID_ETHERNET0_PANEL_ARROW = "ethernet0_panel_arrow";
+const ID_ETHERNET0_PANEL_ICON = "ethernet0_panel_icon";
+const ID_ETHERNET0_TITLE = "ethernet0_title";
+const ID_ETHERNET0_TOOLTIP = "ethernet0_tooltip";
+const ID_ETHERNET1_PANEL = "ethernet1_panel";
+const ID_ETHERNET1_PANEL_AREA = "ethernet1_panel_area";
+const ID_ETHERNET1_PANEL_ARROW = "ethernet1_panel_arrow";
+const ID_ETHERNET1_PANEL_ICON = "ethernet1_panel_icon";
 const ID_FLASH_MEMORY_PANEL = "flash_memory_panel";
 const ID_FLASH_MEMORY_PANEL_AREA = "flash_memory_panel_area";
 const ID_FLASH_MEMORY_PANEL_ARROW = "flash_memory_panel_arrow";
@@ -61,7 +67,8 @@ const ID_WIFI_BT_PANEL_ARROW = "wifi_bt_panel_arrow";
 const ID_WIFI_BT_PANEL_ICON = "wifi_bt_panel_icon";
 
 const IFACE_BT = "hci0/";
-const IFACE_ETHERNET = "eth0/";
+const IFACE_ETHERNET0 = "eth0/";
+const IFACE_ETHERNET1 = "eth1/";
 const IFACE_WIFI = "wlan0/";
 
 const USER_LED = "user_led";
@@ -69,9 +76,12 @@ const USER_LED = "user_led";
 const STREAM_CPU_FREQUENCY = PREFIX_STREAM + "frequency";
 const STREAM_CPU_TEMPERATURE = PREFIX_STREAM + "cpu_temperature";
 const STREAM_CPU_UPTIME = PREFIX_STREAM + "uptime";
-const STREAM_ETHERNET_READ_BYTES = PREFIX_STREAM + IFACE_ETHERNET + "rx_bytes";
-const STREAM_ETHERNET_SENT_BYTES = PREFIX_STREAM + IFACE_ETHERNET + "tx_bytes";
-const STREAM_ETHERNET_STATE = PREFIX_STREAM + IFACE_ETHERNET + "state";
+const STREAM_ETHERNET0_READ_BYTES = PREFIX_STREAM + IFACE_ETHERNET0 + "rx_bytes";
+const STREAM_ETHERNET0_SENT_BYTES = PREFIX_STREAM + IFACE_ETHERNET0 + "tx_bytes";
+const STREAM_ETHERNET0_STATE = PREFIX_STREAM + IFACE_ETHERNET0 + "state";
+const STREAM_ETHERNET1_READ_BYTES = PREFIX_STREAM + IFACE_ETHERNET1 + "rx_bytes";
+const STREAM_ETHERNET1_SENT_BYTES = PREFIX_STREAM + IFACE_ETHERNET1 + "tx_bytes";
+const STREAM_ETHERNET1_STATE = PREFIX_STREAM + IFACE_ETHERNET1 + "state";
 const STREAM_LED_STATUS = PREFIX_STREAM + "led_status";
 const STREAM_MEMORY_USED = PREFIX_STREAM + "used_memory";
 const STREAM_WIFI_READ_BYTES = PREFIX_STREAM + IFACE_WIFI + "rx_bytes";
@@ -260,7 +270,7 @@ function refreshDevice() {
                     initializingDevice = false;
                     return;
                 }
-                device.refreshIPs(data[ID_ETHERNET_IP], data[ID_WIFI_IP]);
+                device.refreshIPs(data[ID_ETHERNET0_IP], data[ID_ETHERNET1_IP], data[ID_WIFI_IP]);
                 updateInfoValues();
             }
         ).fail(function(response) {
@@ -322,7 +332,8 @@ function processDeviceStatusResponse(response) {
     }
 
     // Check if IP values are initialized.
-    if ((response[STREAM_ETHERNET_STATE] == 1 && device.getEthernetIP() == "0.0.0.0")
+    if ((response[STREAM_ETHERNET0_STATE] == 1 && device.getEthernetIP(0) == "0.0.0.0")
+            || (response[STREAM_ETHERNET1_STATE] == 1 && device.getEthernetIP(1) == "0.0.0.0")
             || (response[STREAM_WIFI_STATE] == 1 && device.getWifiIP() == "0.0.0.0")) {
         deviceInitialized = false;
     }
@@ -413,13 +424,26 @@ function initializeComponents() {
     var wifiBtPanelIcon = document.getElementById(ID_WIFI_BT_PANEL_ICON);
     var wifiBtInfo = {"panel": wifiBtPanel, "arrow": wifiBtPanelArrow, "area": wifiBtPanelArea, "icon": wifiBtPanelIcon, "data": device.getWifiBtComponentData()};
     components[ID_WIFI_BT] = wifiBtInfo;
-    // Ethernet component.
-    var ethernetPanel = document.getElementById(ID_ETHERNET_PANEL);
-    var ethernetPanelArrow = document.getElementById(ID_ETHERNET_PANEL_ARROW);
-    var ethernetPanelArea = document.getElementById(ID_ETHERNET_PANEL_AREA);
-    var ethernetPanelIcon = document.getElementById(ID_ETHERNET_PANEL_ICON);
-    var ethernetInfo = {"panel": ethernetPanel, "arrow": ethernetPanelArrow, "area": ethernetPanelArea, "icon": ethernetPanelIcon, "data": device.getEthernetComponentData()};
-    components[ID_ETHERNET] = ethernetInfo;
+    // Ethernet 0 component.
+    var ethernet0Panel = document.getElementById(ID_ETHERNET0_PANEL);
+    var ethernet0PanelArrow = document.getElementById(ID_ETHERNET0_PANEL_ARROW);
+    var ethernet0PanelArea = document.getElementById(ID_ETHERNET0_PANEL_AREA);
+    var ethernet0PanelIcon = document.getElementById(ID_ETHERNET0_PANEL_ICON);
+    var ethernet0Info = {"panel": ethernet0Panel, "arrow": ethernet0PanelArrow, "area": ethernet0PanelArea, "icon": ethernet0PanelIcon, "data": device.getEthernetComponentData(0)};
+    components[ID_ETHERNET0] = ethernet0Info;
+    if (device.supportsDualEthernet()) {
+        // Ethernet 1 component.
+        var ethernet1Panel = document.getElementById(ID_ETHERNET1_PANEL);
+        var ethernet1PanelArrow = document.getElementById(ID_ETHERNET1_PANEL_ARROW);
+        var ethernet1PanelArea = document.getElementById(ID_ETHERNET1_PANEL_AREA);
+        var ethernet1PanelIcon = document.getElementById(ID_ETHERNET1_PANEL_ICON);
+        var ethernet1Info = {"panel": ethernet1Panel, "arrow": ethernet1PanelArrow, "area": ethernet1PanelArea, "icon": ethernet1PanelIcon, "data": device.getEthernetComponentData(1)};
+        components[ID_ETHERNET1] = ethernet1Info;
+    } else {
+        // Update tooltip and title to reflect there is only one Ethernet interface.
+        document.getElementById(ID_ETHERNET0_TOOLTIP).innerText = "Ethernet stats";
+        document.getElementById(ID_ETHERNET0_TITLE).innerText = "Ethernet stats";
+    }
     // Video component.
     var videoPanel = document.getElementById(ID_VIDEO_PANEL);
     var videoPanelArrow = document.getElementById(ID_VIDEO_PANEL_ARROW);
@@ -605,10 +629,13 @@ function updateInfoValues() {
     updateFieldValue(ID_MCA_FW_VERSION, device.getMCAFWVersion());
     // Set MCA HW version.
     updateFieldValue(ID_MCA_HW_VERSION, device.getMCAHWVersion());
-    // Set Ethernet MAC address.
-    updateFieldValue(ID_ETHERNET_MAC, device.getEthernetMAC());
-    // Set Ethernet IP address.
-    updateFieldValue(ID_ETHERNET_IP, device.getEthernetIP());
+    // Iterate Ethernet interfaces.
+    for (var index = 0; index < device.NUM_ETHERNET_INTERFACES; index++) {
+        // Set Ethernet MAC address.
+        updateFieldValue(eval("ID_ETHERNET" + index + "_MAC"), device.getEthernetMAC(index));
+        // Set Ethernet IP address.
+        updateFieldValue(eval("ID_ETHERNET" + index + "_IP"), device.getEthernetIP(index));
+    }
     // Set Wi-Fi MAC address.
     updateFieldValue(ID_WIFI_MAC, device.getWifiMAC());
     // Set Wi-Fi IP address.
@@ -658,14 +685,23 @@ function updateDataPointValue(streamID, value) {
         case STREAM_MEMORY_USED:
             updateValueWithEffect(ID_MEMORY_USED, kiloBytesToMegaBytes(value));
             break;
-        case STREAM_ETHERNET_STATE:
-            updateValueWithEffect(ID_ETHERNET_STATE, onOffStatus(value));
+        case STREAM_ETHERNET0_STATE:
+            updateValueWithEffect(ID_ETHERNET0_STATE, onOffStatus(value));
             break;
-        case STREAM_ETHERNET_READ_BYTES:
-            updateValueWithEffect(ID_ETHERNET_READ_DATA, sizeToHumanRead(value));
+        case STREAM_ETHERNET0_READ_BYTES:
+            updateValueWithEffect(ID_ETHERNET0_READ_DATA, sizeToHumanRead(value));
             break;
-        case STREAM_ETHERNET_SENT_BYTES:
-            updateValueWithEffect(ID_ETHERNET_SENT_DATA, sizeToHumanRead(value));
+        case STREAM_ETHERNET0_SENT_BYTES:
+            updateValueWithEffect(ID_ETHERNET0_SENT_DATA, sizeToHumanRead(value));
+            break;
+        case STREAM_ETHERNET1_STATE:
+            updateValueWithEffect(ID_ETHERNET1_STATE, onOffStatus(value));
+            break;
+        case STREAM_ETHERNET1_READ_BYTES:
+            updateValueWithEffect(ID_ETHERNET1_READ_DATA, sizeToHumanRead(value));
+            break;
+        case STREAM_ETHERNET1_SENT_BYTES:
+            updateValueWithEffect(ID_ETHERNET1_SENT_DATA, sizeToHumanRead(value));
             break;
         case STREAM_WIFI_STATE:
             updateValueWithEffect(ID_WIFI_STATE, onOffStatus(value));
