@@ -90,7 +90,19 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         """
         Override.
         """
-        if re.search("/ajax/get_device_info", self.path) is not None:
+        if re.search("/ajax/get_device_type", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+
+            log.debug("Get device info")
+
+            info = {
+                "device_type": read_proc_file("/proc/device-tree/digi,machine,name")
+            }
+
+            # Send the JSON value.
+            self.wfile.write(json.dumps(info).encode(encoding="utf_8"))
+        elif re.search("/ajax/get_device_info", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
 

@@ -53,7 +53,7 @@ Digi Demo - Management
                 <!-- Bootstrap List Group -->
 
             <ul id="sections" data-pjax class="list-group">
-                <li>
+                <li id="section_dashboard">
                     <a data-pjax href="index.html" class="list-group-item list-group-item-action d-flex align-items-center">
                         <div class="d-flex w-100 justify-content-start align-items-center">
                             <span class="digi-menu-icon fas fa-tachometer-alt fa-fw fa-lg mr-3"></span>
@@ -61,7 +61,7 @@ Digi Demo - Management
                         </div>
                     </a>
                 </li>
-                <li>
+                <li id="section_multimedia">
                     <a data-pjax href="multimedia.html" class="list-group-item list-group-item-action d-flex align-items-center">
                         <div class="d-flex w-100 justify-content-start align-items-center">
                             <span class="digi-menu-icon fas fa-film fa-fw fa-lg mr-3"></span>
@@ -69,7 +69,7 @@ Digi Demo - Management
                         </div>
                     </a>
                 </li>
-                <li>
+                <li id="section_management">
                     <a data-pjax href="management.html" class="list-group-item list-group-item-action d-flex align-items-center">
                         <div class="d-flex w-100 justify-content-start align-items-center">
                             <span class="digi-menu-icon fas fa-cog fa-fw fa-lg mr-3"></span>
@@ -331,6 +331,9 @@ Digi Demo - Management
                 n.children[0].href += "?" + params;
             });
         }
+
+        // Update available sections.
+        updateAvailableSections();
 
         // Set the selected section.
         setSelectedSection();

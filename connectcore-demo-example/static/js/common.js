@@ -98,6 +98,9 @@ const ID_PANEL_VERTICAL_MARGIN = "panel-vertical-margin";
 const ID_PATH = "path";
 const ID_PROGRESS = "progress";
 const ID_SAMPLE_RATE = "sample_rate";
+const ID_SECTION_DASHBOARD = "section_dashboard";
+const ID_SECTION_MANAGEMENT = "section_management";
+const ID_SECTION_MULTIMEDIA = "section_multimedia";
 const ID_SERIAL_NUMBER = "serial_number";
 const ID_SESSION_ID = "session_id";
 const ID_SIZE = "size";
@@ -485,4 +488,35 @@ function isMultimediaShowing() {
 // Returns the device name.
 function getDeviceName() {
     return new URLSearchParams(window.location.search).get(ID_DEVICE_NAME);
+}
+
+// Updates the available web sections.
+function updateAvailableSections() {
+    // Send request to retrieve device type.
+    $.post(
+        "http://" + getServerAddress() + "/ajax/get_device_type",
+        function(data) {
+            // Process answer.
+            if (data[ID_DEVICE_TYPE] == null || data[ID_DEVICE_TYPE] == "undefined") {
+                // Show error message.
+                toastr.error("Could not get device type");
+                return;
+            }
+            switch (data[ID_DEVICE_TYPE]) {
+                case CCIMX6ULSBC.DEVICE_TYPE:
+                    removeSection(ID_SECTION_MULTIMEDIA);
+                    break;
+            }
+        }
+    ).fail(function(response) {
+        // Process error.
+        processAjaxErrorResponse(response);
+    });
+}
+
+// Removes the given section.
+function removeSection(sectionID) {
+    var sectionElement = document.getElementById(sectionID);
+    if (sectionElement != null && sectionElement != "undefined")
+        sectionElement.parentNode.removeChild(sectionElement);
 }
