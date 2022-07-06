@@ -492,7 +492,10 @@ function getDeviceName() {
 
 // Updates the available web sections.
 function updateAvailableSections() {
-    // Send request to retrieve device type.
+    // Remove multimedia section when rendering the demo from a computer.
+    if (!navigator.platform.includes("aarch"))
+        removeSection(ID_SECTION_MULTIMEDIA);
+    // Set visible sections based on device type.
     $.post(
         "http://" + getServerAddress() + "/ajax/get_device_type",
         function(data) {
