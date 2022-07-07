@@ -50,12 +50,18 @@ const ID_ERROR = "error";
 const ID_ERROR_GUIDE = "error_guide";
 const ID_ERROR_MESSAGE = "error_msg";
 const ID_ERROR_TITLE = "error_title";
-const ID_ETHERNET = "ethernet";
-const ID_ETHERNET_IP = "ethernet_ip";
-const ID_ETHERNET_MAC = "ethernet_mac";
-const ID_ETHERNET_READ_DATA = "ethernet_received_data";
-const ID_ETHERNET_SENT_DATA = "ethernet_sent_data";
-const ID_ETHERNET_STATE = "ethernet_state";
+const ID_ETHERNET0 = "ethernet0";
+const ID_ETHERNET1 = "ethernet1";
+const ID_ETHERNET0_IP = "ethernet0_ip";
+const ID_ETHERNET1_IP = "ethernet1_ip";
+const ID_ETHERNET0_MAC = "ethernet0_mac";
+const ID_ETHERNET1_MAC = "ethernet1_mac";
+const ID_ETHERNET0_READ_DATA = "ethernet0_received_data";
+const ID_ETHERNET1_READ_DATA = "ethernet1_received_data";
+const ID_ETHERNET0_SENT_DATA = "ethernet0_sent_data";
+const ID_ETHERNET1_SENT_DATA = "ethernet1_sent_data";
+const ID_ETHERNET0_STATE = "ethernet0_state";
+const ID_ETHERNET1_STATE = "ethernet1_state";
 const ID_FILES = "files";
 const ID_FLASH_MEMORY = "flash_memory";
 const ID_FLASH_SIZE = "flash_size";
@@ -92,6 +98,9 @@ const ID_PANEL_VERTICAL_MARGIN = "panel-vertical-margin";
 const ID_PATH = "path";
 const ID_PROGRESS = "progress";
 const ID_SAMPLE_RATE = "sample_rate";
+const ID_SECTION_DASHBOARD = "section_dashboard";
+const ID_SECTION_MANAGEMENT = "section_management";
+const ID_SECTION_MULTIMEDIA = "section_multimedia";
 const ID_SERIAL_NUMBER = "serial_number";
 const ID_SESSION_ID = "session_id";
 const ID_SIZE = "size";
@@ -479,4 +488,38 @@ function isMultimediaShowing() {
 // Returns the device name.
 function getDeviceName() {
     return new URLSearchParams(window.location.search).get(ID_DEVICE_NAME);
+}
+
+// Updates the available web sections.
+function updateAvailableSections() {
+    // Remove multimedia section when rendering the demo from a computer.
+    if (!navigator.platform.includes("aarch"))
+        removeSection(ID_SECTION_MULTIMEDIA);
+    // Set visible sections based on device type.
+    $.post(
+        "http://" + getServerAddress() + "/ajax/get_device_type",
+        function(data) {
+            // Process answer.
+            if (data[ID_DEVICE_TYPE] == null || data[ID_DEVICE_TYPE] == "undefined") {
+                // Show error message.
+                toastr.error("Could not get device type");
+                return;
+            }
+            switch (data[ID_DEVICE_TYPE]) {
+                case CCIMX6ULSBC.DEVICE_TYPE:
+                    removeSection(ID_SECTION_MULTIMEDIA);
+                    break;
+            }
+        }
+    ).fail(function(response) {
+        // Process error.
+        processAjaxErrorResponse(response);
+    });
+}
+
+// Removes the given section.
+function removeSection(sectionID) {
+    var sectionElement = document.getElementById(sectionID);
+    if (sectionElement != null && sectionElement != "undefined")
+        sectionElement.parentNode.removeChild(sectionElement);
 }

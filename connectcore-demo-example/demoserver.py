@@ -16,6 +16,7 @@
 
 import argparse
 import cgi
+import errno
 import http.server
 import json
 import logging
@@ -37,6 +38,9 @@ from threading import Thread, Event
 APP_NAME = "Demo server"
 
 PORT = 9090
+
+EMMC_SIZE_FILE = "/sys/class/mmc_host/mmc0/mmc0:0001/block/mmcblk0/size"
+NAND_SIZE_FILE = "/proc/mtd"
 
 SIZE_KB = "KB"
 SIZE_MB = "MB"
@@ -86,7 +90,19 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
         """
         Override.
         """
-        if re.search("/ajax/get_device_info", self.path) is not None:
+        if re.search("/ajax/get_device_type", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+
+            log.debug("Get device info")
+
+            info = {
+                "device_type": read_proc_file("/proc/device-tree/digi,machine,name")
+            }
+
+            # Send the JSON value.
+            self.wfile.write(json.dumps(info).encode(encoding="utf_8"))
+        elif re.search("/ajax/get_device_info", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
 
@@ -113,8 +129,10 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 "bluetooth_mac": get_bt_mac("hci0"),
                 "wifi_mac": read_file("/sys/class/net/wlan0/address").strip().upper() if "wlan0" in list_net_ifaces() else ZERO_MAC,
                 "wifi_ip": get_iface_ip("wlan0") if "wlan0" in list_net_ifaces() else ZERO_IP,
-                "ethernet_mac": read_file("/sys/class/net/eth0/address").strip().upper() if "eth0" in list_net_ifaces() else ZERO_MAC,
-                "ethernet_ip": get_iface_ip("eth0") if "eth0" in list_net_ifaces() else ZERO_IP,
+                "ethernet0_mac": read_file("/sys/class/net/eth0/address").strip().upper() if "eth0" in list_net_ifaces() else ZERO_MAC,
+                "ethernet0_ip": get_iface_ip("eth0") if "eth0" in list_net_ifaces() else ZERO_IP,
+                "ethernet1_mac": read_file("/sys/class/net/eth1/address").strip().upper() if "eth1" in list_net_ifaces() else ZERO_MAC,
+                "ethernet1_ip": get_iface_ip("eth1") if "eth1" in list_net_ifaces() else ZERO_IP,
             }
 
             # Send the JSON value.
@@ -574,13 +592,51 @@ def get_storage_size():
     Returns:
         Integer: The internal storage size, -1 if fails.
     """
-    size = read_file("/sys/class/mmc_host/mmc0/mmc0:0001/block/mmcblk0/size")
+    if os.path.exists(NAND_SIZE_FILE):
+        return get_nand_size()
+    if os.path.exists(EMMC_SIZE_FILE):
+        return get_emmc_size()
+    return -1
+
+
+def get_emmc_size():
+    """
+    Gets the internal eMMC storage size in KB.
+
+    Returns:
+        Integer: The internal eMMC storage size, -1 if fails.
+    """
+    size = read_file(EMMC_SIZE_FILE)
     if size == NOT_AVAILABLE:
         return -1
     try:
         return int(resize_to(int(size) * 512, SIZE_KB))
     except ValueError:
         return -1
+
+
+def get_nand_size():
+    """
+    Gets the internal NAND storage size in KB.
+
+    Returns:
+        Integer: The internal NAND storage size, -1 if fails.
+    """
+    total_size = 0
+    mtd_contents = read_file(NAND_SIZE_FILE)
+    if mtd_contents == NOT_AVAILABLE:
+        return -1
+    for line in mtd_contents.splitlines():
+        if line.startswith("mtd"):
+            fields = line.split()
+            if len(fields) < 4:
+                continue
+            try:
+                total_size += int(fields[1], 16)
+            except ValueError:
+                return -1
+
+    return total_size / 1024  # kB
 
 
 def get_video_resolution():
@@ -594,7 +650,7 @@ def get_video_resolution():
     if res == NOT_AVAILABLE:
         return "-"
 
-    return res.split(":")[1].strip()
+    return res.splitlines()[0].split(":")[1].strip()
 
 
 def is_dual_system():

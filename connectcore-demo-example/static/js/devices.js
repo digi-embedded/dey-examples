@@ -81,19 +81,33 @@ class ConnectCoreDevice {
     WIFI_BT_COMPONENT_AREA_WIDTH_PERCENT = 0;
     WIFI_BT_COMPONENT_AREA_HEIGHT_PERCENT = 0;
 
-    // Ethernet panel.
-    ETHERNET_COMPONENT_VISIBLE = false;
-    ETHERNET_COMPONENT_HAS_PANEL = false;
-    ETHERNET_COMPONENT_HAS_ARROW = false;
-    ETHERNET_COMPONENT_PANEL_ALWAYS_VISIBLE = false;
-    ETHERNET_COMPONENT_PANEL_ORIENTATION = VALUE_TOP;
-    ETHERNET_COMPONENT_PANEL_HORIZONTAL_PERCENT = 0;
-    ETHERNET_COMPONENT_PANEL_VERTICAL_PERCENT = 0;
-    ETHERNET_COMPONENT_ARROW_PERCENT = 0;
-    ETHERNET_COMPONENT_AREA_TOP_PERCENT = 0;
-    ETHERNET_COMPONENT_AREA_LEFT_PERCENT = 0;
-    ETHERNET_COMPONENT_AREA_WIDTH_PERCENT = 0;
-    ETHERNET_COMPONENT_AREA_HEIGHT_PERCENT = 0;
+    // Ethernet0 panel.
+    ETHERNET0_COMPONENT_VISIBLE = false;
+    ETHERNET0_COMPONENT_HAS_PANEL = false;
+    ETHERNET0_COMPONENT_HAS_ARROW = false;
+    ETHERNET0_COMPONENT_PANEL_ALWAYS_VISIBLE = false;
+    ETHERNET0_COMPONENT_PANEL_ORIENTATION = VALUE_TOP;
+    ETHERNET0_COMPONENT_PANEL_HORIZONTAL_PERCENT = 0;
+    ETHERNET0_COMPONENT_PANEL_VERTICAL_PERCENT = 0;
+    ETHERNET0_COMPONENT_ARROW_PERCENT = 0;
+    ETHERNET0_COMPONENT_AREA_TOP_PERCENT = 0;
+    ETHERNET0_COMPONENT_AREA_LEFT_PERCENT = 0;
+    ETHERNET0_COMPONENT_AREA_WIDTH_PERCENT = 0;
+    ETHERNET0_COMPONENT_AREA_HEIGHT_PERCENT = 0;
+
+    // Ethernet1 panel.
+    ETHERNET1_COMPONENT_VISIBLE = false;
+    ETHERNET1_COMPONENT_HAS_PANEL = false;
+    ETHERNET1_COMPONENT_HAS_ARROW = false;
+    ETHERNET1_COMPONENT_PANEL_ALWAYS_VISIBLE = false;
+    ETHERNET1_COMPONENT_PANEL_ORIENTATION = VALUE_TOP;
+    ETHERNET1_COMPONENT_PANEL_HORIZONTAL_PERCENT = 0;
+    ETHERNET1_COMPONENT_PANEL_VERTICAL_PERCENT = 0;
+    ETHERNET1_COMPONENT_ARROW_PERCENT = 0;
+    ETHERNET1_COMPONENT_AREA_TOP_PERCENT = 0;
+    ETHERNET1_COMPONENT_AREA_LEFT_PERCENT = 0;
+    ETHERNET1_COMPONENT_AREA_WIDTH_PERCENT = 0;
+    ETHERNET1_COMPONENT_AREA_HEIGHT_PERCENT = 0;
 
     // Console.
     CONSOLE_COMPONENT_VISIBLE = false;
@@ -167,6 +181,9 @@ class ConnectCoreDevice {
 
     // Capabilities
     SUPPORTS_VIDEO_BRIGHTNESS;
+    SUPPORTS_DUAL_ETHERNET;
+
+    NUM_ETHERNET_INTERFACES = 2;
 
     // Device information.
     #deviceType;
@@ -180,8 +197,8 @@ class ConnectCoreDevice {
     #boardID;
     #mcaHWVersion;
     #mcaFWVersion;
-    #ethernetMAC;
-    #ethernetIP;
+    #ethernetMAC = [];
+    #ethernetIP = [];
     #wifiMAC;
     #wifiIP;
     #bluetoothMAC;
@@ -209,8 +226,6 @@ class ConnectCoreDevice {
         this.#boardID = deviceData[ID_BOARD_ID];
         this.#mcaHWVersion = deviceData[ID_MCA_HW_VERSION];
         this.#mcaFWVersion = deviceData[ID_MCA_FW_VERSION];
-        this.#ethernetMAC = deviceData[ID_ETHERNET_MAC];
-        this.#ethernetIP = deviceData[ID_ETHERNET_IP];
         this.#wifiMAC = deviceData[ID_WIFI_MAC];
         this.#wifiIP = deviceData[ID_WIFI_IP];
         this.#bluetoothMAC = deviceData[ID_BLUETOOTH_MAC];
@@ -219,10 +234,15 @@ class ConnectCoreDevice {
         this.#videoResolution = deviceData[ID_VIDEO_RESOLUTION];
         this.#sampleRate = deviceData[ID_SAMPLE_RATE];
         this.#numSamplesUpload = deviceData[ID_NUM_SAMPLES_UPLOAD];
+        for (var index = 0; index < this.NUM_ETHERNET_INTERFACES; index++) {
+            this.#ethernetMAC[index] = deviceData[eval("ID_ETHERNET" + index + "_MAC")];
+            this.#ethernetIP[index] = deviceData[eval("ID_ETHERNET" + index + "_IP")];
+        }
     }
 
-    refreshIPs(eth_ip, wifi_ip) {
-        this.#ethernetIP = eth_ip;
+    refreshIPs(eth0_ip, eth1_ip, wifi_ip) {
+        this.#ethernetIP[0] = eth0_ip;
+        this.#ethernetIP[1] = eth1_ip;
         this.#wifiIP = wifi_ip;
     }
 
@@ -291,14 +311,18 @@ class ConnectCoreDevice {
         return this.#mcaFWVersion;
     }
 
-    // Returns the device Ethernet MAC address.
-    getEthernetMAC() {
-        return this.#ethernetMAC;
+    // Returns the device Ethernet MAC address for the given interface index.
+    getEthernetMAC(index=0) {
+        if (index >= this.NUM_ETHERNET_INTERFACES)
+            return "";
+        return this.#ethernetMAC[index];
     }
 
-    // Returns the device Ethernet IP address.
-    getEthernetIP() {
-        return this.#ethernetIP;
+    // Returns the device Ethernet IP address for the given interface index.
+    getEthernetIP(index=0) {
+        if (index >= this.NUM_ETHERNET_INTERFACES)
+            return "";
+        return this.#ethernetIP[index];
     }
 
     // Returns the device WiFi MAC address.
@@ -389,20 +413,22 @@ class ConnectCoreDevice {
                                                          this.WIFI_BT_COMPONENT_AREA_HEIGHT_PERCENT));
     }
 
-    // Returns the Ethernet panel data.
-    getEthernetComponentData() {
-        return JSON.parse(TEMPLATE_COMPONENT_DATA.format(this.ETHERNET_COMPONENT_VISIBLE,
-                                                         this.ETHERNET_COMPONENT_HAS_PANEL,
-                                                         this.ETHERNET_COMPONENT_HAS_ARROW,
-                                                         this.ETHERNET_COMPONENT_PANEL_ALWAYS_VISIBLE,
-                                                         this.ETHERNET_COMPONENT_PANEL_ORIENTATION,
-                                                         this.ETHERNET_COMPONENT_PANEL_HORIZONTAL_PERCENT,
-                                                         this.ETHERNET_COMPONENT_PANEL_VERTICAL_PERCENT,
-                                                         this.ETHERNET_COMPONENT_ARROW_PERCENT,
-                                                         this.ETHERNET_COMPONENT_AREA_TOP_PERCENT,
-                                                         this.ETHERNET_COMPONENT_AREA_LEFT_PERCENT,
-                                                         this.ETHERNET_COMPONENT_AREA_WIDTH_PERCENT,
-                                                         this.ETHERNET_COMPONENT_AREA_HEIGHT_PERCENT));
+    // Returns the Ethernet panel data for the given interface index.
+    getEthernetComponentData(index=0) {
+        if (index >= this.NUM_ETHERNET_INTERFACES)
+            return "";
+        return JSON.parse(TEMPLATE_COMPONENT_DATA.format(eval("this.ETHERNET" + index + "_COMPONENT_VISIBLE"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_HAS_PANEL"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_HAS_ARROW"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_PANEL_ALWAYS_VISIBLE"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_PANEL_ORIENTATION"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_PANEL_HORIZONTAL_PERCENT"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_PANEL_VERTICAL_PERCENT"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_ARROW_PERCENT"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_AREA_TOP_PERCENT"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_AREA_LEFT_PERCENT"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_AREA_WIDTH_PERCENT"),
+                                                         eval("this.ETHERNET" + index + "_COMPONENT_AREA_HEIGHT_PERCENT")));
     }
 
     // Returns the Console panel data.
@@ -488,5 +514,10 @@ class ConnectCoreDevice {
     // Returns whether the device supports video brightness or not.
     supportsVideoBrightness() {
         return this.SUPPORTS_VIDEO_BRIGHTNESS;
+    }
+
+     // Returns whether the device supports dual ethernet or not.
+    supportsDualEthernet() {
+        return this.SUPPORTS_DUAL_ETHERNET;
     }
 }
