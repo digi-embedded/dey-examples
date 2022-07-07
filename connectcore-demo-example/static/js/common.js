@@ -493,7 +493,7 @@ function getDeviceName() {
 // Updates the available web sections.
 function updateAvailableSections() {
     // Remove multimedia section when rendering the demo from a computer.
-    if (!navigator.platform.includes("aarch"))
+    if (!navigator.platform.includes("aarch") && !navigator.platform.includes("arm"))
         removeSection(ID_SECTION_MULTIMEDIA);
     // Set visible sections based on device type.
     $.post(
