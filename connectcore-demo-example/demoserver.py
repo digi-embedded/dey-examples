@@ -646,7 +646,9 @@ def get_video_resolution():
     Returns:
         String: Video resolution.
     """
-    res = read_file("/sys/class/graphics/fb0/modes")
+    res = read_file("/sys/class/drm/card0/card0-DPI-1/modes")
+    if res == NOT_AVAILABLE:
+        res = read_file("/sys/class/graphics/fb0/modes")
     if res == NOT_AVAILABLE:
         return "-"
 
