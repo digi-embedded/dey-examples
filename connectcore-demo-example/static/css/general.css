@@ -1882,20 +1882,20 @@ body {
 }
 /* END MULTIMEDIA VIEWER */
 
-/* MANAGEMENT */
-.system-monitor-param-container {
+/* CONFIG CONTROLS */
+.param-container {
   margin-top: 10px;
   width: 100%;
   padding-left: 10px;
 }
 
-.system-monitor-param-label {
+.param-label {
   display: inline-block;
   position: relative;
   width: 170px;
 }
 
-.system-monitor-input {
+.input-control {
   position: relative;
   -webkit-transition: none !important;
   -moz-transition: none !important;
@@ -1907,11 +1907,11 @@ body {
   margin: 0px !important;
 }
 
-.system-monitor-input-error {
+.input-control-error {
   background-color: #f3b1b1 !important;
 }
 
-.system-monitor-error {
+.error-label {
   color: red;
   font-size: 12px;
   font-style: italic;
@@ -1919,6 +1919,25 @@ body {
   padding-left: 10px;
 }
 
+.config-button {
+  padding: 5px;
+  cursor: pointer;
+  margin-bottom: 0;
+  margin-top: 15px;
+  width: 100px;
+  float: left;
+  margin-left: 10px;
+}
+
+.config-button-disabled {
+  cursor: default;
+  color: white;
+  background-color: #c3c3c3;
+  pointer-events: none;
+}
+/* END CONFIG CONTROLS */
+
+/* MANAGEMENT */
 .system-monitor-help {
   font-size: 16px;
   padding-left: 5px;
@@ -1938,21 +1957,6 @@ body {
   border: none !important;
   background-color: white !important;
   outline: none;
-}
-
-.system-monitor-save {
-  padding: 5px;
-  cursor: pointer;
-  margin-bottom: 0;
-  margin-top: 15px;
-  width: 100px;
-}
-
-.system-monitor-save-disabled {
-  cursor: default;
-  color: white;
-  background-color: #c3c3c3;
-  pointer-events: none;
 }
 
 .firmware-file-input {
@@ -2007,13 +2011,6 @@ body {
   margin-left: 15px;
   float: left;
   background-color: #a72a2a;
-}
-
-.management-button-disabled {
-  cursor: default;
-  color: #c3c3c3;
-  background-color: #e3e3e3;
-  pointer-events: none;
 }
 
 .update-firmware-progress {

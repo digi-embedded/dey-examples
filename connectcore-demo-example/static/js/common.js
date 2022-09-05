@@ -136,17 +136,25 @@ const VALUE_UNKNOWN = "unknown";
 const CLASS_D_NONE = "d-none";
 const CLASS_DISABLED_DIV = "disabled-div";
 const CLASS_ELEMENT_GRAYED = "element-grayed";
+const CLASS_INPUT_ERROR = "input-control-error";
+const CLASS_CONFIG_BUTTON_DISABLED = "config-button-disabled";
 const CLASS_SELECTED = "selected";
 const CLASS_VALUE_ANIMATION = "value-animation";
 const CLASS_VALUE_UPDATED = "value-updated";
 
 const ERROR_ABORTED = "Operation aborted";
 const ERROR_BAD_REQUEST = "Bad request";
+const ERROR_FIELD_EMPTY = "Field cannot be empty";
 const ERROR_FORBIDDEN = "Could not perform the selected action. Make sure you have the correct access rights.";
 const ERROR_URL_NOT_FOUND = "Requested URL not found";
 const ERROR_SERVER_ERROR = "Internal server error";
 const ERROR_TITLE = "Error";
 const ERROR_UNKNOWN_ERROR = "Unknown error. Make sure that the server is running.";
+
+const IFACE_BT = "hci0";
+const IFACE_ETH0 = "eth0";
+const IFACE_ETH1 = "eth1";
+const IFACE_WIFI = "wlan0";
 
 const PREFIX_STREAM = "system_monitor/";
 const STREAM_CPU_LOAD = PREFIX_STREAM + "cpu_load";

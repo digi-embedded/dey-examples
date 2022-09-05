@@ -31,7 +31,6 @@ const ID_UPDATE_RUNNING = "update_running";
 const CLASS_FIRMWARE_TAB = "firmware-tab";
 const CLASS_FIRMWARE_TAB_HEADER = "firmware-tab-header";
 const CLASS_FIRMWARE_TAB_HEADER_ACTIVE = "firmware-tab-header-active";
-const CLASS_MANAGEMENT_BUTTON_DISABLED = "management-button-disabled";
 const CLASS_PROGRESS_BAR_ERROR = "update-firmware-progress-bar-error";
 const CLASS_PROGRESS_BAR_INFO = "update-firmware-progress-bar-info";
 const CLASS_PROGRESS_BAR_SUCCESS = "update-firmware-progress-bar-success";
@@ -625,10 +624,12 @@ function enableManagementButton(buttonID, enable) {
     var buttonElement = document.getElementById(buttonID);
     if (buttonElement != null) {
         if (enable) {
-            if (buttonElement.classList.contains(CLASS_MANAGEMENT_BUTTON_DISABLED))
-                buttonElement.classList.remove(CLASS_MANAGEMENT_BUTTON_DISABLED);
-        } else
-            buttonElement.classList.add(CLASS_MANAGEMENT_BUTTON_DISABLED);
+            if (buttonElement.classList.contains(CLASS_CONFIG_BUTTON_DISABLED))
+                buttonElement.classList.remove(CLASS_CONFIG_BUTTON_DISABLED);
+        } else {
+            if (!buttonElement.classList.contains(CLASS_CONFIG_BUTTON_DISABLED))
+                buttonElement.classList.add(CLASS_CONFIG_BUTTON_DISABLED);
+        }
     }
 }
 
