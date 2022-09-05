@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+Digi Demo - Network
+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./static/css/stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="./static/css/cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <link href="./static/css/cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.3/css/bootstrap-slider.min.css" rel="stylesheet">
+    <link href="./static/css/fontawesome5.15.4/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet"  href="./static/css/general.css">
+    <link rel="stylesheet"  href="./static/css/toastr.css">
+
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="./static/js/code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="./static/js/cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="./static/js/stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="./static/js/cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+    <script src="./static/js/cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.3/bootstrap-slider.min.js"></script>
+    <script type="text/javascript" src="./static/js/common.js"></script>
+    <script type="text/javascript" src="./static/js/devices.js"></script>
+    <script type="text/javascript" src="./static/js/jquery.pjax.js"></script>
+    <script type="text/javascript" src="./static/js/jquery.matchHeight-min.js"></script>
+    <script type="text/javascript" src="./static/js/toastr.min.js"></script>
+</head>
+<body>
+    <nav id="topBar" class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="nav-container">
+            <a id="banner-link" class="navbar-brand align-middle" href="/">
+                <div class="d-flex align-items-baseline">
+                    <img id="banner-logo" class="banner-icon" src="./static/images/Digi_logo_banner.png">
+                    <p id="banner-text">ConnectCore Demo</p>
+                </div>
+            </a>
+            <div class="nav-right-container">
+                <div>
+                    <img src="./static/images/board.png" class="device-title-img" title="Device">
+                </div>
+                <div id="device-name">DEY DEVICE</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="bg-light" id="body-row">
+
+        <!-- Sidebar https://www.codeply.com/go/3e0RAjccRO/bootstrap-4-collapsing-sidebar-menu# -->
+        <div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
+            <!-- d-* hides the Sidebar in smaller devices. Its items can be kept on the Navbar 'Menu' -->
+            <div id="sidebar-contents">
+                <!-- Bootstrap List Group -->
+
+            <ul id="sections" data-pjax class="list-group">
+                <li id="section_dashboard">
+                    <a data-pjax href="index.html" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="digi-menu-icon fas fa-tachometer-alt fa-fw fa-lg mr-3"></span>
+                            <span class="menu-collapsed">Dashboard</span>
+                        </div>
+                    </a>
+                </li>
+                <li id="section_multimedia">
+                    <a data-pjax href="multimedia.html" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="digi-menu-icon fas fa-film fa-fw fa-lg mr-3"></span>
+                            <span class="menu-collapsed">Multimedia</span>
+                        </div>
+                    </a>
+                </li>
+                <li id="section_network">
+                    <a data-pjax href="network.html" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="digi-menu-icon fas fa-network-wired fa-fw fa-lg mr-3"></span>
+                            <span class="menu-collapsed">Network</span>
+                        </div>
+                    </a>
+                </li>
+                <li id="section_management">
+                    <a data-pjax href="management.html" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="digi-menu-icon fas fa-cog fa-fw fa-lg mr-3"></span>
+                            <span class="menu-collapsed">Management</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+
+                <ul id="collapsator" class="list-group">
+                    <a href="#top" data-toggle="sidebar-collapse" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span id="collapse-icon" class="digi-menu-icon fas fa-fw fa-lg mr-3"></span>
+                            <span id="collapse-text" class="menu-collapsed">Collapse</span>
+                        </div>
+                    </a>
+                </ul>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+
+        <div id="loading">
+            <img id="loading-image" src="./static/images/loading.gif" alt="Loading..." />
+        </div>
+        <div id="pjax-container">
+            <div class="row justify-content-lg-center">
+                <div class="col-lg-12 col-xl-12">
+                   <div id="loading_popup" class="popup popup-loading shadow">
+                        <img class="popup-item" src="./static/images/loading.gif" alt="Loading..." />
+                        <div id="loading_popup_message" class="popup-text">Loading configuration...</div>
+                   </div>
+                   <div id="info_popup" class="popup popup-info shadow d-none">
+                       <div id="info_popup_title" class="popup-title">Error</div>
+                       <div id="info_popup_message" class="popup-text">-</div>
+                   </div>
+                   <div id="confirm_dialog" class="confirm-dialog d-none">
+                       <div class="device-card-header">
+                           <span class="fas fa-question-circle fa-lg mr-2"></span>
+                           <span id="confirm_dialog_title"></span>
+                           <div class="fas fa-window-close fa-lg device-card-header-button" onclick="showPopup(ID_LOADING_WRAPPER, ID_CONFIRM_DIALOG, false)"></div>
+                       </div>
+                       <div id="confirm_dialog_message" class="confirm-dialog-message"></div>
+                       <div class="confirm-dialog-buttons-container">
+                           <div id="confirm_dialog_no_button" class="device-card-button confirm-dialog-button">No</div>
+                           <div id="confirm_dialog_yes_button" class="device-card-button confirm-dialog-button">Yes</div>
+                       </div>
+                   </div>
+                   <div id="loading_wrapper" class="loading-wrapper">
+                       <div class="card shadow-sm" style="padding: 0px">
+                           <div id="eth0_panel_header" class="interface-header" style="cursor: pointer;" onclick="togglePanelVisibility('eth0')">
+                               <span class="fas fa-ethernet fa-lg mr-2"></span>
+                               <span id="eth0_title" class="card-title interface-title">Ethernet 0</span>
+                               <div id="eth0_toggle_button" class="fas fa-caret-up fa-lg device-card-header-button"></div>
+                           </div>
+                           <div id="eth0_panel_container" class="interface-panel-container">
+                               <div>Configure ethernet parameters.</div>
+                               <div class="param-container">
+                                   <span class="param-label">MAC Address:</span>
+                                   <span id="eth0_mac" class="param-value"></span>
+                               </div>
+                               <div class="param-container">
+                                   <span class="param-label">Connected:</span>
+                                   <label class="switch-control">
+                                     <input id="eth0_enable" type="checkbox">
+                                     <span class="slider-control round"></span>
+                                   </label>
+                               </div>
+                               <div id="eth0_ip_mode_param" class="param-container">
+                                   <span class="param-label">IP mode:</span>
+                                   <select name="eth0_ip_mode" id="eth0_ip_mode" class="select-control">
+                                       <option value="static">Static</option>
+                                       <option value="dhcp" selected="selected">DHCP</option>
+                                   </select>
+                               </div>
+                               <div id="eth0_ip_addr_param" class="param-container">
+                                   <span class="param-label">IP address:</span>
+                                   <input id="eth0_ip_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth0_ip_addr_error" class="error-label"></div>
+                               </div>
+                               <div id="eth0_subnet_mask_param" class="param-container">
+                                   <span class="param-label">Subnet mask:</span>
+                                   <input id="eth0_subnet_mask" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth0_subnet_mask_error" class="error-label"></div>
+                               </div>
+                               <div id="eth0_default_gateway_param" class="param-container">
+                                   <span class="param-label">Default gateway:</span>
+                                   <input id="eth0_default_gateway" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth0_default_gateway_error" class="error-label"></div>
+                               </div>
+                               <div id="eth0_dns1_addr_param" class="param-container">
+                                   <span class="param-label">DNS1 address:</span>
+                                   <input id="eth0_dns1_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth0_dns1_addr_error" class="error-label"></div>
+                               </div>
+                               <div id="eth0_dns2_addr_param" class="param-container">
+                                   <span class="param-label">DNS2 address:</span>
+                                   <input id="eth0_dns2_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth0_dns2_addr_error" class="error-label"></div>
+                               </div>
+                               <div class="buttons-container">
+                                   <div id="eth0_refresh_button" class="device-card-button config-button" onclick="readConfiguration(['ethernet'], 'eth0')">Refresh</div>
+                                   <div id="eth0_save_button" class="device-card-button config-button config-button-disabled" onclick="saveInterface('ethernet', 'eth0')">Save</div>
+                               </div>
+                           </div>
+                       </div>
+                       <div id="eth1" class="card shadow-sm" style="padding: 0px">
+                           <div id="eth1_panel_header" class="interface-header" style="cursor: pointer;" onclick="togglePanelVisibility('eth1')">
+                               <span class="fas fa-ethernet fa-lg mr-2"></span>
+                               <span id="eth1_title" class="card-title interface-title">Ethernet 1</span>
+                               <div id="eth1_toggle_button" class="fas fa-caret-down fa-lg device-card-header-button"></div>
+                           </div>
+                           <div id="eth1_panel_container" class="interface-panel-container" style="display: none;">
+                               <div>Configure ethernet 1 parameters.</div>
+                               <div class="param-container">
+                                   <span class="param-label">MAC Address:</span>
+                                   <span id="eth1_mac" class="param-value"></span>
+                               </div>
+                               <div class="param-container">
+                                   <span class="param-label">Connected:</span>
+                                   <label class="switch-control">
+                                     <input id="eth1_enable" type="checkbox">
+                                     <span class="slider-control round"></span>
+                                   </label>
+                               </div>
+                               <div id="eth1_ip_mode_param" class="param-container">
+                                   <span class="param-label">IP mode:</span>
+                                   <select name="eth1_ip_mode" id="eth1_ip_mode" class="select-control">
+                                       <option value="static">Static</option>
+                                       <option value="dhcp" selected="selected">DHCP</option>
+                                   </select>
+                               </div>
+                               <div id="eth1_ip_addr_param" class="param-container">
+                                   <span class="param-label">IP address:</span>
+                                   <input id="eth1_ip_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth1_ip_addr_error" class="error-label"></div>
+                               </div>
+                               <div id="eth1_subnet_mask_param" class="param-container">
+                                   <span class="param-label">Subnet mask:</span>
+                                   <input id="eth1_subnet_mask" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth1_subnet_mask_error" class="error-label"></div>
+                               </div>
+                               <div id="eth1_default_gateway_param" class="param-container">
+                                   <span class="param-label">Default gateway:</span>
+                                   <input id="eth1_default_gateway" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth1_default_gateway_error" class="error-label"></div>
+                               </div>
+                               <div id="eth1_dns1_addr_param" class="param-container">
+                                   <span class="param-label">DNS1 address:</span>
+                                   <input id="eth1_dns1_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth1_dns1_addr_error" class="error-label"></div>
+                               </div>
+                               <div id="eth1_dns2_addr_param" class="param-container">
+                                   <span class="param-label">DNS2 address:</span>
+                                   <input id="eth1_dns2_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth1_dns2_addr_error" class="error-label"></div>
+                               </div>
+                               <div class="buttons-container">
+                                   <div id="eth1_refresh_button" class="device-card-button config-button" onclick="readConfiguration(['ethernet'], 'eth1')">Refresh</div>
+                                   <div id="eth1_save_button" class="device-card-button config-button config-button-disabled" onclick="saveInterface('ethernet', 'eth1')">Save</div>
+                               </div>
+                           </div>
+                       </div>
+                       <div id="wlan0" class="card shadow-sm" style="padding: 0px;">
+                           <div id="wlan0_panel_header" class="interface-header" style="cursor: pointer;" onclick="togglePanelVisibility('wlan0')">
+                               <span class="fas fa-wifi fa-lg mr-2"></span>
+                               <span id="wlan0_title" class="card-title interface-title">Wi-Fi</span>
+                               <div id="wlan0_toggle_button" class="fas fa-caret-down fa-lg device-card-header-button"></div>
+                           </div>
+                           <div id="wlan0_panel_container" class="interface-panel-container" style="display: none;">
+                               <div>Configure wifi parameters.</div>
+                               <div class="param-container">
+                                   <span class="param-label">MAC Address:</span>
+                                   <span id="wlan0_mac" class="param-value"></span>
+                               </div>
+                               <div class="param-container">
+                                   <span class="param-label">Connected:</span>
+                                   <label class="switch-control">
+                                     <input id="wlan0_enable" type="checkbox">
+                                     <span class="slider-control round"></span>
+                                   </label>
+                               </div>
+                               <div id="wlan0_ssid_param" class="param-container">
+                                   <span class="param-label">SSID:</span>
+                                   <input id="wlan0_ssid" class="input-control input-control-wide" type="text"/>
+                                   <div id="wlan0_ssid_error" class="error-label"></div>
+                               </div>
+                               <div id="wlan0_enc_type_param" class="param-container">
+                                   <span class="param-label">Encryption type:</span>
+                                   <select name="wlan0_enc_type" id="wlan0_enc_type" class="select-control">
+                                       <option value="0">Open</option>
+                                       <option value="1">WPA</option>
+                                       <option value="2">WPA2</option>
+                                       <option value="3">WPA3</option>
+                                   </select>
+                               </div>
+                               <div id="wlan0_password_param" class="param-container">
+                                   <span class="param-label">Password:</span>
+                                   <input id="wlan0_password" class="input-control input-control-wide" type="password"/>
+                                   <div id="wlan0_password_error" class="error-label"></div>
+                               </div>
+                               <div id="wlan0_ip_mode_param" class="param-container">
+                                   <span class="param-label">IP mode:</span>
+                                   <select name="wlan0_ip_mode" id="wlan0_ip_mode" class="select-control">
+                                       <option value="static">Static</option>
+                                       <option value="dhcp" selected="selected">DHCP</option>
+                                   </select>
+                               </div>
+                               <div id="wlan0_ip_addr_param" class="param-container">
+                                   <span class="param-label">IP address:</span>
+                                   <input id="wlan0_ip_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="wlan0_ip_addr_error" class="error-label"></div>
+                               </div>
+                               <div id="wlan0_subnet_mask_param" class="param-container">
+                                   <span class="param-label">Subnet mask:</span>
+                                   <input id="wlan0_subnet_mask" class="input-control input-control-wide" type="text"/>
+                                   <div id="wlan0_subnet_mask_error" class="error-label"></div>
+                               </div>
+                               <div id="wlan0_default_gateway_param" class="param-container">
+                                   <span class="param-label">Default gateway:</span>
+                                   <input id="wlan0_default_gateway" class="input-control input-control-wide" type="text"/>
+                                   <div id="wlan0_default_gateway_error" class="error-label"></div>
+                               </div>
+                               <div id="wlan0_dns1_addr_param" class="param-container">
+                                   <span class="param-label">DNS1 address:</span>
+                                   <input id="wlan0_dns1_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="wlan0_dns1_addr_error" class="error-label"></div>
+                               </div>
+                               <div id="wlan0_dns2_addr_param" class="param-container">
+                                   <span class="param-label">DNS2 address:</span>
+                                   <input id="wlan0_dns2_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="wlan0_dns2_addr_error" class="error-label"></div>
+                               </div>
+                               <div class="buttons-container">
+                                   <div id="wlan0_refresh_button" class="device-card-button config-button" onclick="readConfiguration(['wifi'], 'wlan0')">Refresh</div>
+                                   <div id="wlan0_save_button" class="device-card-button config-button config-button-disabled" onclick="saveInterface('wifi', 'wlan0')">Save</div>
+                               </div>
+                           </div>
+                        </div>
+                   </div>
+                </div>
+            </div>
+
+    <script>
+    $(document).ready(function() {
+        // Reset variables.
+        readingNetworkInfo = false;
+        // Register input changed events.
+        $('#eth0_enable').click(function(){
+            updateInterfaceControls("eth0");
+        });
+        $("#eth0_ip_mode").on("change", function(event) {
+            updateInterfaceControls("eth0");
+        });
+        $("#eth0_ip_addr").on("input", function(event) {
+            validateInterface("eth0");
+        });
+        $("#eth0_subnet_mask").on("input", function(event) {
+            validateInterface("eth0");
+        });
+        $("#eth0_default_gateway").on("input", function(event) {
+            validateInterface("eth0");
+        });
+        $("#eth0_dns1_addr").on("input", function(event) {
+            validateInterface("eth0");
+        });
+        $("#eth0_dns2_addr").on("input", function(event) {
+            validateInterface("eth0");
+        });
+        $('#eth1_enable').click(function(){
+            updateInterfaceControls("eth1");
+        });
+        $("#eth1_ip_mode").on("change", function(event) {
+            updateInterfaceControls("eth1");
+        });
+        $("#eth1_ip_addr").on("input", function(event) {
+            validateInterface("eth1");
+        });
+        $("#eth1_subnet_mask").on("input", function(event) {
+            validateInterface("eth1");
+        });
+        $('#eth1_enable').click(function(){
+            updateInterfaceControls("eth1");
+        });
+        $("#eth1_ip_mode").on("change", function(event) {
+            updateInterfaceControls("eth1");
+        });
+        $("#eth1_ip_addr").on("input", function(event) {
+            validateInterface("eth1");
+        });
+        $("#eth1_subnet_mask").on("input", function(event) {
+            validateInterface("eth1");
+        });
+        $("#eth1_default_gateway").on("input", function(event) {
+            validateInterface("eth1");
+        });
+        $("#eth1_dns1_addr").on("input", function(event) {
+            validateInterface("eth1");
+        });
+        $("#eth1_dns2_addr").on("input", function(event) {
+            validateInterface("eth1");
+        });
+        $('#wlan0_enable').click(function(){
+            updateInterfaceControls("wlan0");
+        });
+        $("#wlan0_ssid").on("input", function(event) {
+            validateInterface("wlan0");
+        });
+        $("#wlan0_enc_type").on("change", function(event) {
+            document.getElementById("wlan0_password").value = "";
+            passwordChanged = true;
+            updateInterfaceControls("wlan0");
+        });
+        $("#wlan0_password").on("input", function(event) {
+            passwordChanged = true;
+            validateInterface("wlan0");
+        });
+        $("#wlan0_ip_mode").on("change", function(event) {
+            updateInterfaceControls("wlan0");
+        });
+        $("#wlan0_ip_addr").on("input", function(event) {
+            validateInterface("wlan0");
+        });
+        $("#wlan0_subnet_mask").on("input", function(event) {
+            validateInterface("wlan0");
+        });
+        $("#wlan0_default_gateway").on("input", function(event) {
+            validateInterface("wlan0");
+        });
+        $("#wlan0_dns1_addr").on("input", function(event) {
+            validateInterface("wlan0");
+        });
+        $("#wlan0_dns2_addr").on("input", function(event) {
+            validateInterface("wlan0");
+        });
+        // Gray out page.
+        document.getElementById("loading_wrapper").classList.add("element-grayed");
+        // Update all controls.
+        updateAllControls();
+        // Initialize page.
+        initializeNetworkPage();
+    });
+    </script>
+
+        </div> <!-- pjax-container -->
+
+        </div> <!-- container fluid -->
+    </div> <!--bg light -->
+
+    <script>
+    $(document).ready(function() {
+        $("#banner-link").on({
+            "mouseover" : function() {
+                $("#banner-logo").attr("src", "./static/images/Digi_logo_banner_gray.png");
+            },
+            "mouseout" : function() {
+                $("#banner-logo").attr("src", "./static/images/Digi_logo_banner.png");
+            }
+        });
+    });
+
+    // Enable the tooltip library.
+    $(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+    </script>
+
+    <!-- Local JS files and functions -->
+    <script type="text/javascript" src="./static/js/sidebar.js"></script>
+    <script type="text/javascript" src="./static/js/ccmp157-dvk.js"></script>
+    <script type="text/javascript" src="./static/js/ccimx6ulsbc.js"></script>
+    <script type="text/javascript" src="./static/js/ccimx8mm-dvk.js"></script>
+    <script type="text/javascript" src="./static/js/ccimx8m-nano.js"></script>
+    <script type="text/javascript" src="./static/js/ccimx8x-sbc-pro.js"></script>
+    <script type="text/javascript" src="./static/js/dashboard.js"></script>
+    <script type="text/javascript" src="./static/js/network.js"></script>
+    <script type="text/javascript" src="./static/js/multimedia.js"></script>
+    <script type="text/javascript" src="./static/js/management.js"></script>
+    <script type="text/javascript" src="./static/js/file-system.js"></script>
+    <script>
+    $(document).ready(function() {
+        // Don't show the loading spinner at the beginning. Initial page
+        // load is full, so not relying on AJAX.
+        $("#loading").hide();
+
+        // Set up PJAX.
+        if ($.support.pjax) {
+            $.pjax.defaults.timeout = 20000;
+            $.pjax.defaults.fragment = "#pjax-container";
+            $(document).pjax("a[data-pjax]", "#pjax-container");
+
+            $(document).on("pjax:beforeSend", function() {
+                // Do not load new content if there are unsaved changes.
+                if ($("#save-schedule").length && !$("#save-schedule").attr("disabled") && !confirm("There are unsaved changes. Do you want to exit?"))
+                    return false;
+            });
+
+            $(document).on("pjax:send", function(e) {
+                setSelectedSection(e.currentTarget.activeElement);
+                $("#pjax-container").hide();
+                $("#loading").show();
+            });
+
+            $(document).on("pjax:complete", function() {
+                $("#loading").hide();
+                $("#pjax-container").show();
+            });
+        }
+
+        // Append the URL parameters to the section links.
+        var params = new URLSearchParams(window.location.search).toString();
+        if (params) {
+            $("#sections li").each(function(i, n) {
+                n.children[0].href += "?" + params;
+            });
+        }
+
+        // Update available sections.
+        updateAvailableSections();
+
+        // Set the selected section.
+        setSelectedSection();
+    });
+    </script>
+
+
+</body>
+</html>
+

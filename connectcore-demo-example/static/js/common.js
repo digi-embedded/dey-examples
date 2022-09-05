@@ -42,6 +42,7 @@ const ID_CPU_TEMPERATURE = "cpu_temperature";
 const ID_CPU_UPTIME = "cpu_uptime";
 const ID_CURRENT_DIR = "current_dir";
 const ID_DATA = "data";
+const ID_DESC = "desc";
 const ID_DEVICE_NAME = "device-name";
 const ID_DEVICE_TYPE = "device_type";
 const ID_DEVICES = "devices";
@@ -133,9 +134,12 @@ const VALUE_SUCCESSFUL = "successful";
 const VALUE_TOP = "top";
 const VALUE_UNKNOWN = "unknown";
 
+const CLASS_ARROW_DOWN = "fa-caret-down";
+const CLASS_ARROW_UP = "fa-caret-up";
 const CLASS_D_NONE = "d-none";
 const CLASS_DISABLED_DIV = "disabled-div";
 const CLASS_ELEMENT_GRAYED = "element-grayed";
+const CLASS_INPUT_DISABLED = "input-control-disabled";
 const CLASS_INPUT_ERROR = "input-control-error";
 const CLASS_CONFIG_BUTTON_DISABLED = "config-button-disabled";
 const CLASS_SELECTED = "selected";
@@ -485,6 +489,11 @@ function isDashboardShowing() {
     if (window.location.pathname == "/")
         return true;
     return window.location.pathname.indexOf("index") > -1;
+}
+
+// Returns whether the network page is showing or not.
+function isNetworkShowing() {
+    return window.location.pathname.indexOf("network") > -1;
 }
 
 // Returns whether the management page is showing or not.

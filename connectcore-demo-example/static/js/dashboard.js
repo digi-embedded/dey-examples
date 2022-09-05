@@ -92,8 +92,6 @@ const STREAM_BT_STATE = PREFIX_STREAM + IFACE_BT + "/state";
 const PANEL_ARROW_WIDTH_100 = 20;
 const PANEL_BOARD_WIDTH_100 = 1200;
 
-const CLASS_ARROW_DOWN = "fa-caret-down";
-const CLASS_ARROW_UP = "fa-caret-up";
 const CLASS_LED_PANEL_AREA_ON = "led-panel-area-on";
 const CLASS_PANEL_AREA_SELECTED = "panel-area-selected";
 const CLASS_PANEL_AREA_ICON_SELECTED = "panel-area-icon-selected";
