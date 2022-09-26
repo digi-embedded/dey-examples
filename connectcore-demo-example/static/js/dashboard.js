@@ -368,6 +368,9 @@ function createDevice(deviceData) {
         case CCMP157.DEVICE_TYPE:
             device = new CCMP157(deviceData);
             break;
+        case CCMP133.DEVICE_TYPE:
+            device = new CCMP133(deviceData);
+            break;
     }
     if (device != null) {
         // Draw the device.
