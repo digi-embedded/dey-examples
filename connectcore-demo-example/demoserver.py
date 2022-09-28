@@ -31,7 +31,7 @@ import subprocess
 
 from logging.handlers import SysLogHandler
 from subprocess import call, TimeoutExpired
-from threading import Thread, Event
+from threading import Thread
 
 
 # Constants.
@@ -54,7 +54,6 @@ NOT_AVAILABLE = "N/A"
 
 # Variables.
 log = logging.getLogger(APP_NAME)
-stop_event = Event()
 last_cpu_work = 0
 last_cpu_total = 0
 led_status = {}
@@ -1109,8 +1108,6 @@ def signal_handler(signal_number, _frame):
         _frame: Current stack frame.
     """
     log.debug("Signal received %d", signal_number)
-    if signal_number in (signal.SIGTERM, signal.SIGINT):
-        stop_event.set()
 
 
 def main():
@@ -1146,7 +1143,8 @@ def main():
     server_thread.deamon = True
     server_thread.start()
 
-    stop_event.wait()
+    # Wait for termination/interrupt signal.
+    signal.sigwait([signal.SIGTERM, signal.SIGINT])
 
     server.shutdown()
     server.server_close()
