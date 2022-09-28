@@ -212,7 +212,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": error}).encode(encoding="utf_8"))
                 return
 
-            vol, error = set_audio_volume(value)
+            error = set_audio_volume(value)
 
             # Send the JSON value.
             if error:
@@ -221,7 +221,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
             # Send the JSON value.
-            self.wfile.write(json.dumps({"value": vol}).encode(encoding="utf_8"))
+            self.wfile.write("{}".encode(encoding="utf_8"))
         elif re.search("/ajax/fs_list_directory", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
@@ -652,7 +652,7 @@ def get_video_resolution():
     if res == NOT_AVAILABLE:
         res = read_file("/sys/class/graphics/fb0/modes")
     if res == NOT_AVAILABLE:
-        return "-"
+        return "No video device found"
 
     line = res.splitlines()[0]
     if ":" in line:
@@ -959,27 +959,12 @@ def set_audio_volume(value):
         value (Integer): Volume to set in percentage.
 
     Returns:
-        Tuple (Integer, String): Current volume value and error string if fails.
+        String: Error string if fails.
     """
-    res = exec_cmd("amixer set Headphone %d%%" % value)
+    res = exec_cmd(f"amixer set 'Speaker' {value}% && amixer set 'Headphone' {value}%")
     if res[0] != 0:
-        return -1, res[1]
-
-    tmp = res[1].split("Front Right:")
-    if len(tmp) < 1:
-        return -1, "Unable to get current volume"
-
-    m = re.search("\[(.+?)%\]", tmp[1])
-    if not m:
-        return -1, "Unable to get current volume"
-
-    if len(m.groups()) < 1:
-        return -1, "Unable to get current volume"
-
-    try:
-        return int(m.group(1)), ""
-    except ValueError:
-        return -1, "Unable to get current volume"
+        return res[1]
+    return None
 
 
 def read_proc_file(path):

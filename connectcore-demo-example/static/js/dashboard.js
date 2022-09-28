@@ -239,6 +239,7 @@ function processDeviceInfoResponse(response) {
     // Position components after some time to give time to the image to load.
     window.setTimeout(function () {
        positionComponents();
+       adjustImageSize();
        setInfoPanelsVisible(false);
     }, 500);
     // Read device status.
@@ -979,10 +980,9 @@ function processSetAudioVolumeResponse(response) {
         audioSlider.setValue(volume);
     } else {
         // Save new volume value.
-        volume = response["value"];
-        if (volume == null)
-            volume = audioSlider.getValue();
-        audioSlider.setValue(volume);
+        volume = audioSlider.getValue();
+        // Show confirmation.
+        toastr.info("Volume changed to " + volume + "%")
     }
     // Hide the loading panel of the device.
     showLoadingPopup(false);
@@ -1052,6 +1052,10 @@ function processSetLEDResponse(response) {
     if (!checkErrorResponse(response, false)) {
         // Update the LED status.
         updateLEDStatus();
+        if (ledStatus)
+            toastr.info("User LED set to ON");
+        else
+            toastr.info("User LED set to OFF");
     }
     // Hide the loading panel of the device.
     showLoadingPopup(false);
