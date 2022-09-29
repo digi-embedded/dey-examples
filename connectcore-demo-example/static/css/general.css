@@ -1058,11 +1058,24 @@ body {
 
 /* AUDIO */
 .audio-panel {
-  width: 350px;
+  width: 280px;
 }
 
 #audio_panel .slider-horizontal {
-	width: 180px;
+	width: 110px;
+}
+
+.audio-button {
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
+    text-align: center;
+    z-index: 99999;
+}
+
+.audio-button:hover {
+    cursor: pointer;
+    color: var(--digi-green);
 }
 /* END AUDIO */
 

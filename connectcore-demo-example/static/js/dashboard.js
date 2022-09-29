@@ -12,6 +12,8 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * Music by https://www.bensound.com
  */
 
 // Constants.
@@ -55,6 +57,7 @@ const ID_MEMORY_PANEL_AREA = "memory_panel_area";
 const ID_MEMORY_PANEL_ARROW = "memory_panel_arrow";
 const ID_MEMORY_PANEL_ICON = "memory_panel_icon";
 const ID_PLATFORM_NAME = "platform_name";
+const ID_PLAY = "play";
 const ID_VIDEO_BRIGHTNESS_CONTAINER = "video_brightness_container";
 const ID_VIDEO_PANEL = "video_panel";
 const ID_VIDEO_PANEL_AREA = "video_panel_area";
@@ -103,6 +106,9 @@ const CLASS_PANEL_TOOLTIP = "panel-tooltip";
 
 const MESSAGE_CHANGING_VIDEO_BRIGHTNESS = "Changing video brightness...";
 const MESSAGE_CHANGING_AUDIO_VOLUME = "Changing audio volume...";
+const MESSAGE_MUSIC_PLAYING = "Music playing..."
+const MESSAGE_MUSIC_STOPPED = "Music stopped."
+const MESSAGE_PLAY_MUSIC = "Setting play music value..."
 const MESSAGE_READING_DEVICE_INFO = "Reading device info...";
 const MESSAGE_READING_DEVICE_STATUS = "Reading device status...";
 const MESSAGE_TOGGLING_LED_VALUE = "Toggling LED value...";
@@ -110,6 +116,8 @@ const MESSAGE_TOGGLING_LED_VALUE = "Toggling LED value...";
 const ERROR_LED_UNKNOWN = "LED status has not been read yet, please wait.";
 const ERROR_NOT_SUPPORTED_DEVICE_MESSAGE = "The selected device type is not supported: {0}";
 const ERROR_NOT_SUPPORTED_DEVICE_TITLE = "Unsupported device";
+
+const MUSIC_FILE = "/srv/www/static/sounds/inspire.mp3"
 
 // Variables.
 var deviceInitialized = false;
@@ -936,6 +944,50 @@ function processSetVideoBrightnessResponse(response) {
     showLoadingPopup(false);
     // Enable the slider.
     videoSlider.enable();
+}
+
+// Handles what happens when the Play music button is pressed.
+function playMusic(play) {
+    // Show the loading panel of the device.
+    showLoadingPopup(true, MESSAGE_PLAY_MUSIC);
+    // Send request to play music.
+    $.post(
+        "http://" + getServerAddress() + "/ajax/play_music",
+        JSON.stringify({
+            "play": play,
+            "music_file": MUSIC_FILE
+        }),
+        function(data) {
+            // Process only in the dashboard page.
+            if (!isDashboardShowing())
+                return;
+            // Process answer.
+            processPlayMusicResponse(data);
+        }
+    ).fail(function(response) {
+        // Process only in the dashboard page.
+        if (!isDashboardShowing())
+            return;
+        // Process error.
+        processAjaxErrorResponse(response);
+        // Hide the loading panel of the device.
+        showLoadingPopup(false);
+    });
+}
+
+// Processes the "play music" request answer.
+function processPlayMusicResponse(response) {
+    // Check if there was any error in the request.
+    if (!checkErrorResponse(response, false)) {
+        play = response[ID_PLAY];
+        // Show confirmation.
+        if (play)
+            toastr.info(MESSAGE_MUSIC_PLAYING);
+        else
+            toastr.info(MESSAGE_MUSIC_STOPPED);
+    }
+    // Hide the loading panel of the device.
+    showLoadingPopup(false);
 }
 
 // Processes an audio volume changed event.

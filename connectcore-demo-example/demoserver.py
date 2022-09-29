@@ -195,6 +195,23 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
             self.wfile.write("{}".encode(encoding="utf_8"))
+        elif re.search("/ajax/play_music", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            play = json.loads(data.decode("utf-8")).get("play", None)
+            music_file = json.loads(data.decode("utf-8")).get("music_file", None)
+
+            log.debug("Play music: %s", play)
+            if music_file:
+                log.debug("Music file: %s", music_file)
+
+            play_music(play, music_file)
+
+            # Send the JSON value.
+            self.wfile.write(json.dumps({"play": play}).encode(encoding="utf_8"))
         elif re.search("/ajax/set_audio_volume", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
@@ -950,6 +967,19 @@ def get_led_by_alias(alias):
         return led_loc.split(",")
 
 
+def play_music(play, music_file):
+    """
+    Sets the play music value.
+
+    Args:
+        play (Boolean): `True` to play music, `False` to stop it.
+        music_file (String): Path of the music file to play.
+    """
+    exec_cmd("pkill -KILL -f mpg123")
+    if play:
+        exec_cmd_nowait(f"mpg123 {music_file}")
+
+
 def set_audio_volume(value):
     """
     Configures the audio volume.
@@ -1007,6 +1037,21 @@ def exec_cmd(cmd, timeout=None):
         return -1, e.stdout
     except subprocess.CalledProcessError as e:
         return e.returncode, e.stdout
+
+
+def exec_cmd_nowait(command, *args):
+    """
+    Executes the provided command without waiting to finish.
+
+    Args:
+        command (String): The command to execute.
+        args (List): The list of arguments.
+    """
+    arguments = []
+    for arg in args:
+        arguments.extend(arg)
+    subprocess.Popen([command] + arguments, shell=True, stdout=subprocess.PIPE,
+                     stderr=subprocess.STDOUT, text=True)
 
 
 def read_file(path):

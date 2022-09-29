@@ -620,6 +620,13 @@ Digi Demo - Dashboard
                                                     <span>Audio control</span>
                                                     <div class="fas fa-window-close fa-lg device-card-header-button" onclick="setInfoPanelVisible('audio', false)"></div>
                                                 </div>
+                                                <div class="device-card-content" style="padding-bottom: 0px;">
+                                                    <span class="device-card-content-text" style="margin-right: 15px;">Music:</span>
+                                                    <div id="play_audio_button" class="fas fa-play audio-button" onclick="playMusic(true)">
+                                                    </div>
+                                                    <div id="stop_audio_button" class="fas fa-stop audio-button" onclick="playMusic(false)">
+                                                    </div>
+                                                </div>
                                                 <div class="device-card-content">
                                                     <div>
                                                         <span class="device-card-content-text">Volume:</span>
