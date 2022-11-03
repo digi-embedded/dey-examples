@@ -29,9 +29,13 @@ import socketserver
 import stat
 import subprocess
 
+from digi.apix.bluetooth import BluetoothException, BluetoothDevice, BluetoothProfile
+from digi.apix.exceptions import DigiAPIXException
+from digi.apix.network import IPMode, NetworkException, NetStatus, NetworkInterface, NetworkProfile
+from digi.apix.wifi import SecurityMode, WifiException, WifiInterface, WifiProfile
 from logging.handlers import SysLogHandler
 from subprocess import call, TimeoutExpired
-from threading import Thread, Event
+from threading import Thread
 
 
 # Constants.
@@ -52,9 +56,15 @@ ZERO_MAC = "00:00:00:00:00:00"
 ZERO_IP = "0.0.0.0"
 NOT_AVAILABLE = "N/A"
 
+ELEMENT_BLUETOOTH = "bluetooth"
+ELEMENT_ETHERNET = "ethernet"
+ELEMENT_WIFI = "wifi"
+
+PREFIX_ETHERNET = "eth"
+PREFIX_WIFI = "wlan"
+
 # Variables.
 log = logging.getLogger(APP_NAME)
-stop_event = Event()
 last_cpu_work = 0
 last_cpu_total = 0
 led_status = {}
@@ -113,7 +123,11 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             mca_versions = get_mca_version()
             info = {
                 "uboot_version": read_proc_file("/proc/device-tree/digi,uboot,version"),
-                "kernel_version": "%s %s %s %s %s GNU/Linux" % (platform.system(), platform.node(), platform.release(), platform.version(), platform.machine()),
+                "kernel_version": "%s %s %s %s %s GNU/Linux" % (platform.system(),
+                                                                platform.node(),
+                                                                platform.release(),
+                                                                platform.version(),
+                                                                platform.machine()),
                 "dey_version": "DEY-%s-%s" % (get_dey_version(), read_file("/etc/version")),
                 "serial_number": read_proc_file("/proc/device-tree/digi,hwid,sn"),
                 "device_type": read_proc_file("/proc/device-tree/digi,machine,name"),
@@ -126,14 +140,57 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 "flash_size": get_storage_size(),
                 "video_resolution": get_video_resolution(),
                 "fw_store_path": get_fw_store_path(),
-                "bluetooth_mac": get_bt_mac("hci0"),
-                "wifi_mac": read_file("/sys/class/net/wlan0/address").strip().upper() if "wlan0" in list_net_ifaces() else ZERO_MAC,
-                "wifi_ip": get_iface_ip("wlan0") if "wlan0" in list_net_ifaces() else ZERO_IP,
-                "ethernet0_mac": read_file("/sys/class/net/eth0/address").strip().upper() if "eth0" in list_net_ifaces() else ZERO_MAC,
-                "ethernet0_ip": get_iface_ip("eth0") if "eth0" in list_net_ifaces() else ZERO_IP,
-                "ethernet1_mac": read_file("/sys/class/net/eth1/address").strip().upper() if "eth1" in list_net_ifaces() else ZERO_MAC,
-                "ethernet1_ip": get_iface_ip("eth1") if "eth1" in list_net_ifaces() else ZERO_IP,
+                "bluetooth_mac": ZERO_MAC,
+                "wifi_mac": ZERO_MAC,
+                "wifi_ip": ZERO_IP,
+                "ethernet0_mac": ZERO_MAC,
+                "ethernet0_ip": ZERO_IP,
+                "ethernet1_mac": ZERO_MAC,
+                "ethernet1_ip": ZERO_IP,
             }
+            # Fill bluetooth data.
+            try:
+                bt_devices = BluetoothDevice.list_devices()
+                if bt_devices and "hci0" in bt_devices:
+                    try:
+                        bt_device = BluetoothDevice.get("hci0")
+                        info["bluetooth_mac"] = mac_to_human_string(bt_device.mac)
+                    except BluetoothException as exc2:
+                        log.error("Error reading interface 'hci0' data: %s", str(exc2))
+            except DigiAPIXException as exc:
+                log.error("Error listing bluetooth devices: %s", str(exc))
+            # Fill ethernet interfaces data.
+            try:
+                interfaces = NetworkInterface.list_interfaces()
+                if interfaces and "eth0" in interfaces:
+                    try:
+                        net_iface = NetworkInterface.get("eth0")
+                        info["ethernet0_mac"] = str(net_iface.mac)
+                        info["ethernet0_ip"] = str(net_iface.ipv4)
+                    except NetworkException as exc2:
+                        log.error("Error reading interface 'eth0' data: %s", str(exc2))
+                if interfaces and "eth1" in interfaces:
+                    try:
+                        net_iface = NetworkInterface.get("eth1")
+                        info["ethernet1_mac"] = mac_to_human_string(net_iface.mac)
+                        info["ethernet1_ip"] = str(net_iface.ipv4)
+                    except NetworkException as exc2:
+                        log.error("Error reading interface 'eth1' data: %s", str(exc2))
+            except DigiAPIXException as exc:
+                log.error("Error listing network interfaces: %s", str(exc))
+
+            # Fill WiFi interfaces data.
+            try:
+                interfaces = WifiInterface.list_interfaces()
+                if interfaces and "wlan0" in interfaces:
+                    try:
+                        net_iface = WifiInterface.get("wlan0")
+                        info["wifi_mac"] = mac_to_human_string(net_iface.mac)
+                        info["wifi_ip"] = str(net_iface.ipv4)
+                    except WifiException as exc2:
+                        log.error("Error reading interface 'wlan0' data: %s", str(exc2))
+            except DigiAPIXException as exc:
+                log.error("Error listing network interfaces: %s", str(exc))
 
             # Send the JSON value.
             self.wfile.write(json.dumps(info).encode(encoding="utf_8"))
@@ -147,7 +204,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             mem_total = int(mem_info.get("MemTotal", "-1")) if mem_info else -1
             mem_free = int(mem_info.get("MemFree", "-1")) if mem_info else -1
             mem_used = (mem_total - mem_free) if (mem_total > 0 and mem_free > 0) else -1
-            bt_data = get_bt_data("hci0")
+
             status = {
                 "system_monitor/cpu_load": get_cpu_load(),
                 "system_monitor/cpu_temperature": get_cpu_temp(),
@@ -155,18 +212,56 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 "system_monitor/uptime": get_uptime(),
                 "system_monitor/free_memory": mem_free,
                 "system_monitor/used_memory": mem_used,
-                "system_monitor/led_status": get_led_status("USER_LED"),
-                "system_monitor/hci0/state": bt_data.get("state", 0),
-                "system_monitor/hci0/rx_bytes": bt_data.get("rx_bytes", 0),
-                "system_monitor/hci0/tx_bytes": bt_data.get("tx_bytes", 0),
+                "system_monitor/led_status": get_led_status("USER_LED")
             }
 
-            list_ifaces = list_net_ifaces()
-            for name in list_ifaces:
-                data = get_iface_data(name)
-                status["system_monitor/%s/state" % name] = data["state"]
-                status["system_monitor/%s/rx_bytes" % name] = data["rx_bytes"]
-                status["system_monitor/%s/tx_bytes" % name] = data["tx_bytes"]
+            # Fill bluetooth devices data.
+            try:
+                bt_devices = BluetoothDevice.list_devices() or []
+                for device in bt_devices:
+                    try:
+                        bt_device = BluetoothDevice.get(device)
+                        statistics = bt_device.get_statistics()
+                        status[f"system_monitor/{device}/state"] = 1 if \
+                            bt_device.is_enabled else 0
+                        status[f"system_monitor/{device}/rx_bytes"] = statistics.rx_bytes
+                        status[f"system_monitor/{device}/tx_bytes"] = statistics.tx_bytes
+                    except NetworkException as exc2:
+                        log.error("Error reading bluetooth device '%s' data: %s", device, str(exc2))
+            except DigiAPIXException as exc:
+                log.error("Error listing bluetooth devices: %s", str(exc))
+
+            # Fill ethernet interfaces data.
+            try:
+                interfaces = NetworkInterface.list_interfaces() or []
+                for iface in interfaces:
+                    try:
+                        net_iface = NetworkInterface.get(iface)
+                        statistics = net_iface.get_statistics()
+                        status[f"system_monitor/{iface}/state"] = 1 if \
+                            net_iface.status == NetStatus.CONNECTED else 0
+                        status[f"system_monitor/{iface}/rx_bytes"] = statistics.rx_bytes
+                        status[f"system_monitor/{iface}/tx_bytes"] = statistics.tx_bytes
+                    except NetworkException as exc2:
+                        log.error("Error reading interface '%s' data: %s", iface, str(exc2))
+            except DigiAPIXException as exc:
+                log.error("Error listing network interfaces: %s", str(exc))
+
+            # Fill WiFi interfaces data.
+            try:
+                interfaces = WifiInterface.list_interfaces() or []
+                for iface in interfaces:
+                    try:
+                        wifi_iface = WifiInterface.get(iface)
+                        statistics = wifi_iface.get_statistics()
+                        status[f"system_monitor/{iface}/state"] = 1 if \
+                            wifi_iface.status == NetStatus.CONNECTED else 0
+                        status[f"system_monitor/{iface}/rx_bytes"] = statistics.rx_bytes
+                        status[f"system_monitor/{iface}/tx_bytes"] = statistics.tx_bytes
+                    except WifiException as exc2:
+                        log.error("Error reading interface '%s' data: %s", iface, str(exc2))
+            except DigiAPIXException as exc:
+                log.error("Error listing WiFi interfaces: %s", str(exc))
 
             # Send the JSON value.
             self.wfile.write(json.dumps(status).encode(encoding="utf_8"))
@@ -196,6 +291,23 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
             self.wfile.write("{}".encode(encoding="utf_8"))
+        elif re.search("/ajax/play_music", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            play = json.loads(data.decode("utf-8")).get("play", None)
+            music_file = json.loads(data.decode("utf-8")).get("music_file", None)
+
+            log.debug("Play music: %s", play)
+            if music_file:
+                log.debug("Music file: %s", music_file)
+
+            play_music(play, music_file)
+
+            # Send the JSON value.
+            self.wfile.write(json.dumps({"play": play}).encode(encoding="utf_8"))
         elif re.search("/ajax/set_audio_volume", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
@@ -212,7 +324,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": error}).encode(encoding="utf_8"))
                 return
 
-            vol, error = set_audio_volume(value)
+            error = set_audio_volume(value)
 
             # Send the JSON value.
             if error:
@@ -221,7 +333,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
             # Send the JSON value.
-            self.wfile.write(json.dumps({"value": vol}).encode(encoding="utf_8"))
+            self.wfile.write("{}".encode(encoding="utf_8"))
         elif re.search("/ajax/fs_list_directory", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
@@ -462,7 +574,34 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             progress = 100
             if fw_process and fw_process.poll() is None:
                 progress = "?"
-            self.wfile.write(json.dumps({"progress": progress, "message": "Updating firmare"}).encode(encoding="utf_8"))
+            self.wfile.write(json.dumps({"progress": progress, "message": "Updating firmware"}).encode(encoding="utf_8"))
+        elif re.search("/ajax/get_config", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            elements = json.loads(data.decode("utf-8")).get("elements", None)
+            # Fill configuration data.
+            config_data = get_elements_configuration(elements)
+            # Send the answer.
+            if "error" in config_data:
+                self.wfile.write(json.dumps(config_data).encode(encoding="utf_8"))
+            else:
+                self.wfile.write(json.dumps(
+                    {"data": json.dumps(config_data)}).encode(encoding="utf_8"))
+        elif re.search("/ajax/set_config", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            configuration = json.loads(data.decode("utf-8")).get("configuration", None)
+            # Apply configuration.
+            result = set_configuration(configuration)
+            # Send the answer.
+            if "error" in result:
+                self.wfile.write(json.dumps(result).encode(encoding="utf_8"))
+            else:
+                self.wfile.write(json.dumps({"data": json.dumps(result)}).encode(encoding="utf_8"))
         else:
             # Forbidden.
             self._set_headers(403)
@@ -507,7 +646,7 @@ def filter_by_extension(name, filters):
         if name.endswith(ext):
             return True
 
-    return False;
+    return False
 
 
 def get_uptime():
@@ -652,7 +791,7 @@ def get_video_resolution():
     if res == NOT_AVAILABLE:
         res = read_file("/sys/class/graphics/fb0/modes")
     if res == NOT_AVAILABLE:
-        return "-"
+        return "No video device found"
 
     line = res.splitlines()[0]
     if ":" in line:
@@ -737,146 +876,6 @@ def get_mca_version():
     return NOT_AVAILABLE, NOT_AVAILABLE
 
 
-def list_net_ifaces():
-    """
-    Returs a list with the names of the network interfaces.
-
-    Returns:
-       List: List of network inteface names.
-    """
-    return os.listdir("/sys/class/net")
-
-
-def get_iface_ip(iface_name):
-    """
-    Gets the IP address of the provided interface.
-
-    Args:
-        iface_name (String): Name of the network interface to get its IP.
-
-    Returns:
-        String: The IP of the interface.
-    """
-    res = exec_cmd("ip addr show %s" % iface_name)
-    if res[0] == 0:
-        tmp = res[1].split("inet ")
-        if len(tmp) > 1:
-            return tmp[1].split("/")[0]
-
-    log.error("Error getting IP of interface '%s': %s", iface_name, res[1])
-
-    return ZERO_IP
-
-
-def get_iface_data(iface_name):
-    """
-    Gets network interface state and statistics.
-
-    Args:
-        iface_name (String): Name of the interface to get data.
-
-    Returns:
-        Dictionary: The network interface state and statistics.
-    """
-    data = {
-        "state": 0,
-        "rx_bytes": 0,
-        "tx_bytes": 0
-    }
-    state = read_file("/sys/class/net/%s/operstate" % iface_name)
-    if state != NOT_AVAILABLE:
-        data["state"] = 1 if state.strip() == "up" else 0
-
-    stats = read_file("/proc/net/dev")
-    if stats == NOT_AVAILABLE:
-        return data
-
-    for line in stats.splitlines():
-         if not line.strip().startswith("%s: " % iface_name):
-             continue
-         fields = line.split()
-         data["rx_bytes"] = fields[1]
-         data["tx_bytes"] = fields[9]
-         break
-
-    return data
-
-
-def is_bt_available():
-    """
-    Checks if Bluetooth is available on the device.
-
-    Returns:
-        Boolean: True if available, False otherwise.
-    """
-    return os.path.isdir("/proc/device-tree/bluetooth")
-
-
-def get_bt_mac(iface_name):
-    """
-    Gets Bluetooth MAC address.
-
-    Args:
-        iface_name (String): Name of the interface to get the MAC.
-
-    Returns:
-        String: The Bluetooth MAC.
-    """
-    if not is_bt_available():
-        return ZERO_MAC
-
-    res = exec_cmd("hciconfig %s" % iface_name)
-    if res[0] == 0:
-        return res[1].split("BD Address:")[1].split("ACL")[0].strip()
-    else:
-        log.error("Error getting MAC of Bluetooth interface '%s': %s", iface_name, res[1])
-        return ZERO_MAC
-
-
-def get_bt_data(iface_name):
-    """
-    Gets Bluetooth interface state and statistics.
-
-    Args:
-        iface_name (String): Name of the interface to get data.
-
-    Returns:
-        Dictionary: The Bluetooth interface state and statistics.
-    """
-    data = {
-        "state": 0,
-        "rx_bytes": 0,
-        "tx_bytes": 0
-    }
-
-    if not is_bt_available():
-        return data
-
-    res = exec_cmd("hciconfig %s" % iface_name)
-    if res[0] == 0:
-        info = res[1]
-    else:
-        log.error("Error getting status of Bluetooth interface '%s': %s", iface_name, res[1])
-        return data
-
-    lines = info.splitlines()
-    if not lines:
-        return data
-
-    if len(lines) > 2 and re.fullmatch("(UP) .*", lines[2].strip()):
-        data["state"] = 1
-
-    if len(lines) > 3:
-        m = re.fullmatch("RX bytes:([0-9]+) .*", lines[3].strip())
-        data["rx_bytes"] = m.group(1) if m else 0
-
-    if len(lines) > 4:
-        m = re.fullmatch("TX bytes:([0-9]+) .*", lines[4].strip())
-        data["tx_bytes"] = m.group(1) if m else 0
-
-    return data
-
-
 def get_led_status(name):
     """
     Get the LED value.
@@ -951,6 +950,19 @@ def get_led_by_alias(alias):
         return led_loc.split(",")
 
 
+def play_music(play, music_file):
+    """
+    Sets the play music value.
+
+    Args:
+        play (Boolean): `True` to play music, `False` to stop it.
+        music_file (String): Path of the music file to play.
+    """
+    exec_cmd("pkill -KILL -f mpg123")
+    if play:
+        exec_cmd_nowait(f"mpg123 {music_file}")
+
+
 def set_audio_volume(value):
     """
     Configures the audio volume.
@@ -959,27 +971,277 @@ def set_audio_volume(value):
         value (Integer): Volume to set in percentage.
 
     Returns:
-        Tuple (Integer, String): Current volume value and error string if fails.
+        String: Error string if fails.
     """
-    res = exec_cmd("amixer set Headphone %d%%" % value)
+    res = exec_cmd(f"amixer set 'Speaker' {value}% && amixer set 'Headphone' {value}%")
     if res[0] != 0:
-        return -1, res[1]
+        return res[1]
+    return None
 
-    tmp = res[1].split("Front Right:")
-    if len(tmp) < 1:
-        return -1, "Unable to get current volume"
 
-    m = re.search("\[(.+?)%\]", tmp[1])
-    if not m:
-        return -1, "Unable to get current volume"
+def get_elements_configuration(elements):
+    """
+    Gets the configuration for the given elements.
 
-    if len(m.groups()) < 1:
-        return -1, "Unable to get current volume"
+    Args:
+        elements (List): Elements for which to get the configuration.
 
+    Returns:
+        Dictionary: The elements configuration data.
+    """
+    data = {}
+    for element in elements:
+        if element == ELEMENT_BLUETOOTH:
+            data[element] = get_bluetooth_element_configuration()
+        elif element in (ELEMENT_ETHERNET, ELEMENT_WIFI):
+            data[element] = get_network_element_configuration(element)
+        else:
+            data["error"] = f"Unknown element '{element}'"
+
+    return data
+
+
+def get_network_element_configuration(element):
+    """
+    Gets the configuration for the given network element.
+
+    Args:
+        element (String): Network element for which to get the configuration.
+
+    Returns:
+        Dictionary: The network element configuration data.
+    """
+    data = {}
+    prefix = PREFIX_ETHERNET
+    if element == ELEMENT_WIFI:
+        prefix = PREFIX_WIFI
     try:
-        return int(m.group(1)), ""
-    except ValueError:
-        return -1, "Unable to get current volume"
+        ifaces = NetworkInterface.list_interfaces() or []
+        for iface in ifaces:
+            if prefix in iface:
+                data[iface] = get_network_iface_configuration(iface)
+    except DigiAPIXException as exc:
+        data["error"] = f"Error listing network interfaces: '{str(exc)}'"
+
+    return data
+
+
+def get_network_iface_configuration(interface):
+    """
+    Returns the network configuration of the given interface.
+
+    Args:
+        interface (String): Network interface to get its configuration.
+
+    Returns:
+        Dictionary: dictionary with the interface configuration.
+    """
+    data = {}
+    try:
+        net_iface = NetworkInterface.get(interface)
+        data["enable"] = 1 if net_iface.status == NetStatus.CONNECTED else 0
+        data["mac"] = mac_to_human_string(net_iface.mac)
+        data["type"] = 0 if net_iface.ip_mode == IPMode.STATIC else 1
+        data["ip"] = str(net_iface.ipv4)
+        data["netmask"] = str(net_iface.netmask)
+        data["dns1"] = str(net_iface.dns1)
+        data["dns2"] = str(net_iface.dns2)
+        data["gateway"] = str(net_iface.gateway)
+        if PREFIX_WIFI in interface:
+            try:
+                wifi_iface = WifiInterface.get(interface)
+                data["ssid"] = wifi_iface.ssid
+                data["frequency"] = wifi_iface.frequency
+                data["channel"] = wifi_iface.channel
+                data["sec_mode"] = 0 if wifi_iface.sec_mode == SecurityMode.UNKNOWN \
+                    else wifi_iface.sec_mode.code
+            except WifiException as exc:
+                raise NetworkException({str(exc)}) from exc
+    except NetworkException as exc2:
+        data["error"] = f"Error reading interface data: {str(exc2)}"
+
+    return data
+
+
+def set_configuration(config_data):
+    """
+    Applies the given configuration.
+
+    Args:
+        config_data (Dictionary): Configuration to apply.
+
+    Returns:
+        Dictionary: The operation result.
+    """
+    data = {}
+    for element in config_data:
+        if element == ELEMENT_BLUETOOTH:
+            data[element] = set_bluetooth_element_configuration(config_data[element])
+        elif element in (ELEMENT_ETHERNET, ELEMENT_WIFI):
+            data[element] = set_network_element_configuration(config_data[element])
+        else:
+            data["error"] = f"Unknown element '{element}'"
+
+    return data
+
+
+def set_network_element_configuration(config_data):
+    """
+    Applies the given network configuration.
+
+    Args:
+        config_data (Dictionary): Network configuration to apply.
+
+    Returns:
+        Dictionary: The operation result.
+    """
+    data = {}
+    for iface in config_data:
+        data[iface] = set_network_iface_configuration(iface, config_data[iface])
+
+    return data
+
+
+def set_network_iface_configuration(interface, config_data):
+    """
+    Applies the given network configuration to the given interface.
+
+    Args:
+        interface (String): Network interface to apply configuration to.
+        config_data (Dictionary): Network configuration to apply.
+
+    Returns:
+        Dictionary: Operation result.
+    """
+    data = {}
+    profile = NetworkProfile()
+    if PREFIX_WIFI in interface:
+        profile = WifiProfile()
+    profile.connect = config_data.get("enable", None)
+    profile.mode = IPMode.get(config_data["type"]) if "type" in config_data else None
+    profile.ipv4 = config_data.get("ip", None)
+    profile.netmask = config_data.get("netmask", None)
+    profile.gateway = config_data.get("gateway", None)
+    profile.dns1 = config_data.get("dns1", None)
+    profile.dns2 = config_data.get("dns2", None)
+    if PREFIX_WIFI in interface:
+        profile.ssid = config_data.get("ssid", None)
+        profile.sec_mode = (SecurityMode.get(config_data["sec_mode"])
+                            if "sec_mode" in config_data else None)
+        profile.psk = config_data.get("psk", None)
+    try:
+        if PREFIX_ETHERNET in interface:
+            net_iface = NetworkInterface.get(interface)
+        elif PREFIX_WIFI in interface:
+            net_iface = WifiInterface.get(interface)
+        else:
+            raise DigiAPIXException(f"Unknown interface '{interface}'")
+        net_iface.configure(profile)
+        data["status"] = 0
+    except DigiAPIXException as exc2:
+        data["status"] = 1
+        data["desc"] = f"Error configuring interface: {str(exc2)}"
+
+    return data
+
+
+def get_bluetooth_element_configuration():
+    """
+    Gets the configuration for the bluetooth element.
+
+    Returns:
+        Dictionary: The bluetooth element configuration data.
+    """
+    data = {}
+    try:
+        bt_devices = BluetoothDevice.list_devices() or []
+        for bt_device in bt_devices:
+            data[bt_device] = get_bluetooth_device_configuration(bt_device)
+    except DigiAPIXException as exc:
+        data["error"] = f"Error listing bluetooth devices: '{str(exc)}'"
+
+    return data
+
+
+def get_bluetooth_device_configuration(device):
+    """
+    Returns the configuration of the given bluetooth device.
+
+    Args:
+        device (String): Bluetooth device to get its configuration.
+
+    Returns:
+        Dictionary: dictionary with the device configuration.
+    """
+    data = {}
+    try:
+        bt_device = BluetoothDevice.get(device)
+        data["device_id"] = bt_device.device_id
+        data["advert_name"] = str(bt_device.advert_name)
+        data["mac"] = mac_to_human_string(bt_device.mac)
+        data["enable"] = 1 if bt_device.is_enabled else 0
+        data["running"] = 1 if bt_device.is_running else 0
+    except BluetoothException as exc:
+        data["error"] = f"Error reading device data: {str(exc)}"
+
+    return data
+
+
+def set_bluetooth_element_configuration(config_data):
+    """
+    Applies the given bluetooth configuration.
+
+    Args:
+        config_data (Dictionary): Bluetooth configuration to apply.
+
+    Returns:
+        Dictionary: The operation result.
+    """
+    data = {}
+    for device in config_data:
+        data[device] = set_bluetooth_device_configuration(device, config_data[device])
+
+    return data
+
+
+def set_bluetooth_device_configuration(device, config_data):
+    """
+    Applies the given bluetooth configuration to the given device.
+
+    Args:
+        device (String): Bluetooth device to apply configuration to.
+        config_data (Dictionary): Bluetooth configuration to apply.
+
+    Returns:
+        Dictionary: Operation result.
+    """
+    data = {}
+    try:
+        bt_device = BluetoothDevice.get(device)
+        profile = BluetoothProfile()
+        profile.enable = config_data.get("enable", None)
+        profile.advert_name = config_data.get("advert_name", None)
+        bt_device.configure(profile)
+        data["status"] = 0
+    except DigiAPIXException as exc2:
+        data["status"] = 1
+        data["desc"] = f"Error configuring interface: {str(exc2)}"
+
+    return data
+
+
+def mac_to_human_string(mac, num_bytes=6):
+    """
+    Transforms the given MAC address into a human readable string.
+
+    Args:
+        mac (:class:`.MacAddress`): The MAC address to transform.
+        num_bytes (Integer): The number of bytes to use in the MAC Address.
+
+    Return:
+        String: The given MAC as human readable string.
+    """
+    return ":".join(["%02X" % i for i in mac][8-num_bytes:]).upper()
 
 
 def read_proc_file(path):
@@ -1023,6 +1285,21 @@ def exec_cmd(cmd, timeout=None):
         return -1, e.stdout
     except subprocess.CalledProcessError as e:
         return e.returncode, e.stdout
+
+
+def exec_cmd_nowait(command, *args):
+    """
+    Executes the provided command without waiting to finish.
+
+    Args:
+        command (String): The command to execute.
+        args (List): The list of arguments.
+    """
+    arguments = []
+    for arg in args:
+        arguments.extend(arg)
+    subprocess.Popen([command] + arguments, shell=True, stdout=subprocess.PIPE,
+                     stderr=subprocess.STDOUT, text=True)
 
 
 def read_file(path):
@@ -1124,8 +1401,6 @@ def signal_handler(signal_number, _frame):
         _frame: Current stack frame.
     """
     log.debug("Signal received %d", signal_number)
-    if signal_number in (signal.SIGTERM, signal.SIGINT):
-        stop_event.set()
 
 
 def main():
@@ -1161,7 +1436,8 @@ def main():
     server_thread.deamon = True
     server_thread.start()
 
-    stop_event.wait()
+    # Wait for termination/interrupt signal.
+    signal.sigwait([signal.SIGTERM, signal.SIGINT])
 
     server.shutdown()
     server.server_close()

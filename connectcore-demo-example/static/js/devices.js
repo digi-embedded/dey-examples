@@ -325,6 +325,11 @@ class ConnectCoreDevice {
         return this.#ethernetIP[index];
     }
 
+    // Returns whether the device supports Wifi or not.
+    hasWifi() {
+        return this.#wifiMAC != null && this.#wifiMAC != "undefined"
+    }
+
     // Returns the device WiFi MAC address.
     getWifiMAC() {
         return this.#wifiMAC;

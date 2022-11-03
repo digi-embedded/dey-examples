@@ -12,6 +12,8 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * Music by https://www.bensound.com
  */
 
 // Constants.
@@ -55,6 +57,7 @@ const ID_MEMORY_PANEL_AREA = "memory_panel_area";
 const ID_MEMORY_PANEL_ARROW = "memory_panel_arrow";
 const ID_MEMORY_PANEL_ICON = "memory_panel_icon";
 const ID_PLATFORM_NAME = "platform_name";
+const ID_PLAY = "play";
 const ID_VIDEO_BRIGHTNESS_CONTAINER = "video_brightness_container";
 const ID_VIDEO_PANEL = "video_panel";
 const ID_VIDEO_PANEL_AREA = "video_panel_area";
@@ -66,36 +69,29 @@ const ID_WIFI_BT_PANEL_AREA = "wifi_bt_panel_area";
 const ID_WIFI_BT_PANEL_ARROW = "wifi_bt_panel_arrow";
 const ID_WIFI_BT_PANEL_ICON = "wifi_bt_panel_icon";
 
-const IFACE_BT = "hci0/";
-const IFACE_ETHERNET0 = "eth0/";
-const IFACE_ETHERNET1 = "eth1/";
-const IFACE_WIFI = "wlan0/";
-
 const USER_LED = "user_led";
 
 const STREAM_CPU_FREQUENCY = PREFIX_STREAM + "frequency";
 const STREAM_CPU_TEMPERATURE = PREFIX_STREAM + "cpu_temperature";
 const STREAM_CPU_UPTIME = PREFIX_STREAM + "uptime";
-const STREAM_ETHERNET0_READ_BYTES = PREFIX_STREAM + IFACE_ETHERNET0 + "rx_bytes";
-const STREAM_ETHERNET0_SENT_BYTES = PREFIX_STREAM + IFACE_ETHERNET0 + "tx_bytes";
-const STREAM_ETHERNET0_STATE = PREFIX_STREAM + IFACE_ETHERNET0 + "state";
-const STREAM_ETHERNET1_READ_BYTES = PREFIX_STREAM + IFACE_ETHERNET1 + "rx_bytes";
-const STREAM_ETHERNET1_SENT_BYTES = PREFIX_STREAM + IFACE_ETHERNET1 + "tx_bytes";
-const STREAM_ETHERNET1_STATE = PREFIX_STREAM + IFACE_ETHERNET1 + "state";
+const STREAM_ETHERNET0_READ_BYTES = PREFIX_STREAM + IFACE_ETH0 + "/rx_bytes";
+const STREAM_ETHERNET0_SENT_BYTES = PREFIX_STREAM + IFACE_ETH0 + "/tx_bytes";
+const STREAM_ETHERNET0_STATE = PREFIX_STREAM + IFACE_ETH0 + "/state";
+const STREAM_ETHERNET1_READ_BYTES = PREFIX_STREAM + IFACE_ETH1 + "/rx_bytes";
+const STREAM_ETHERNET1_SENT_BYTES = PREFIX_STREAM + IFACE_ETH1 + "/tx_bytes";
+const STREAM_ETHERNET1_STATE = PREFIX_STREAM + IFACE_ETH1 + "/state";
 const STREAM_LED_STATUS = PREFIX_STREAM + "led_status";
 const STREAM_MEMORY_USED = PREFIX_STREAM + "used_memory";
-const STREAM_WIFI_READ_BYTES = PREFIX_STREAM + IFACE_WIFI + "rx_bytes";
-const STREAM_WIFI_SENT_BYTES = PREFIX_STREAM + IFACE_WIFI + "tx_bytes";
-const STREAM_WIFI_STATE = PREFIX_STREAM + IFACE_WIFI + "state";
-const STREAM_BT_READ_BYTES = PREFIX_STREAM + IFACE_BT + "rx_bytes";
-const STREAM_BT_SENT_BYTES = PREFIX_STREAM + IFACE_BT + "tx_bytes";
-const STREAM_BT_STATE = PREFIX_STREAM + IFACE_BT + "state";
+const STREAM_WIFI_READ_BYTES = PREFIX_STREAM + IFACE_WIFI + "/rx_bytes";
+const STREAM_WIFI_SENT_BYTES = PREFIX_STREAM + IFACE_WIFI + "/tx_bytes";
+const STREAM_WIFI_STATE = PREFIX_STREAM + IFACE_WIFI + "/state";
+const STREAM_BT_READ_BYTES = PREFIX_STREAM + IFACE_BT + "/rx_bytes";
+const STREAM_BT_SENT_BYTES = PREFIX_STREAM + IFACE_BT + "/tx_bytes";
+const STREAM_BT_STATE = PREFIX_STREAM + IFACE_BT + "/state";
 
 const PANEL_ARROW_WIDTH_100 = 20;
 const PANEL_BOARD_WIDTH_100 = 1200;
 
-const CLASS_ARROW_DOWN = "fa-caret-down";
-const CLASS_ARROW_UP = "fa-caret-up";
 const CLASS_LED_PANEL_AREA_ON = "led-panel-area-on";
 const CLASS_PANEL_AREA_SELECTED = "panel-area-selected";
 const CLASS_PANEL_AREA_ICON_SELECTED = "panel-area-icon-selected";
@@ -103,6 +99,9 @@ const CLASS_PANEL_TOOLTIP = "panel-tooltip";
 
 const MESSAGE_CHANGING_VIDEO_BRIGHTNESS = "Changing video brightness...";
 const MESSAGE_CHANGING_AUDIO_VOLUME = "Changing audio volume...";
+const MESSAGE_MUSIC_PLAYING = "Music playing..."
+const MESSAGE_MUSIC_STOPPED = "Music stopped."
+const MESSAGE_PLAY_MUSIC = "Setting play music value..."
 const MESSAGE_READING_DEVICE_INFO = "Reading device info...";
 const MESSAGE_READING_DEVICE_STATUS = "Reading device status...";
 const MESSAGE_TOGGLING_LED_VALUE = "Toggling LED value...";
@@ -110,6 +109,8 @@ const MESSAGE_TOGGLING_LED_VALUE = "Toggling LED value...";
 const ERROR_LED_UNKNOWN = "LED status has not been read yet, please wait.";
 const ERROR_NOT_SUPPORTED_DEVICE_MESSAGE = "The selected device type is not supported: {0}";
 const ERROR_NOT_SUPPORTED_DEVICE_TITLE = "Unsupported device";
+
+const MUSIC_FILE = "/srv/www/static/sounds/inspire.mp3"
 
 // Variables.
 var deviceInitialized = false;
@@ -239,6 +240,7 @@ function processDeviceInfoResponse(response) {
     // Position components after some time to give time to the image to load.
     window.setTimeout(function () {
        positionComponents();
+       adjustImageSize();
        setInfoPanelsVisible(false);
     }, 500);
     // Read device status.
@@ -367,6 +369,9 @@ function createDevice(deviceData) {
             break;
         case CCMP157.DEVICE_TYPE:
             device = new CCMP157(deviceData);
+            break;
+        case CCMP133.DEVICE_TYPE:
+            device = new CCMP133(deviceData);
             break;
     }
     if (device != null) {
@@ -934,6 +939,50 @@ function processSetVideoBrightnessResponse(response) {
     videoSlider.enable();
 }
 
+// Handles what happens when the Play music button is pressed.
+function playMusic(play) {
+    // Show the loading panel of the device.
+    showLoadingPopup(true, MESSAGE_PLAY_MUSIC);
+    // Send request to play music.
+    $.post(
+        "http://" + getServerAddress() + "/ajax/play_music",
+        JSON.stringify({
+            "play": play,
+            "music_file": MUSIC_FILE
+        }),
+        function(data) {
+            // Process only in the dashboard page.
+            if (!isDashboardShowing())
+                return;
+            // Process answer.
+            processPlayMusicResponse(data);
+        }
+    ).fail(function(response) {
+        // Process only in the dashboard page.
+        if (!isDashboardShowing())
+            return;
+        // Process error.
+        processAjaxErrorResponse(response);
+        // Hide the loading panel of the device.
+        showLoadingPopup(false);
+    });
+}
+
+// Processes the "play music" request answer.
+function processPlayMusicResponse(response) {
+    // Check if there was any error in the request.
+    if (!checkErrorResponse(response, false)) {
+        play = response[ID_PLAY];
+        // Show confirmation.
+        if (play)
+            toastr.info(MESSAGE_MUSIC_PLAYING);
+        else
+            toastr.info(MESSAGE_MUSIC_STOPPED);
+    }
+    // Hide the loading panel of the device.
+    showLoadingPopup(false);
+}
+
 // Processes an audio volume changed event.
 function volumeChanged(newValue) {
     // Show the loading panel of the device.
@@ -976,10 +1025,9 @@ function processSetAudioVolumeResponse(response) {
         audioSlider.setValue(volume);
     } else {
         // Save new volume value.
-        volume = response["value"];
-        if (volume == null)
-            volume = audioSlider.getValue();
-        audioSlider.setValue(volume);
+        volume = audioSlider.getValue();
+        // Show confirmation.
+        toastr.info("Volume changed to " + volume + "%")
     }
     // Hide the loading panel of the device.
     showLoadingPopup(false);
@@ -1049,6 +1097,10 @@ function processSetLEDResponse(response) {
     if (!checkErrorResponse(response, false)) {
         // Update the LED status.
         updateLEDStatus();
+        if (ledStatus)
+            toastr.info("User LED set to ON");
+        else
+            toastr.info("User LED set to OFF");
     }
     // Hide the loading panel of the device.
     showLoadingPopup(false);

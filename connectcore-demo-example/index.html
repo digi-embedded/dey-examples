@@ -34,7 +34,6 @@ Digi Demo - Dashboard
                     <p id="banner-text">ConnectCore Demo</p>
                 </div>
             </a>
-
             <div class="nav-right-container">
                 <div>
                     <img src="./static/images/board.png" class="device-title-img" title="Device">
@@ -66,6 +65,14 @@ Digi Demo - Dashboard
                         <div class="d-flex w-100 justify-content-start align-items-center">
                             <span class="digi-menu-icon fas fa-film fa-fw fa-lg mr-3"></span>
                             <span class="menu-collapsed">Multimedia</span>
+                        </div>
+                    </a>
+                </li>
+                <li id="section_network">
+                    <a data-pjax href="network.html" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="digi-menu-icon fas fa-network-wired fa-fw fa-lg mr-3"></span>
+                            <span class="menu-collapsed">Network</span>
                         </div>
                     </a>
                 </li>
@@ -620,6 +627,13 @@ Digi Demo - Dashboard
                                                     <span>Audio control</span>
                                                     <div class="fas fa-window-close fa-lg device-card-header-button" onclick="setInfoPanelVisible('audio', false)"></div>
                                                 </div>
+                                                <div class="device-card-content" style="padding-bottom: 0px;">
+                                                    <span class="device-card-content-text" style="margin-right: 15px;">Music:</span>
+                                                    <div id="play_audio_button" class="fas fa-play audio-button" onclick="playMusic(true)">
+                                                    </div>
+                                                    <div id="stop_audio_button" class="fas fa-stop audio-button" onclick="playMusic(false)">
+                                                    </div>
+                                                </div>
                                                 <div class="device-card-content">
                                                     <div>
                                                         <span class="device-card-content-text">Volume:</span>
@@ -740,12 +754,14 @@ Digi Demo - Dashboard
 
     <!-- Local JS files and functions -->
     <script type="text/javascript" src="./static/js/sidebar.js"></script>
+    <script type="text/javascript" src="./static/js/ccmp133-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccmp157-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccimx6ulsbc.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8mm-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8m-nano.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8x-sbc-pro.js"></script>
     <script type="text/javascript" src="./static/js/dashboard.js"></script>
+    <script type="text/javascript" src="./static/js/network.js"></script>
     <script type="text/javascript" src="./static/js/multimedia.js"></script>
     <script type="text/javascript" src="./static/js/management.js"></script>
     <script type="text/javascript" src="./static/js/file-system.js"></script>
