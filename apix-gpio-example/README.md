@@ -9,6 +9,9 @@ whenever an interrupt is generated in the input GPIO.
 
 The GPIOs lines used in this example are mapped as follows in the Digi boards:
 
+ - **ConnectCore MP15 DVK**:
+  - User button: GPIOA,13 (User Button 1 in the board)
+  - User led: GPIOC,3 (ULED in the board)
  - **ConnectCore 8M Mini DVK**:
   - User button: MCA_IO10 (User Button 1 in the board)
   - User led: USER_LED1 (User Led 1 in the board)
@@ -68,7 +71,7 @@ for example, for ConnectCore 6UL:
 For more information, see the [Digi Embedded Yocto online documentation](https://github.com/digi-embedded/meta-digi).
 License
 -------
-Copyright 2017, Digi International Inc.
+Copyright 2017-2022, Digi International Inc.
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice
