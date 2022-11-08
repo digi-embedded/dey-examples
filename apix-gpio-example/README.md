@@ -25,7 +25,7 @@ The GPIOs lines used in this example are mapped as follows in the Digi boards:
     - User button: GPIO0_20 (Connected in the board)
     - User led: GPIO0_19 (Connected in the board)
  - **ConnectCore 6UL SBC Pro**:
-   - User button: MCA_IO1 (GPIO connector, J30, Pin 7)
+   - User button: GPIO1_IO3 (GPIO connector, J30, Pin 12)
    - User led: USER_LED1 (Connected in the board)
  - **ConnectCore 6UL SBC Express**:
    - User button: GPIO3_IO3 (Connected in the board)
