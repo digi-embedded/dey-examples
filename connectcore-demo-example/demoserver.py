@@ -513,19 +513,15 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             path = json.loads(data.decode("utf-8")).get("file", None)
 
             log.debug("Update firmware with file %s", path)
-
-            if is_dual_system():
-                cmd = "firmware-update-dual.sh %s" % path
-            else:
-                if not path.startswith(get_fw_store_path()):
-                    # Move the package to /mnt/update
-                    update_path = os.path.join(get_fw_store_path(), os.path.basename(path))
-                    if os.path.exists(update_path):
-                        os.remove(update_path)
-                    shutil.move(path, update_path)
-                    path = update_path
-                cmd = "update-firmware --reboot-timeout=1 %s" % path
-
+            if not is_dual_system() and not path.startswith(get_fw_store_path())\
+                    and shutil.disk_usage(get_fw_store_path())[2] >= os.path.getsize(path):
+                # Move the package to /mnt/update to avoid permission problems
+                update_path = os.path.join(get_fw_store_path(), os.path.basename(path))
+                if os.path.exists(update_path):
+                    os.remove(update_path)
+                shutil.move(path, update_path)
+                path = update_path
+            cmd = "update-firmware %s" % path
             log.debug("Update cmd: %s", cmd)
 
             try:
@@ -790,7 +786,7 @@ def get_video_resolution():
         res = read_file("/sys/class/drm/card0/card0-DPI-1/modes")
     if res == NOT_AVAILABLE:
         res = read_file("/sys/class/graphics/fb0/modes")
-    if res == NOT_AVAILABLE:
+    if res == NOT_AVAILABLE or not res:
         return "No video device found"
 
     line = res.splitlines()[0]
@@ -806,8 +802,8 @@ def is_dual_system():
     Returns:
         Boolean: True for dual systems, False otherwise.
     """
-    res = exec_cmd("fdisk -l | grep recovery")
-    return res[0] != 0
+    res = exec_cmd("fw_printenv -n dualboot")
+    return res[0] == 0 and res[1] == "yes"
 
 
 def get_fw_store_path():

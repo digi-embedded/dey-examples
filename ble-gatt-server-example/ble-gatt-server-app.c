@@ -625,7 +625,7 @@ static struct server *server_create(int fd, uint16_t mtu)
 	}
 
 	if (verbose) {
-		bt_att_set_debug(server->att, debug_cb, "att: ", NULL);
+		bt_att_set_debug(server->att, BT_ATT_DEBUG_VERBOSE, debug_cb, "att: ", NULL);
 		bt_gatt_server_set_debug(server->gatt, debug_cb,
 							"server: ", NULL);
 	}

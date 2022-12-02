@@ -7,6 +7,7 @@ This application enables one ADC channel on the board. After that, the
 application takes periodic samples and prints the raw value and the value in mv.
 
 The ADC lines used in this example are mapped as follows in the Digi boards:
+ - **ConnectCore MP15 DVK**: AN0 (GPIO connector, J41, Pin 4).
  - **ConnectCore 8M Mini DVK**: MCA_IO1 (channel 1) at XBEE1_UART_TX. By default
  this ADC channel is not enabled, you need to modify the device tree.
  - **ConnectCore 8M Nano DVK**: MCA_IO1 (channel 1) at XBEE1_UART_TX. By default
@@ -56,7 +57,7 @@ For more information, see the [Digi Embedded Yocto online documentation](https:/
 
 License
 -------
-Copyright 2017, Digi International Inc.
+Copyright 2017-2022, Digi International Inc.
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice

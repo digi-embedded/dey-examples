@@ -9,6 +9,7 @@ vice-versa.
 
 The PWM lines used in this example are mapped as follows in the Digi boards:
 
+ - **ConnectCore MP15 DVK**: MikroBus PWM channel 4 - PIN **1** of the MikroBus connector (J31).
  - **ConnectCore 8M Mini DVK**: MCA PWM0 channel 2 connected to the LED1.
  - **ConnectCore 8M Nano DVK**: MCA PWM0 channel 2 connected to the LED1.
  - **ConnectCore 8X SBC Pro**: MCA PWM2 channel 0 - Pin **A3** of the Expansion connector (J20).
@@ -54,7 +55,7 @@ For more information, see the [Digi Embedded Yocto online documentation](https:/
 
 License
 -------
-Copyright 2017, Digi International Inc.
+Copyright 2017-2022, Digi International Inc.
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice
