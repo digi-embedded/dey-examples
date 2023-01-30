@@ -20,7 +20,7 @@ class CCIMX8MMINI extends ConnectCoreDevice {
     static PLATFORM_NAME = "ConnectCore 8M-Mini DVK";
 
     // Variables.
-    BOARD_IMAGE = "ccimx8m-mini_board.png";
+    BOARD_IMAGE = "ccimx8mm-dvk_board.png";
     BOARD_IMAGE_SCALE = 85;
 
     CPU_COMPONENT_VISIBLE = true;

@@ -20,7 +20,7 @@ class CCMP157 extends ConnectCoreDevice {
     static PLATFORM_NAME = "ConnectCore MP157";
 
     // Variables.
-    BOARD_IMAGE = "ccmp157_board.png";
+    BOARD_IMAGE = "ccmp15-dvk_board.png";
     BOARD_IMAGE_SCALE = 82;
 
     CPU_COMPONENT_VISIBLE = true;
