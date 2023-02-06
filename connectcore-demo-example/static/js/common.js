@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, Digi International Inc.
+ * Copyright 2022, 2023, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -528,6 +528,8 @@ function updateAvailableSections() {
             }
             switch (data[ID_DEVICE_TYPE]) {
                 case CCIMX6ULSBC.DEVICE_TYPE:
+                case CCMP157.DEVICE_TYPE:
+                case CCMP133.DEVICE_TYPE:
                     removeSection(ID_SECTION_MULTIMEDIA);
                     break;
             }
