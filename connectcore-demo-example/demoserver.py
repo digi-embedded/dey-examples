@@ -95,7 +95,7 @@ BT_TAG_VALUE = "value"
 BT_OP_READ = "R"
 BT_OP_WRITE = "W"
 
-BT_PAYLOAD_LIMIT = 200
+BT_PAYLOAD_LIMIT = 140
 
 BT_REQUEST_TIMEOUT = 5000
 
@@ -1010,7 +1010,6 @@ class BluetoothService:
                                               BT_PAYLOAD_LIMIT + BT_PAYLOAD_LIMIT]
                 }
                 self._ble_service.send_data(json.dumps(chunk_data).encode('utf-8'))
-                time.sleep(0.2)
                 chunk_index += 1
         except ConnectCoreBLEException as exc:
             log.error("Unable send data to connected device: %s", str(exc))
