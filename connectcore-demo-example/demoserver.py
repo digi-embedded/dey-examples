@@ -1138,10 +1138,10 @@ def get_storage_size():
     Returns:
         Integer: The internal storage size, -1 if fails.
     """
-    if os.path.exists(NAND_SIZE_FILE):
-        return get_nand_size()
     if os.path.exists(EMMC_SIZE_FILE):
         return get_emmc_size()
+    if os.path.exists(NAND_SIZE_FILE):
+        return get_nand_size()
     return -1
 
 
