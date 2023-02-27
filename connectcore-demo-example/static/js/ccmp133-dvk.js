@@ -20,7 +20,7 @@ class CCMP133 extends ConnectCoreDevice {
     static PLATFORM_NAME = "ConnectCore MP133";
 
     // Variables.
-    BOARD_IMAGE = "ccmp133_board.png";
+    BOARD_IMAGE = "ccmp13-dvk_board.png";
     BOARD_IMAGE_SCALE = 82;
 
     CPU_COMPONENT_VISIBLE = true;

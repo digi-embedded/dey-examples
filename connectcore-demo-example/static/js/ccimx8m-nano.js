@@ -20,7 +20,7 @@ class CCIMX8MNANO extends ConnectCoreDevice {
     static PLATFORM_NAME = "ConnectCore 8M-Nano DVK";
 
     // Variables.
-    BOARD_IMAGE = "ccimx8m-nano_board.png";
+    BOARD_IMAGE = "ccimx8mn-dvk_board.png";
     BOARD_IMAGE_SCALE = 85;
 
     CPU_COMPONENT_VISIBLE = true;
