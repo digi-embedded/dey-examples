@@ -11,6 +11,13 @@ the page size and the address size in bytes.
 
 The SPI connections for this example depends on the running platform:
 
+ - **ConnectCore MP13 DVK**: MikroBus connector (J30).
+    - VCC: Pin 7
+    - GND: Pin 8
+    - SPI-0 CLK: 4
+    - SPI-0 MISO: 5
+    - SPI-0 MOSI: 6
+    - SPI-0 SS0: 3
  - **ConnectCore MP15 DVK**: MikroBus connector (J30).
     - VCC: Pin 7
     - GND: Pin 8

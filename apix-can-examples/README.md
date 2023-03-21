@@ -14,6 +14,11 @@ the ID and print in the console.
 
 The CAN interface for this example depends on the running platform:
 
+ - **ConnectCore MP13 DVK**: CAN connector of the board (J33).
+   - 5V: Pin 1
+   - CAN1_H: Pin 2
+   - CAN1_L: Pin 3
+   - GND: Pin 4
  - **ConnectCore MP15 DVK**: CAN connector of the board (J33).
    - 5V: Pin 1
    - CAN1_H: Pin 2
