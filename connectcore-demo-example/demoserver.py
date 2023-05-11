@@ -666,7 +666,7 @@ class BluetoothService:
         """
         with self._lock:
             try:
-                self._ble_service = ConnectCoreBLEService.get_instance()
+                self._ble_service = ConnectCoreBLEService.get_instance(ble_interface=BLEInterface.ADAPTER)
                 self._ble_service.add_connect_callback(self._connection_cb)
                 self._ble_service.add_data_received_callback(self._data_received_cb)
                 self._ble_service.set_password(get_bt_password())
