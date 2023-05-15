@@ -172,7 +172,7 @@ then the device will reboot automatically after the timeout expires.
         </platforms>
     </sample>
     <sample id="ble-gat-server-example">
-        <name>Digi BLE GAT server Example</name>
+        <name>Digi BLE GATT server Example</name>
         <description>
 This application enables a BLE GATT server on the board. After that, the
 application starts listening for BLE connections to provide custom BLE
