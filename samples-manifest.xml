@@ -19,6 +19,7 @@ application takes periodic samples and prints the raw value and the value in mv.
             <platform>ccimx8mm-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
+            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="apix-can-samples">
@@ -40,6 +41,7 @@ reception using the selected baudrate.
             <platform>ccimx8mm-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
+            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="apix-gpio-sample">
@@ -62,6 +64,7 @@ whenever an interrupt is generated in the input GPIO.
             <platform>ccimx8mm-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
+            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="apix-i2c-sample">
@@ -83,6 +86,7 @@ Afterward, it reads the data back to validate it (tested with 24FC1026).
             <platform>ccimx8mm-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
+            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="apix-pm-sample">
@@ -147,6 +151,7 @@ the page size and the address size in bytes.
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
+            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="apix-watchdog-sample">
@@ -169,10 +174,11 @@ then the device will reboot automatically after the timeout expires.
             <platform>ccimx8mm-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
+            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="ble-gat-server-example">
-        <name>Digi BLE GAT server Example</name>
+        <name>Digi BLE GATT server Example</name>
         <description>
 This application enables a BLE GATT server on the board. After that, the
 application starts listening for BLE connections to provide custom BLE
@@ -190,6 +196,7 @@ GATT services and characteristics.
             <platform>ccimx8mm-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
+            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="caam-blob-example">
