@@ -223,4 +223,51 @@ A key modifier may be used to further differentiate the key used in a particular
             <platform>ccimx8mm-dvk</platform>
         </platforms>
     </sample>
+    <sample id="cccs-data-request-example">
+        <name>Digi CCCS data request Example</name>
+        <description>
+Example application to listen to data requests from Remote Manager using
+ConnectCore Cloud Services.
+This application registers a `get_time` data request.
+When this request arrives the application sends back the current time.
+        </description>
+        <path>cccs-data-request-example</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
+            <platform>ccimx8mn-dvk</platform>
+            <platform>ccimx8mm-dvk</platform>
+            <platform>ccmp15-dvk</platform>
+            <platform>ccmp13-dvk</platform>
+            <platform>ccimx93-dvk</platform>
+        </platforms>
+    </sample>
+    <sample id="cccs-upload-data-points-example">
+        <name>Digi CCCS upload data points Example</name>
+        <description>
+Example application to upload data points to Remote Manager using ConnectCore
+Cloud Services.
+This application uploads an integer value with an incremented counter to a data
+stream called 'incremental'. The counter value is incremented every 5 seconds.
+The uploads takes place every 10 new samples, that is every 50 seconds.
+        </description>
+        <path>cccs-upload-data-points-example</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
+            <platform>ccimx8mn-dvk</platform>
+            <platform>ccimx8mm-dvk</platform>
+            <platform>ccmp15-dvk</platform>
+            <platform>ccmp13-dvk</platform>
+            <platform>ccimx93-dvk</platform>
+        </platforms>
+    </sample>
 </samples>
