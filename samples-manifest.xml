@@ -270,4 +270,27 @@ The uploads takes place every 10 new samples, that is every 50 seconds.
             <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
+    <sample id="cccs-upload-binary-file-example">
+        <name>Digi CCCS upload binary file Example</name>
+        <description>
+Example application to upload a binary file to Remote Manager using ConnectCore
+Cloud Services.
+This application uploads the content of file `/etc/build` as a binary data point
+to stream `binary_dp`.
+        </description>
+        <path>cccs-upload-binary-file-example</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
+            <platform>ccimx8mn-dvk</platform>
+            <platform>ccimx8mm-dvk</platform>
+            <platform>ccmp15-dvk</platform>
+            <platform>ccmp13-dvk</platform>
+            <platform>ccimx93-dvk</platform>
+        </platforms>
+    </sample>
 </samples>
