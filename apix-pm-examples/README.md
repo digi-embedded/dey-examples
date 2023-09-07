@@ -69,7 +69,7 @@ This demo can be compiled using a Digi Embedded Yocto based toolchain. Make
 sure to source the corresponding toolchain of the platform you are using,
 for example, for ConnectCore 6UL:
 ```
-~$ . <DEY-toolchain-path>/environment-setup-cortexa7hf-vfp-neon-dey-linux-gnueabi
+~$ . <DEY-toolchain-path>/environment-setup-cortexa7t2hf-neon-dey-linux-gnueabi
 ~$ make
 ```
 
@@ -77,7 +77,7 @@ For more information, see the [Digi Embedded Yocto](https://github.com/digi-embe
 
 License
 -------
-Copyright 2019, Digi International Inc.
+Copyright 2019-2023, Digi International Inc.
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice

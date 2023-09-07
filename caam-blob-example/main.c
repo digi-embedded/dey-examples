@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 	/* this is a limitation of the current driver implementation */
 	if (input_len > max_input_len) {
 		fprintf(stderr, "[ERROR] Input is too big, continuing may result in unexpected behavior.\n"
-			"[ERROR] The maximum input size for %s is %u bytes.\n",
+			"[ERROR] The maximum input size for %s is %zu bytes.\n",
 			op == ENCRYPT ? "encryption" : "decryption", max_input_len);
 		return EXIT_FAILURE;
 	}

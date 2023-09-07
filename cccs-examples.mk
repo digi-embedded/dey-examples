@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017-2023 Digi International Inc.
+# Copyright (c) 2023 Digi International Inc.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -15,14 +15,8 @@
 #
 
 SUBDIRS := \
-		apix-adc-example \
-		apix-can-examples \
-		apix-gpio-example \
-		apix-i2c-example \
-		apix-pm-examples \
-		apix-pwm-example \
-		apix-spi-example \
-		apix-watchdog-example
+		cccs-data-request-example \
+		cccs-upload-data-points-example
 
 all: $(SUBDIRS)
 
