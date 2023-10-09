@@ -23,7 +23,7 @@
 
 #define STREAM_NAME	"incremental"
 
-#define DP_SLEEP_TIME	5
+#define DP_SLEEP_TIME	6
 #define DP_NUMBER	10
 
 static int stop_requested = 0;
@@ -179,7 +179,7 @@ static int send_data(cccs_dp_collection_handle_t collection)
 	cccs_comm_error_t ret;
 	cccs_resp_t resp;
 
-	log_info("%s", "Sending data sream with new incremental value");
+	log_info("%s", "Sending data stream with new incremental value");
 
 	ret = cccs_send_dp_collection_tout(collection, 5, &resp);
 	if (ret != CCCS_SEND_ERROR_NONE) {
