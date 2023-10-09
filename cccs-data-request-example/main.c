@@ -195,12 +195,14 @@ int main(int argc, char *argv[])
 
 		return EXIT_FAILURE;
 	} else if (resp.code != 0) {
-		if (resp.hint)
+		if (resp.hint) {
 			log_error("%s: Cannot register target '%s': CCCSD error, %s (%d)",
 				__func__, TARGET_GET_TIME, resp.hint, resp.code);
-		else
+			free(resp.hint);
+		} else {
 			log_error("%s: Cannot register target '%s': CCCSD error, %d",
 				__func__, TARGET_GET_TIME, resp.code);
+		}
 
 		return EXIT_FAILURE;
 	}
