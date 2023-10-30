@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, Digi International Inc.
+ * Copyright 2022, 2023, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -139,6 +139,9 @@ class CCMP157 extends ConnectCoreDevice {
     // Capabilities
     SUPPORTS_VIDEO_BRIGHTNESS = false;
     SUPPORTS_DUAL_ETHERNET = false;
+
+    // Misc info
+    PCB_COLOR = ID_COLOR_BLUE;
 
     // Constructor.
     constructor(deviceData) {

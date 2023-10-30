@@ -647,7 +647,7 @@ Digi Demo - Dashboard
                                             <div id="led_panel" class="led-panel shadow-sm panel-tooltip" onclick="toggleUserLED()">
                                                 <span class="panel-tooltip-text">Toggle LED</span>
                                                 <span id="led_panel_arrow" class="panel-arrow"></span>
-                                                <img id ="led_image" class="led-image" src="./static/images/led_bubble.png"/>
+                                                <img id ="led_image" class="led-image"/>
                                             </div>
                                             <div id="flash_memory_panel_area" class="panel-area panel-tooltip" onclick="toggleInfoPanelVisibility('flash_memory')">
                                                 <span class="panel-tooltip-text">Storage</span>
@@ -720,10 +720,10 @@ Digi Demo - Dashboard
         // Change image of the LED panel when hovering.
         $("#led_panel").on({
             "mouseover" : function() {
-                $("#led_image").attr("src", "./static/images/led_bubble_hover.png");
+                $("#led_image").addClass("led-image-hover");
             },
             "mouseout" : function() {
-                $("#led_image").attr("src", "./static/images/led_bubble.png");
+                $("#led_image").removeClass("led-image-hover");
             }
         });
     });

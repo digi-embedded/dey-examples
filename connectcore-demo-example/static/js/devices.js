@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, Digi International Inc.
+ * Copyright 2022, 2023, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -521,8 +521,13 @@ class ConnectCoreDevice {
         return this.SUPPORTS_VIDEO_BRIGHTNESS;
     }
 
-     // Returns whether the device supports dual ethernet or not.
+    // Returns whether the device supports dual ethernet or not.
     supportsDualEthernet() {
         return this.SUPPORTS_DUAL_ETHERNET;
+    }
+
+    // Returns the color of the device PCB.
+    getPCBColor() {
+        return this.PCB_COLOR;
     }
 }

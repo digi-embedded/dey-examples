@@ -869,6 +869,12 @@ body {
   color: #004e03;
 }
 
+.panel-area-blue {
+  background-color: #6ec4edb3;
+  border: 2px solid #011377;
+  color: #011377;
+}
+
 .panel-area:hover {
   background-color: #f5e04eb3;
   cursor: pointer;
@@ -1156,6 +1162,15 @@ body {
   position: relative;
   max-width:100%;
   max-height:100%;
+  content: url("../images/led_bubble.png");
+}
+
+.led-image-blue {
+  content: url("../images/led_bubble_blue.png");
+}
+
+.led-image-hover {
+  content: url("../images/led_bubble_hover.png");
 }
 
 .led-panel-area-off {
