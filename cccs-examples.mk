@@ -16,6 +16,7 @@
 
 SUBDIRS := \
 		cccs-data-request-example \
+		cccs-maintenance-status-example \
 		cccs-upload-binary-file-example \
 		cccs-upload-data-points-example
 
