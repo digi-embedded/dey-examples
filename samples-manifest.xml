@@ -17,9 +17,9 @@ application takes periodic samples and prints the raw value and the value in mv.
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
+            <platform>ccimx93-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
-            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="apix-can-samples">
@@ -39,9 +39,9 @@ reception using the selected baudrate.
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
+            <platform>ccimx93-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
-            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="apix-gpio-sample">
@@ -62,9 +62,9 @@ whenever an interrupt is generated in the input GPIO.
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
+            <platform>ccimx93-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
-            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="apix-i2c-sample">
@@ -84,9 +84,9 @@ Afterward, it reads the data back to validate it (tested with 24FC1026).
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
+            <platform>ccimx93-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
-            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="apix-pm-sample">
@@ -149,9 +149,9 @@ the page size and the address size in bytes.
             <platform>ccimx6ulsbc</platform>
             <platform>ccimx8x-sbc-express</platform>
             <platform>ccimx8x-sbc-pro</platform>
+            <platform>ccimx93-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
-            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="apix-watchdog-sample">
@@ -172,9 +172,9 @@ then the device will reboot automatically after the timeout expires.
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
+            <platform>ccimx93-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
-            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="ble-gat-server-example">
@@ -194,9 +194,9 @@ GATT services and characteristics.
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
+            <platform>ccimx93-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
-            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="caam-blob-example">
@@ -241,9 +241,9 @@ When this request arrives the application sends back the current time.
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
+            <platform>ccimx93-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
-            <platform>ccimx93-dvk</platform>
         </platforms>
     </sample>
     <sample id="cccs-upload-data-points-example">
@@ -265,9 +265,52 @@ The uploads takes place every 10 new samples, that is every 50 seconds.
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
+            <platform>ccimx93-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
+        </platforms>
+    </sample>
+    <sample id="cccs-upload-binary-file-example">
+        <name>Digi CCCS upload binary file Example</name>
+        <description>
+Example application to upload a binary file to Remote Manager using ConnectCore
+Cloud Services.
+This application uploads the content of file `/etc/build` as a binary data point
+to stream `binary_dp`.
+        </description>
+        <path>cccs-upload-binary-file-example</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
+            <platform>ccimx8mn-dvk</platform>
+            <platform>ccimx8mm-dvk</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccmp15-dvk</platform>
+            <platform>ccmp13-dvk</platform>
+        </platforms>
+    </sample>
+    <sample id="cccs-maintenance-status-example">
+        <name>Digi CCCS set maintenance Example</name>
+        <description>
+Example application to enable/disable maintenance status.
+        </description>
+        <path>cccs-maintenance-status-example</path>
+        <platforms>
+            <platform>ccimx6sbc</platform>
+            <platform>ccimx6qpsbc</platform>
+            <platform>ccimx6ulstarter</platform>
+            <platform>ccimx6ulsbc</platform>
+            <platform>ccimx8x-sbc-express</platform>
+            <platform>ccimx8x-sbc-pro</platform>
+            <platform>ccimx8mn-dvk</platform>
+            <platform>ccimx8mm-dvk</platform>
+            <platform>ccimx93-dvk</platform>
+            <platform>ccmp15-dvk</platform>
+            <platform>ccmp13-dvk</platform>
         </platforms>
     </sample>
 </samples>

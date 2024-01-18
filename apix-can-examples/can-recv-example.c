@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Digi International Inc.
+ * Copyright 2018-2024, Digi International Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -114,6 +114,7 @@ static void register_signals(void)
 static void can_rx_callback(struct canfd_frame *frame, struct timeval *tv)
 {
 	static uint32_t nframe = 1;
+	int i;
 
 	if (prn_msg_count) {
 		printf("CAN frame       %u\n", nframe);
@@ -127,12 +128,16 @@ static void can_rx_callback(struct canfd_frame *frame, struct timeval *tv)
 			" - Type:        %s\n"
 			" - ID:          %x\n"
 			" - Data length: %u\n"
-			" - Data:        %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n"
-			"\n",
-			tv->tv_sec, tv->tv_usec, ldx_can_is_extid_frame(frame) ?
-			"Extended ID" : "Standard ID", ldx_can_get_id(frame), frame->len,
-			frame->data[0], frame->data[1], frame->data[2], frame->data[3],
-			frame->data[4], frame->data[5], frame->data[6], frame->data[7]);
+			" - Data:        "
+			,tv->tv_sec, tv->tv_usec, ldx_can_is_extid_frame(frame) ?
+			"Extended ID" : "Standard ID", ldx_can_get_id(frame), frame->len);
+
+		for (i=0;i<frame->len;i++) {
+			printf("%02x", frame->data[i]);
+			if (i < (frame->len -1))
+				printf(":");
+		}
+		printf("\n\n");
 	}
 
 	nframe++;

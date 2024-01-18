@@ -1508,7 +1508,10 @@ def set_audio_volume(value):
     Returns:
         String: Error string if fails.
     """
-    res = exec_cmd(f"amixer set 'Speaker' {value}% && amixer set 'Headphone' {value}%")
+    cmd = f"amixer set 'Speaker' {value}% && amixer set 'Headphone' {value}%"\
+        if read_proc_file("/proc/device-tree/digi,machine,name") not in ("ccimx6sbc", "ccimx6qpsbc")\
+        else f"amixer set 'Master' {value}%"
+    res = exec_cmd(cmd)
     if res[0] != 0:
         return res[1]
     return None

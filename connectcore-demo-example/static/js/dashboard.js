@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, Digi International Inc.
+ * Copyright 2022, 2023, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -49,6 +49,7 @@ const ID_FLASH_MEMORY_PANEL_ARROW = "flash_memory_panel_arrow";
 const ID_FLASH_MEMORY_PANEL_ICON = "flash_memory_panel_icon";
 const ID_HELP_PANEL = "help_panel";
 const ID_HELP_POPUP_SHOWN = "help_popup_shown";
+const ID_LED_IMAGE = "led_image";
 const ID_LED_PANEL = "led_panel";
 const ID_LED_PANEL_AREA = "led_panel_area";
 const ID_LED_PANEL_ARROW = "led_panel_arrow";
@@ -92,9 +93,11 @@ const STREAM_BT_STATE = PREFIX_STREAM + IFACE_BT + "/state";
 const PANEL_ARROW_WIDTH_100 = 20;
 const PANEL_BOARD_WIDTH_100 = 1200;
 
+const CLASS_LED_IMAGE_BLUE = "led-image-blue";
 const CLASS_LED_PANEL_AREA_ON = "led-panel-area-on";
 const CLASS_PANEL_AREA_SELECTED = "panel-area-selected";
 const CLASS_PANEL_AREA_ICON_SELECTED = "panel-area-icon-selected";
+const CLASS_PANEL_BLUE = "panel-area-blue";
 const CLASS_PANEL_TOOLTIP = "panel-tooltip";
 
 const MESSAGE_CHANGING_VIDEO_BRIGHTNESS = "Changing video brightness...";
@@ -376,6 +379,12 @@ function createDevice(deviceData) {
         case CCIMX93.DEVICE_TYPE:
             device = new CCIMX93(deviceData);
             break;
+        case CCIMX6SBC.DEVICE_TYPE:
+            device = new CCIMX6SBC(deviceData);
+            break;
+        case CCIMX6QPSBC.DEVICE_TYPE:
+            device = new CCIMX6QPSBC(deviceData);
+            break;
     }
     if (device != null) {
         // Draw the device.
@@ -421,6 +430,8 @@ function initializeComponents() {
     var cpuPanel = document.getElementById(ID_CPU_PANEL);
     var cpuPanelArrow = document.getElementById(ID_CPU_PANEL_ARROW);
     var cpuPanelArea = document.getElementById(ID_CPU_PANEL_AREA);
+    if (device.getPCBColor() == ID_COLOR_GREEN)
+        cpuPanelArea.classList.add(CLASS_PANEL_BLUE);
     var cpuPanelIcon = document.getElementById(ID_CPU_PANEL_ICON);
     var cpuInfo = {"panel": cpuPanel, "arrow": cpuPanelArrow, "area": cpuPanelArea, "icon": cpuPanelIcon, "data": device.getCPUComponentData()};
     components[ID_CPU] = cpuInfo;
@@ -428,6 +439,8 @@ function initializeComponents() {
     var memoryPanel = document.getElementById(ID_MEMORY_PANEL);
     var memoryPanelArrow = document.getElementById(ID_MEMORY_PANEL_ARROW);
     var memoryPanelArea = document.getElementById(ID_MEMORY_PANEL_AREA);
+    if (device.getPCBColor() == ID_COLOR_GREEN)
+        memoryPanelArea.classList.add(CLASS_PANEL_BLUE);
     var memoryPanelIcon = document.getElementById(ID_MEMORY_PANEL_ICON);
     var memoryInfo = {"panel": memoryPanel, "arrow": memoryPanelArrow, "area": memoryPanelArea, "icon": memoryPanelIcon, "data": device.getMemoryComponentData()};
     components[ID_MEMORY] = memoryInfo;
@@ -435,6 +448,8 @@ function initializeComponents() {
     var wifiBtPanel = document.getElementById(ID_WIFI_BT_PANEL);
     var wifiBtPanelArrow = document.getElementById(ID_WIFI_BT_PANEL_ARROW);
     var wifiBtPanelArea = document.getElementById(ID_WIFI_BT_PANEL_AREA);
+    if (device.getPCBColor() == ID_COLOR_GREEN)
+        wifiBtPanelArea.classList.add(CLASS_PANEL_BLUE);
     var wifiBtPanelIcon = document.getElementById(ID_WIFI_BT_PANEL_ICON);
     var wifiBtInfo = {"panel": wifiBtPanel, "arrow": wifiBtPanelArrow, "area": wifiBtPanelArea, "icon": wifiBtPanelIcon, "data": device.getWifiBtComponentData()};
     components[ID_WIFI_BT] = wifiBtInfo;
@@ -442,6 +457,8 @@ function initializeComponents() {
     var ethernet0Panel = document.getElementById(ID_ETHERNET0_PANEL);
     var ethernet0PanelArrow = document.getElementById(ID_ETHERNET0_PANEL_ARROW);
     var ethernet0PanelArea = document.getElementById(ID_ETHERNET0_PANEL_AREA);
+    if (device.getPCBColor() == ID_COLOR_GREEN)
+        ethernet0PanelArea.classList.add(CLASS_PANEL_BLUE);
     var ethernet0PanelIcon = document.getElementById(ID_ETHERNET0_PANEL_ICON);
     var ethernet0Info = {"panel": ethernet0Panel, "arrow": ethernet0PanelArrow, "area": ethernet0PanelArea, "icon": ethernet0PanelIcon, "data": device.getEthernetComponentData(0)};
     components[ID_ETHERNET0] = ethernet0Info;
@@ -450,6 +467,8 @@ function initializeComponents() {
         var ethernet1Panel = document.getElementById(ID_ETHERNET1_PANEL);
         var ethernet1PanelArrow = document.getElementById(ID_ETHERNET1_PANEL_ARROW);
         var ethernet1PanelArea = document.getElementById(ID_ETHERNET1_PANEL_AREA);
+        if (device.getPCBColor() == ID_COLOR_GREEN)
+            ethernet1PanelArea.classList.add(CLASS_PANEL_BLUE);
         var ethernet1PanelIcon = document.getElementById(ID_ETHERNET1_PANEL_ICON);
         var ethernet1Info = {"panel": ethernet1Panel, "arrow": ethernet1PanelArrow, "area": ethernet1PanelArea, "icon": ethernet1PanelIcon, "data": device.getEthernetComponentData(1)};
         components[ID_ETHERNET1] = ethernet1Info;
@@ -462,6 +481,8 @@ function initializeComponents() {
     var videoPanel = document.getElementById(ID_VIDEO_PANEL);
     var videoPanelArrow = document.getElementById(ID_VIDEO_PANEL_ARROW);
     var videoPanelArea = document.getElementById(ID_VIDEO_PANEL_AREA);
+    if (device.getPCBColor() == ID_COLOR_GREEN)
+        videoPanelArea.classList.add(CLASS_PANEL_BLUE);
     var videoPanelIcon = document.getElementById(ID_VIDEO_PANEL_ICON);
     var videoInfo = {"panel": videoPanel, "arrow": videoPanelArrow, "area": videoPanelArea, "icon": videoPanelIcon, "data": device.getVideoComponentData()};
     components[ID_VIDEO] = videoInfo;
@@ -474,6 +495,8 @@ function initializeComponents() {
     var audioPanel = document.getElementById(ID_AUDIO_PANEL);
     var audioPanelArrow = document.getElementById(ID_AUDIO_PANEL_ARROW);
     var audioPanelArea = document.getElementById(ID_AUDIO_PANEL_AREA);
+    if (device.getPCBColor() == ID_COLOR_GREEN)
+        audioPanelArea.classList.add(CLASS_PANEL_BLUE);
     var audioPanelIcon = document.getElementById(ID_AUDIO_PANEL_ICON);
     var audioInfo = {"panel": audioPanel, "arrow": audioPanelArrow, "area": audioPanelArea, "icon": audioPanelIcon, "data": device.getAudioComponentData()};
     components[ID_AUDIO] = audioInfo;
@@ -481,12 +504,20 @@ function initializeComponents() {
     var ledPanel = document.getElementById(ID_LED_PANEL);
     var ledPanelArrow = document.getElementById(ID_LED_PANEL_ARROW);
     var ledPanelArea = document.getElementById(ID_LED_PANEL_AREA);
+    if (device.getPCBColor() == ID_COLOR_GREEN)
+        ledPanelArea.classList.add(CLASS_PANEL_BLUE);
     var ledInfo = {"panel": ledPanel, "arrow": ledPanelArrow, "area": ledPanelArea, "data": device.getLEDComponentData()};
     components[ID_LED] = ledInfo;
+    if (device.getPCBColor() == ID_COLOR_GREEN) {
+        var ledImage = document.getElementById(ID_LED_IMAGE);
+        ledImage.classList.add(CLASS_LED_IMAGE_BLUE);
+    }
     // Flash memory component.
     var flashPanel = document.getElementById(ID_FLASH_MEMORY_PANEL);
     var flashPanelArrow = document.getElementById(ID_FLASH_MEMORY_PANEL_ARROW);
     var flashPanelArea = document.getElementById(ID_FLASH_MEMORY_PANEL_AREA);
+    if (device.getPCBColor() == ID_COLOR_GREEN)
+        flashPanelArea.classList.add(CLASS_PANEL_BLUE);
     var flashPanelIcon = document.getElementById(ID_FLASH_MEMORY_PANEL_ICON);
     var flashInfo = {"panel": flashPanel, "arrow": flashPanelArrow, "area": flashPanelArea, "icon": flashPanelIcon, "data": device.getFlashMemoryComponentData()};
     components[ID_FLASH_MEMORY] = flashInfo;
