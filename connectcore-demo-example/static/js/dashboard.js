@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, 2023, Digi International Inc.
+ * Copyright (C) 2022-2024, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -375,6 +375,9 @@ function createDevice(deviceData) {
             break;
         case CCMP133.DEVICE_TYPE:
             device = new CCMP133(deviceData);
+            break;
+        case CCMP255.DEVICE_TYPE:
+            device = new CCMP255(deviceData);
             break;
         case CCIMX93.DEVICE_TYPE:
             device = new CCIMX93(deviceData);

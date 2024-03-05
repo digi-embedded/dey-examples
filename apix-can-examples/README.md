@@ -24,6 +24,11 @@ The CAN interface for this example depends on the running platform:
    - CAN1_H: Pin 2
    - CAN1_L: Pin 3
    - GND: Pin 4
+ - **ConnectCore MP25 DVK**: CAN connector of the board (J14).
+   - 5V: Pin 1
+   - CAN1_H: Pin 2
+   - CAN1_L: Pin 3
+   - GND: Pin 4
  - **ConnectCore 8M Mini DVK**: CAN connector of the board (J24).
    - 5V: Pin 1
    - CAN1_H: Pin 2

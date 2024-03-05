@@ -25,6 +25,13 @@ The SPI connections for this example depends on the running platform:
     - SPI-0 MISO: 5
     - SPI-0 MOSI: 6
     - SPI-0 SS0: 3
+ - **ConnectCore MP25 DVK**: MikroBus connector (J39).
+    - VCC: Pin 7
+    - GND: Pin 8
+    - SPI-0 CLK: 4
+    - SPI-0 MISO: 5
+    - SPI-0 MOSI: 6
+    - SPI-0 SS0: 3
  - **ConnectCore 8X SBC Pro**: Expansion connector of the board (J27).
     - VCC: Pin D1
     - GND: Pin C1
