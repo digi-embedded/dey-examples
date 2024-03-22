@@ -586,6 +586,62 @@ Digi Demo - Dashboard
                                                     </table>
                                                 </div>
                                             </div>
+                                            <div id="ethernet2_panel_area" class="panel-area panel-tooltip" onclick="toggleInfoPanelVisibility('ethernet2')">
+                                                <span class="panel-tooltip-text">Ethernet 2 stats</span>
+                                                <span id="ethernet2_panel_icon" class="fas fa-ethernet panel-area-icon"></span>
+                                            </div>
+                                            <div id="ethernet2_panel" class="device-card ethernet-panel shadow-sm">
+                                                <span id="ethernet2_panel_arrow" class="panel-arrow"></span>
+                                                <div class="device-card-header">
+                                                    <span class="fas fa-ethernet fa-lg mr-2"></span>
+                                                    <span>Ethernet 2 stats</span>
+                                                    <div class="fas fa-window-close fa-lg device-card-header-button" onclick="setInfoPanelVisible('ethernet2', false)"></div>
+                                                </div>
+                                                <div class="device-card-content">
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">Status:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet2_state" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">MAC:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet2_mac" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">IP:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet2_ip" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">TX data:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet2_sent_data" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">RX data:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet2_received_data" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
                                             <div id="video_panel_area" class="panel-area panel-tooltip" onclick="toggleInfoPanelVisibility('video')">
                                                 <span class="panel-tooltip-text">Video info</span>
                                                 <span id="video_panel_icon" class="fas fa-desktop panel-area-icon"></span>
