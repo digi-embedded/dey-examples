@@ -415,18 +415,6 @@ Digi Demo - Network
         $("#eth1_subnet_mask").on("input", function(event) {
             validateInterface("eth1");
         });
-        $('#eth1_enable').click(function(){
-            updateInterfaceControls("eth1");
-        });
-        $("#eth1_ip_mode").on("change", function(event) {
-            updateInterfaceControls("eth1");
-        });
-        $("#eth1_ip_addr").on("input", function(event) {
-            validateInterface("eth1");
-        });
-        $("#eth1_subnet_mask").on("input", function(event) {
-            validateInterface("eth1");
-        });
         $("#eth1_default_gateway").on("input", function(event) {
             validateInterface("eth1");
         });
