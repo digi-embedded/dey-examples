@@ -8,7 +8,7 @@ Afterward, it reads the data back to validate it (tested with 24FC1026).
 
 The I2C connections for this example depend on the running platform:
 
- - **ConnectCore MP15 DVK**: MikroBus connector (J31).
+ - **ConnectCore MP13 DVK**: MikroBus connector (J31).
    - VCC: Pin 7
    - GND: Pin 8
    - I2C-2 SDA: Pin 6
