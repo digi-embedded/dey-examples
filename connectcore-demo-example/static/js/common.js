@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, 2023, Digi International Inc.
+ * Copyright 2022-2024, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -55,16 +55,22 @@ const ID_ERROR_MESSAGE = "error_msg";
 const ID_ERROR_TITLE = "error_title";
 const ID_ETHERNET0 = "ethernet0";
 const ID_ETHERNET1 = "ethernet1";
+const ID_ETHERNET2 = "ethernet2";
 const ID_ETHERNET0_IP = "ethernet0_ip";
 const ID_ETHERNET1_IP = "ethernet1_ip";
+const ID_ETHERNET2_IP = "ethernet2_ip";
 const ID_ETHERNET0_MAC = "ethernet0_mac";
 const ID_ETHERNET1_MAC = "ethernet1_mac";
+const ID_ETHERNET2_MAC = "ethernet2_mac";
 const ID_ETHERNET0_READ_DATA = "ethernet0_received_data";
 const ID_ETHERNET1_READ_DATA = "ethernet1_received_data";
+const ID_ETHERNET2_READ_DATA = "ethernet2_received_data";
 const ID_ETHERNET0_SENT_DATA = "ethernet0_sent_data";
 const ID_ETHERNET1_SENT_DATA = "ethernet1_sent_data";
+const ID_ETHERNET2_SENT_DATA = "ethernet2_sent_data";
 const ID_ETHERNET0_STATE = "ethernet0_state";
 const ID_ETHERNET1_STATE = "ethernet1_state";
+const ID_ETHERNET2_STATE = "ethernet2_state";
 const ID_FILES = "files";
 const ID_FLASH_MEMORY = "flash_memory";
 const ID_FLASH_SIZE = "flash_size";
@@ -160,6 +166,7 @@ const ERROR_UNKNOWN_ERROR = "Unknown error. Make sure that the server is running
 const IFACE_BT = "hci0";
 const IFACE_ETH0 = "eth0";
 const IFACE_ETH1 = "eth1";
+const IFACE_ETH2 = "eth2";
 const IFACE_WIFI = "wlan0";
 
 const PREFIX_STREAM = "system_monitor/";

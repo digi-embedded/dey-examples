@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, 2023, Digi International Inc.
+ * Copyright (C) 2022-2024, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -109,6 +109,20 @@ class ConnectCoreDevice {
     ETHERNET1_COMPONENT_AREA_WIDTH_PERCENT = 0;
     ETHERNET1_COMPONENT_AREA_HEIGHT_PERCENT = 0;
 
+    // Ethernet2 panel.
+    ETHERNET2_COMPONENT_VISIBLE = false;
+    ETHERNET2_COMPONENT_HAS_PANEL = false;
+    ETHERNET2_COMPONENT_HAS_ARROW = false;
+    ETHERNET2_COMPONENT_PANEL_ALWAYS_VISIBLE = false;
+    ETHERNET2_COMPONENT_PANEL_ORIENTATION = VALUE_TOP;
+    ETHERNET2_COMPONENT_PANEL_HORIZONTAL_PERCENT = 0;
+    ETHERNET2_COMPONENT_PANEL_VERTICAL_PERCENT = 0;
+    ETHERNET2_COMPONENT_ARROW_PERCENT = 0;
+    ETHERNET2_COMPONENT_AREA_TOP_PERCENT = 0;
+    ETHERNET2_COMPONENT_AREA_LEFT_PERCENT = 0;
+    ETHERNET2_COMPONENT_AREA_WIDTH_PERCENT = 0;
+    ETHERNET2_COMPONENT_AREA_HEIGHT_PERCENT = 0;
+
     // Console.
     CONSOLE_COMPONENT_VISIBLE = false;
     CONSOLE_COMPONENT_HAS_PANEL = false;
@@ -181,9 +195,9 @@ class ConnectCoreDevice {
 
     // Capabilities
     SUPPORTS_VIDEO_BRIGHTNESS;
-    SUPPORTS_DUAL_ETHERNET;
+    SUPPORTS_NUM_ETHERNET;
 
-    NUM_ETHERNET_INTERFACES = 2;
+    MAX_NUM_ETHERNET_INTERFACES = 3;
 
     // Device information.
     #deviceType;
@@ -234,15 +248,18 @@ class ConnectCoreDevice {
         this.#videoResolution = deviceData[ID_VIDEO_RESOLUTION];
         this.#sampleRate = deviceData[ID_SAMPLE_RATE];
         this.#numSamplesUpload = deviceData[ID_NUM_SAMPLES_UPLOAD];
-        for (var index = 0; index < this.NUM_ETHERNET_INTERFACES; index++) {
-            this.#ethernetMAC[index] = deviceData[eval("ID_ETHERNET" + index + "_MAC")];
-            this.#ethernetIP[index] = deviceData[eval("ID_ETHERNET" + index + "_IP")];
+        for (var index = 0; index < this.MAX_NUM_ETHERNET_INTERFACES; index++) {
+            if (deviceData[eval("ID_ETHERNET" + index + "_MAC")]) {
+                this.#ethernetMAC[index] = deviceData[eval("ID_ETHERNET" + index + "_MAC")];
+                this.#ethernetIP[index] = deviceData[eval("ID_ETHERNET" + index + "_IP")];
+            }
         }
     }
 
-    refreshIPs(eth0_ip, eth1_ip, wifi_ip) {
+    refreshIPs(eth0_ip, eth1_ip, eth2_ip, wifi_ip) {
         this.#ethernetIP[0] = eth0_ip;
         this.#ethernetIP[1] = eth1_ip;
+        this.#ethernetIP[2] = eth2_ip;
         this.#wifiIP = wifi_ip;
     }
 
@@ -313,14 +330,14 @@ class ConnectCoreDevice {
 
     // Returns the device Ethernet MAC address for the given interface index.
     getEthernetMAC(index=0) {
-        if (index >= this.NUM_ETHERNET_INTERFACES)
+        if (index >= this.MAX_NUM_ETHERNET_INTERFACES)
             return "";
         return this.#ethernetMAC[index];
     }
 
     // Returns the device Ethernet IP address for the given interface index.
     getEthernetIP(index=0) {
-        if (index >= this.NUM_ETHERNET_INTERFACES)
+        if (index >= this.MAX_NUM_ETHERNET_INTERFACES)
             return "";
         return this.#ethernetIP[index];
     }
@@ -420,7 +437,7 @@ class ConnectCoreDevice {
 
     // Returns the Ethernet panel data for the given interface index.
     getEthernetComponentData(index=0) {
-        if (index >= this.NUM_ETHERNET_INTERFACES)
+        if (index >= this.SUPPORTS_NUM_ETHERNET)
             return "";
         return JSON.parse(TEMPLATE_COMPONENT_DATA.format(eval("this.ETHERNET" + index + "_COMPONENT_VISIBLE"),
                                                          eval("this.ETHERNET" + index + "_COMPONENT_HAS_PANEL"),
@@ -434,6 +451,11 @@ class ConnectCoreDevice {
                                                          eval("this.ETHERNET" + index + "_COMPONENT_AREA_LEFT_PERCENT"),
                                                          eval("this.ETHERNET" + index + "_COMPONENT_AREA_WIDTH_PERCENT"),
                                                          eval("this.ETHERNET" + index + "_COMPONENT_AREA_HEIGHT_PERCENT")));
+    }
+
+    // Returns number ethernet interfaces the device supports.
+    getEthernetNumSupported() {
+        return this.SUPPORTS_NUM_ETHERNET;
     }
 
     // Returns the Console panel data.
@@ -519,11 +541,6 @@ class ConnectCoreDevice {
     // Returns whether the device supports video brightness or not.
     supportsVideoBrightness() {
         return this.SUPPORTS_VIDEO_BRIGHTNESS;
-    }
-
-    // Returns whether the device supports dual ethernet or not.
-    supportsDualEthernet() {
-        return this.SUPPORTS_DUAL_ETHERNET;
     }
 
     // Returns the color of the device PCB.

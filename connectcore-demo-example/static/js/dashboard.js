@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, 2023, Digi International Inc.
+ * Copyright (C) 2022-2024, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -43,6 +43,10 @@ const ID_ETHERNET1_PANEL = "ethernet1_panel";
 const ID_ETHERNET1_PANEL_AREA = "ethernet1_panel_area";
 const ID_ETHERNET1_PANEL_ARROW = "ethernet1_panel_arrow";
 const ID_ETHERNET1_PANEL_ICON = "ethernet1_panel_icon";
+const ID_ETHERNET2_PANEL = "ethernet2_panel";
+const ID_ETHERNET2_PANEL_AREA = "ethernet2_panel_area";
+const ID_ETHERNET2_PANEL_ARROW = "ethernet2_panel_arrow";
+const ID_ETHERNET2_PANEL_ICON = "ethernet2_panel_icon";
 const ID_FLASH_MEMORY_PANEL = "flash_memory_panel";
 const ID_FLASH_MEMORY_PANEL_AREA = "flash_memory_panel_area";
 const ID_FLASH_MEMORY_PANEL_ARROW = "flash_memory_panel_arrow";
@@ -69,6 +73,11 @@ const ID_WIFI_BT_PANEL = "wifi_bt_panel";
 const ID_WIFI_BT_PANEL_AREA = "wifi_bt_panel_area";
 const ID_WIFI_BT_PANEL_ARROW = "wifi_bt_panel_arrow";
 const ID_WIFI_BT_PANEL_ICON = "wifi_bt_panel_icon";
+const ID_ETHERNETX = "ethernet{index}";
+const ID_ETHERNETX_PANEL = "ethernet{index}_panel";
+const ID_ETHERNETX_PANEL_AREA = "ethernet{index}_panel_area";
+const ID_ETHERNETX_PANEL_ARROW = "ethernet{index}_panel_arrow";
+const ID_ETHERNETX_PANEL_ICON = "ethernet{index}_panel_icon";
 
 const USER_LED = "user_led";
 
@@ -81,6 +90,9 @@ const STREAM_ETHERNET0_STATE = PREFIX_STREAM + IFACE_ETH0 + "/state";
 const STREAM_ETHERNET1_READ_BYTES = PREFIX_STREAM + IFACE_ETH1 + "/rx_bytes";
 const STREAM_ETHERNET1_SENT_BYTES = PREFIX_STREAM + IFACE_ETH1 + "/tx_bytes";
 const STREAM_ETHERNET1_STATE = PREFIX_STREAM + IFACE_ETH1 + "/state";
+const STREAM_ETHERNET2_READ_BYTES = PREFIX_STREAM + IFACE_ETH2 + "/rx_bytes";
+const STREAM_ETHERNET2_SENT_BYTES = PREFIX_STREAM + IFACE_ETH2 + "/tx_bytes";
+const STREAM_ETHERNET2_STATE = PREFIX_STREAM + IFACE_ETH2 + "/state";
 const STREAM_LED_STATUS = PREFIX_STREAM + "led_status";
 const STREAM_MEMORY_USED = PREFIX_STREAM + "used_memory";
 const STREAM_WIFI_READ_BYTES = PREFIX_STREAM + IFACE_WIFI + "/rx_bytes";
@@ -275,7 +287,7 @@ function refreshDevice() {
                     initializingDevice = false;
                     return;
                 }
-                device.refreshIPs(data[ID_ETHERNET0_IP], data[ID_ETHERNET1_IP], data[ID_WIFI_IP]);
+                device.refreshIPs(data[ID_ETHERNET0_IP], data[ID_ETHERNET1_IP], data[ID_ETHERNET2_IP], data[ID_WIFI_IP]);
                 updateInfoValues();
             }
         ).fail(function(response) {
@@ -339,6 +351,7 @@ function processDeviceStatusResponse(response) {
     // Check if IP values are initialized.
     if ((response[STREAM_ETHERNET0_STATE] == 1 && device.getEthernetIP(0) == "0.0.0.0")
             || (response[STREAM_ETHERNET1_STATE] == 1 && device.getEthernetIP(1) == "0.0.0.0")
+            || (response[STREAM_ETHERNET2_STATE] == 1 && device.getEthernetIP(2) == "0.0.0.0")
             || (response[STREAM_WIFI_STATE] == 1 && device.getWifiIP() == "0.0.0.0")) {
         deviceInitialized = false;
     }
@@ -375,6 +388,9 @@ function createDevice(deviceData) {
             break;
         case CCMP133.DEVICE_TYPE:
             device = new CCMP133(deviceData);
+            break;
+        case CCMP255.DEVICE_TYPE:
+            device = new CCMP255(deviceData);
             break;
         case CCIMX93.DEVICE_TYPE:
             device = new CCIMX93(deviceData);
@@ -453,26 +469,25 @@ function initializeComponents() {
     var wifiBtPanelIcon = document.getElementById(ID_WIFI_BT_PANEL_ICON);
     var wifiBtInfo = {"panel": wifiBtPanel, "arrow": wifiBtPanelArrow, "area": wifiBtPanelArea, "icon": wifiBtPanelIcon, "data": device.getWifiBtComponentData()};
     components[ID_WIFI_BT] = wifiBtInfo;
-    // Ethernet 0 component.
-    var ethernet0Panel = document.getElementById(ID_ETHERNET0_PANEL);
-    var ethernet0PanelArrow = document.getElementById(ID_ETHERNET0_PANEL_ARROW);
-    var ethernet0PanelArea = document.getElementById(ID_ETHERNET0_PANEL_AREA);
-    if (device.getPCBColor() == ID_COLOR_GREEN)
-        ethernet0PanelArea.classList.add(CLASS_PANEL_BLUE);
-    var ethernet0PanelIcon = document.getElementById(ID_ETHERNET0_PANEL_ICON);
-    var ethernet0Info = {"panel": ethernet0Panel, "arrow": ethernet0PanelArrow, "area": ethernet0PanelArea, "icon": ethernet0PanelIcon, "data": device.getEthernetComponentData(0)};
-    components[ID_ETHERNET0] = ethernet0Info;
-    if (device.supportsDualEthernet()) {
-        // Ethernet 1 component.
-        var ethernet1Panel = document.getElementById(ID_ETHERNET1_PANEL);
-        var ethernet1PanelArrow = document.getElementById(ID_ETHERNET1_PANEL_ARROW);
-        var ethernet1PanelArea = document.getElementById(ID_ETHERNET1_PANEL_AREA);
+    // Ethernet components.
+    for (var i = 0; i < device.getEthernetNumSupported(); i++) {
+        var idEth = ID_ETHERNETX.replace('{index}', i);
+        var idEthPanel = ID_ETHERNETX_PANEL.replace('{index}', i);
+        var idEthPanelArea = ID_ETHERNETX_PANEL_AREA.replace('{index}', i);
+        var idEthPanelArrow = ID_ETHERNETX_PANEL_ARROW.replace('{index}', i);
+        var idEthPanelIcon = ID_ETHERNETX_PANEL_ICON.replace('{index}', i);
+
+        var ethernetPanel = document.getElementById(idEthPanel);
+        var ethernetPanelArrow = document.getElementById(idEthPanelArrow);
+        var ethernetPanelArea = document.getElementById(idEthPanelArea);
         if (device.getPCBColor() == ID_COLOR_GREEN)
-            ethernet1PanelArea.classList.add(CLASS_PANEL_BLUE);
-        var ethernet1PanelIcon = document.getElementById(ID_ETHERNET1_PANEL_ICON);
-        var ethernet1Info = {"panel": ethernet1Panel, "arrow": ethernet1PanelArrow, "area": ethernet1PanelArea, "icon": ethernet1PanelIcon, "data": device.getEthernetComponentData(1)};
-        components[ID_ETHERNET1] = ethernet1Info;
-    } else {
+            ethernetPanelArea.classList.add(CLASS_PANEL_BLUE);
+        var ethernetPanelIcon = document.getElementById(idEthPanelIcon);
+        var ethernetInfo = {"panel": ethernetPanel, "arrow": ethernetPanelArrow, "area": ethernetPanelArea, "icon": ethernetPanelIcon, "data": device.getEthernetComponentData(i)};
+        components[idEth] = ethernetInfo;
+    }
+
+    if (device.getEthernetNumSupported() <= 0) {
         // Update tooltip and title to reflect there is only one Ethernet interface.
         document.getElementById(ID_ETHERNET0_TOOLTIP).innerText = "Ethernet stats";
         document.getElementById(ID_ETHERNET0_TITLE).innerText = "Ethernet stats";
@@ -675,7 +690,7 @@ function updateInfoValues() {
     // Set MCA HW version.
     updateFieldValue(ID_MCA_HW_VERSION, device.getMCAHWVersion());
     // Iterate Ethernet interfaces.
-    for (var index = 0; index < device.NUM_ETHERNET_INTERFACES; index++) {
+    for (var index = 0; index < device.getEthernetNumSupported(); index++) {
         // Set Ethernet MAC address.
         updateFieldValue(eval("ID_ETHERNET" + index + "_MAC"), device.getEthernetMAC(index));
         // Set Ethernet IP address.
@@ -748,6 +763,15 @@ function updateDataPointValue(streamID, value) {
             break;
         case STREAM_ETHERNET1_SENT_BYTES:
             updateValueWithEffect(ID_ETHERNET1_SENT_DATA, sizeToHumanRead(value));
+            break;
+        case STREAM_ETHERNET2_STATE:
+            updateValueWithEffect(ID_ETHERNET2_STATE, onOffStatus(value));
+            break;
+        case STREAM_ETHERNET2_READ_BYTES:
+            updateValueWithEffect(ID_ETHERNET2_READ_DATA, sizeToHumanRead(value));
+            break;
+        case STREAM_ETHERNET2_SENT_BYTES:
+            updateValueWithEffect(ID_ETHERNET2_SENT_DATA, sizeToHumanRead(value));
             break;
         case STREAM_WIFI_STATE:
             updateValueWithEffect(ID_WIFI_STATE, onOffStatus(value));

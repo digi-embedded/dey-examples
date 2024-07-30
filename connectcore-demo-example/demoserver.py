@@ -186,24 +186,22 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 "ethernet0_ip": ZERO_IP,
                 "ethernet1_mac": ZERO_MAC,
                 "ethernet1_ip": ZERO_IP,
+                "ethernet2_mac": ZERO_MAC,
+                "ethernet2_ip": ZERO_IP,
             }
             # Fill ethernet interfaces data.
             try:
                 interfaces = NetworkInterface.list_interfaces()
-                if interfaces and "eth0" in interfaces:
+                for iface in interfaces:
+                    if iface not in ("eth0", "eth1", "eth2"):
+                        continue
                     try:
-                        net_iface = NetworkInterface.get("eth0")
-                        info["ethernet0_mac"] = str(net_iface.mac)
-                        info["ethernet0_ip"] = str(net_iface.ipv4)
+                        net_iface = NetworkInterface.get(iface)
+                        index = iface[len("eth"):]
+                        info["ethernet%s_mac" % index] = str(net_iface.mac)
+                        info["ethernet%s_ip" % index] = str(net_iface.ipv4)
                     except NetworkException as exc2:
-                        log.error("Error reading interface 'eth0' data: %s", str(exc2))
-                if interfaces and "eth1" in interfaces:
-                    try:
-                        net_iface = NetworkInterface.get("eth1")
-                        info["ethernet1_mac"] = mac_to_human_string(net_iface.mac)
-                        info["ethernet1_ip"] = str(net_iface.ipv4)
-                    except NetworkException as exc2:
-                        log.error("Error reading interface 'eth1' data: %s", str(exc2))
+                        log.error("Error reading interface '%s' data: %s", iface, str(exc2))
             except DigiAPIXException as exc:
                 log.error("Error listing network interfaces: %s", str(exc))
 
