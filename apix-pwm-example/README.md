@@ -9,9 +9,9 @@ vice-versa.
 
 The PWM lines used in this example are mapped as follows in the Digi boards:
 
+ - **ConnectCore MP25 DVK**: MikroBus PWM channel 4 - PIN **1** of the MikroBus connector (J40).
  - **ConnectCore MP13 DVK**: MikroBus PWM channel 8 - PIN **1** of the MikroBus connector (J31). Need to add the overlay _ov_board_pwm8_ccmp13-dvk.dtbo
  - **ConnectCore MP15 DVK**: MikroBus PWM channel 4 - PIN **1** of the MikroBus connector (J31).
- - **ConnectCore MP25 DVK**: MikroBus PWM channel 4 - PIN **1** of the MikroBus connector (J40).
  - **ConnectCore 93 DVK**: PWM0 channel 1 shared with LVDS backlight. Need to disable LVDS and enable the PWM channel in the DTB.
  - **ConnectCore 91 DVK**: PWM0 channel 1 shared.
  - **ConnectCore 8M Mini DVK**: MCA PWM0 channel 2 connected to the LED1.

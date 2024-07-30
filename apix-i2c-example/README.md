@@ -8,6 +8,11 @@ Afterward, it reads the data back to validate it (tested with 24FC1026).
 
 The I2C connections for this example depend on the running platform:
 
+ - **ConnectCore MP25 DVK**: MikroBus connector (J40).
+   - VCC: Pin 7
+   - GND: Pin 8
+   - I2C-1 SDA: Pin 6
+   - I2C-1 SCL: Pin 5
  - **ConnectCore MP13 DVK**: MikroBus connector (J31).
    - VCC: Pin 7
    - GND: Pin 8
@@ -18,11 +23,6 @@ The I2C connections for this example depend on the running platform:
    - GND: Pin 8
    - I2C-6 SDA: Pin 6
    - I2C-6 SCL: Pin 5
- - **ConnectCore MP25 DVK**: MikroBus connector (J40).
-   - VCC: Pin 7
-   - GND: Pin 8
-   - I2C-2 SDA: Pin 6
-   - I2C-2 SCL: Pin 5
  - **ConnectCore 91 DVK**: MikroBus connector (J40).
    - VCC: Pin 7
    - GND: Pin 8
