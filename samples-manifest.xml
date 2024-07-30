@@ -18,6 +18,7 @@ application takes periodic samples and prints the raw value and the value in mv.
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>
@@ -41,6 +42,7 @@ reception using the selected baudrate.
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>
@@ -65,6 +67,7 @@ whenever an interrupt is generated in the input GPIO.
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>
@@ -88,6 +91,7 @@ Afterward, it reads the data back to validate it (tested with 24FC1026).
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>
@@ -133,6 +137,7 @@ vice-versa.
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>
@@ -156,6 +161,7 @@ the page size and the address size in bytes.
             <platform>ccimx8x-sbc-express</platform>
             <platform>ccimx8x-sbc-pro</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>
@@ -180,6 +186,7 @@ then the device will reboot automatically after the timeout expires.
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>
@@ -251,6 +258,7 @@ When this request arrives the application sends back the current time.
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>
@@ -276,6 +284,7 @@ The uploads takes place every 10 new samples, that is every 50 seconds.
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>
@@ -300,6 +309,7 @@ to stream `binary_dp`.
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>
@@ -321,6 +331,7 @@ Example application to enable/disable maintenance status.
             <platform>ccimx8mn-dvk</platform>
             <platform>ccimx8mm-dvk</platform>
             <platform>ccimx93-dvk</platform>
+            <platform>ccimx91-dvk</platform>
             <platform>ccmp15-dvk</platform>
             <platform>ccmp13-dvk</platform>
             <platform>ccmp25-dvk</platform>

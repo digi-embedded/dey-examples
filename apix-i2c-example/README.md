@@ -23,6 +23,16 @@ The I2C connections for this example depend on the running platform:
    - GND: Pin 8
    - I2C-2 SDA: Pin 6
    - I2C-2 SCL: Pin 5
+ - **ConnectCore 91 DVK**: MikroBus connector (J40).
+   - VCC: Pin 7
+   - GND: Pin 8
+   - I2C-3 SDA: Pin 6
+   - I2C-3 SCL: Pin 5
+ - **ConnectCore 93 DVK**: MikroBus connector (J40).
+   - VCC: Pin 7
+   - GND: Pin 8
+   - I2C-3 SDA: Pin 6
+   - I2C-3 SCL: Pin 5
  - **ConnectCore 8M Mini DVK**: Expansion connector of the board (J48).
    - VCC: Connector J52 Pin 7
    - GND: Pin 9
