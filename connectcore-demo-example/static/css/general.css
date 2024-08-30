@@ -1897,6 +1897,52 @@ body {
 }
 /* END MULTIMEDIA VIEWER */
 
+/* NPU */
+.npu-container {
+  color: #666666;
+  padding: 20px 7px 0px 7px;
+}
+
+.npu-box {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.npu-item {
+  cursor: pointer;
+  padding: 5px;
+  height: 240px;
+  border: 1px solid var(--light);
+  border-radius: 0px;
+  text-align: center;
+  background-color: white;
+  box-shadow: 4px .25rem .25rem rgba(0,0,0,.075);
+}
+
+.npu-item:hover {
+  border: 1px solid var(--digi-green);
+}
+
+.npu-title {
+  padding: 0px 0px 3px 0px;
+  margin-bottom: 0px;
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.npu-item hr {
+  border-width: 1px;
+  border-color: #CCCCCC;
+  margin-top: 5px;
+}
+
+.npu-item img {
+  height: 200px;
+  object-fit: contain;
+  max-width: 100%;
+}
+/* END NPU */
+
 /* CONFIG CONTROLS */
 .param-container {
   margin-top: 10px;

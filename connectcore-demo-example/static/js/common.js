@@ -76,6 +76,7 @@ const ID_FLASH_MEMORY = "flash_memory";
 const ID_FLASH_SIZE = "flash_size";
 const ID_FW_STORE_PATH = "fw_store_path";
 const ID_HAS_ARROW = "has-arrow";
+const ID_HAS_NPU_DEMOS = "has-npu-demos";
 const ID_HAS_PANEL = "has-panel";
 const ID_ICON = "icon";
 const ID_ID = "id";
@@ -110,6 +111,7 @@ const ID_SAMPLE_RATE = "sample_rate";
 const ID_SECTION_DASHBOARD = "section_dashboard";
 const ID_SECTION_MANAGEMENT = "section_management";
 const ID_SECTION_MULTIMEDIA = "section_multimedia";
+const ID_SECTION_NPU = "section_npu";
 const ID_SERIAL_NUMBER = "serial_number";
 const ID_SESSION_ID = "session_id";
 const ID_SIZE = "size";
@@ -515,6 +517,11 @@ function isMultimediaShowing() {
     return window.location.pathname.indexOf("multimedia") > -1;
 }
 
+// Returns whether the NPU page is showing or not.
+function isNPUShowing() {
+    return window.location.pathname.indexOf("npu") > -1;
+}
+
 // Returns the device name.
 function getDeviceName() {
     return new URLSearchParams(window.location.search).get(ID_DEVICE_NAME);
@@ -522,9 +529,11 @@ function getDeviceName() {
 
 // Updates the available web sections.
 function updateAvailableSections() {
-    // Remove multimedia section when rendering the demo from a computer.
-    if (!navigator.platform.includes("aarch") && !navigator.platform.includes("arm"))
+    // Remove device specific sections when rendering the demo from a computer.
+    if (!navigator.platform.includes("aarch") && !navigator.platform.includes("arm")) {
         removeSection(ID_SECTION_MULTIMEDIA);
+        removeSection(ID_SECTION_NPU);
+    }
     // Set visible sections based on device type.
     $.post(
         "http://" + getServerAddress() + "/ajax/get_device_type",
@@ -535,12 +544,27 @@ function updateAvailableSections() {
                 toastr.error("Could not get device type");
                 return;
             }
+            // Update multimedia section.
             switch (data[ID_DEVICE_TYPE]) {
                 case CCIMX6ULSBC.DEVICE_TYPE:
                 case CCMP157.DEVICE_TYPE:
                 case CCMP133.DEVICE_TYPE:
                     removeSection(ID_SECTION_MULTIMEDIA);
                     break;
+            }
+        }
+    ).fail(function(response) {
+        // Process error.
+        processAjaxErrorResponse(response);
+    });
+    // Set NPU section visibility.
+    $.post(
+        "http://" + getServerAddress() + "/ajax/get_npu_info",
+        function(data) {
+            // Process answer.
+            if (data[ID_HAS_NPU_DEMOS] != "true") {
+                // Remove NPU section.
+                removeSection(ID_SECTION_NPU);
             }
         }
     ).fail(function(response) {
