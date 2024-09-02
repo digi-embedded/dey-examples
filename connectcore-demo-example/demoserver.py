@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Copyright (c) 2022, 2023, Digi International, Inc.
+# Copyright (c) 2022-2024, Digi International, Inc.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -146,7 +146,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             log.debug("Get device info")
 
             info = {
-                "device_type": read_proc_file("/proc/device-tree/digi,machine,name")
+                "device_type": get_platform_id()
             }
 
             # Send the JSON value.
@@ -169,7 +169,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                                                                 platform.machine()),
                 "dey_version": "DEY-%s-%s" % (get_dey_version(), read_file("/etc/version")),
                 "serial_number": get_serial_number(),
-                "device_type": read_proc_file("/proc/device-tree/digi,machine,name"),
+                "device_type": get_platform_id(),
                 "module_variant": read_proc_file("/proc/device-tree/digi,hwid,variant"),
                 "board_variant": read_proc_file("/proc/device-tree/digi,carrierboard,version"),
                 "board_id": read_proc_file("/proc/device-tree/digi,carrierboard,id"),
@@ -842,7 +842,7 @@ class BluetoothService:
             elif setting_name == "dey_version":
                 setting_value = f"DEY-{get_dey_version()}-{read_file('/etc/version')}"
             elif setting_name == "device_type":
-                setting_value = read_proc_file("/proc/device-tree/digi,machine,name")
+                setting_value = get_platform_id()
             elif setting_name == "ethernet0_mac":
                 setting_value = get_ethernet_mac()
             elif setting_name == "n_eth":
@@ -1507,7 +1507,7 @@ def set_audio_volume(value):
         String: Error string if fails.
     """
     cmd = f"amixer set 'Speaker' {value}% && amixer set 'Headphone' {value}%"\
-        if read_proc_file("/proc/device-tree/digi,machine,name") not in ("ccimx6sbc", "ccimx6qpsbc")\
+        if get_platform_id() not in ("ccimx6sbc", "ccimx6qpsbc")\
         else f"amixer set 'Master' {value}%"
     res = exec_cmd(cmd)
     if res[0] != 0:
@@ -1764,6 +1764,16 @@ def set_bluetooth_device_configuration(device, config_data):
         data["desc"] = f"Error configuring interface: {str(exc2)}"
 
     return data
+
+
+def get_platform_id():
+    """
+    Returns the running platform ID.
+
+    Returns:
+        String: The running platform ID.
+    """
+    return read_proc_file("/proc/device-tree/digi,machine,name")
 
 
 def mac_to_human_string(mac, num_bytes=6):
