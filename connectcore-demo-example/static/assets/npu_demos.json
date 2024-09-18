@@ -8,7 +8,7 @@
       "compatible_platforms": [
         {
           "platform": "ccmp255-dvk",
-          "launch_script": "/etc/demos/scripts/npu_pose_estimation.sh"
+          "launch_script": "/etc/demos/scripts/launch_npu_demo_pose_estimation.sh"
         }
       ]
     },
@@ -20,7 +20,7 @@
       "compatible_platforms": [
         {
           "platform": "ccmp255-dvk",
-          "launch_script": "/etc/demos/scripts/npu_object_detection.sh"
+          "launch_script": "/etc/demos/scripts/launch_npu_demo_object_detection.sh"
         },
         {
           "platform": "ccimx93-dvk",
@@ -36,7 +36,7 @@
       "compatible_platforms": [
         {
           "platform": "ccmp255-dvk",
-          "launch_script": "/etc/demos/scripts/npu_image_classification.sh"
+          "launch_script": "/etc/demos/scripts/launch_npu_demo_image_classification.sh"
         }
       ]
     },
@@ -48,7 +48,7 @@
       "compatible_platforms": [
         {
           "platform": "ccmp255-dvk",
-          "launch_script": "/etc/demos/scripts/npu_semantic_segmentation.sh"
+          "launch_script": "/etc/demos/scripts/launch_npu_demo_semantic_segmentation.sh"
         }
       ]
     },
