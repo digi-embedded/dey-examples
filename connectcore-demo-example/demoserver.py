@@ -104,6 +104,9 @@ COMMAND_READ_SN = "fw_printenv -n serial#"
 
 NPU_DEMOS_FILE = "static/assets/npu_demos.json"
 
+PROGRAM_RUN_CHECK_TIMES = 3
+PROGRAM_RUN_CHECK_INTERVAL = 0.2
+
 # Variables.
 log = logging.getLogger(APP_NAME)
 last_cpu_work = 0
@@ -662,11 +665,20 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 if script:
                     # Execute the demo.
                     exec_cmd_nowait(script)
-                    self.wfile.write("{}".encode(encoding="utf_8"))
+                    self.wfile.write(json.dumps({"id": demo_id}).encode(encoding="utf_8"))
                 else:
                     self.wfile.write(json.dumps({"error": "NPU demo launch script not found."}).encode(encoding="utf_8"))
             else:
                 self.wfile.write(json.dumps({"error": "NPU demo not found."}).encode(encoding="utf_8"))
+        elif re.search("/ajax/is_npu_demo_running", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            # Get the demo ID.
+            demo_id = json.loads(data.decode("utf-8")).get("demo_id", None)
+            # Return whether demo is running or not.
+            self.wfile.write(json.dumps({"id": demo_id, "is_running": is_npu_demo_running(demo_id)}).encode(encoding="utf_8"))
         else:
             # Forbidden.
             self._set_headers(403)
@@ -1894,6 +1906,59 @@ def get_npu_demos_for_platform(platform_name):
                     break
 
     return compatible_demos
+
+
+def is_npu_demo_running(demo_id):
+    """
+    Check if the given NPU demo is currently running in the system or not.
+    
+    Args:
+        demo_id (str): ID of the demo to check.
+        
+    Returns:
+        bool: True if the demo is running, False otherwise.
+    """
+    demo = get_npu_demo(demo_id)
+    if demo:
+        # Get the demo execution script.
+        script = None
+        platform_id = get_platform_id()
+        for comp_platform in demo.get("compatible_platforms", []):
+            if comp_platform.get("platform", None) == platform_id:
+                script = comp_platform.get("launch_script", None)
+                break
+        if script:
+            return is_program_running(script)
+        
+    return False
+
+
+def is_program_running(program):
+    """
+    Check if a given program is currently running in the system or not.
+    
+    Args:
+        program (str): The program/command to check.
+        
+    Returns:
+        bool: True if the program is running, False otherwise.
+    """
+    try:
+        for i in range(PROGRAM_RUN_CHECK_TIMES):
+            # Run the 'ps' command and capture the output
+            command = f"ps w | grep -v 'grep' | grep -q '{program}'"
+            result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            
+            # Check if the return code is 0 (program is running)
+            if result.returncode == 0:
+                return True
+            
+            # Keep checking to discard false negatives.
+            time.sleep(PROGRAM_RUN_CHECK_INTERVAL)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    
+    return False
 
 
 def get_platform_id():

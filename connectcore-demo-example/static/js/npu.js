@@ -33,7 +33,8 @@ const TEMPLATE_NO_DEMOS = "<p style='padding-left: 15px;'><i>No demos found</i><
 
 const MESSAGE_EXECUTING_NPU_DEMO = "Executing NPU demo...";
 
-const HIDE_STATUS_TIMEOUT = 10000; // 10 seconds.
+const CHECK_DEMO_RUNNING_OFFSET = 8000;
+const CHECK_DEMO_RUNNING_TIME = 200;
 
 // Variables.
 var readingNPUInfo = false;
@@ -155,12 +156,71 @@ function runNPUDemo(npuDemoID) {
 function processRunNPUDemoResponse(response) {
     // Check if there was any error in the request.
     checkErrorResponse(response, false);
-    // Start timer to hide loading popup.
+    demoID = response[ID_ID];
+    // Start timer to check whether demo is running.
+    blackFrame = document.getElementById('black_frame');
+    blackFrame.style.pointerEvents = 'auto';
+    blackFrame.style.opacity = 1;
     setTimeout(() => {
         // Process only in the NPU page.
         if (!isNPUShowing())
             return;
+        // Show top black bar.
+        isNPUDemoRunning(demoID);
+    }, CHECK_DEMO_RUNNING_OFFSET);
+}
+
+// Checks whether the given NPU demo is running or not.
+function isNPUDemoRunning(npuDemoID) {
+    // Send request.
+    $.post(
+        "http://" + getServerAddress() + "/ajax/is_npu_demo_running",
+        JSON.stringify({
+            "demo_id": npuDemoID,
+        }),
+        function(data) {
+            // Process only in the NPU page.
+            if (!isNPUShowing())
+                return;
+            // Process answer.
+            processIsNPUDemoRunningResponse(data);
+        }
+    ).fail(function(response) {
+        // Process only in the NPU page.
+        if (!isNPUShowing())
+            return;
+        // Process error.
+        processAjaxErrorResponse(response);
+        // Hide the black frame.
+        blackFrame = document.getElementById('black_frame');
+        blackFrame.style.opacity = 0;
+        blackFrame.style.pointerEvents = 'none';
         // Hide the loading panel.
         showLoadingPopup(false);
-    }, HIDE_STATUS_TIMEOUT);
+    });
+}
+
+// Processes the response of the is NPU demo running request.
+function processIsNPUDemoRunningResponse(response) {
+    // Check if there was any error in the request.
+    checkErrorResponse(response, false);
+    // Check whether demo is running.
+    demoID = response[ID_ID];
+    isRunning = response[ID_IS_RUNNING];
+    if (isRunning) {
+        // Schedule to check again.
+        setTimeout(() => {
+            // Process only in the NPU page.
+            if (!isNPUShowing())
+                return;
+            isNPUDemoRunning(demoID);
+        }, CHECK_DEMO_RUNNING_TIME);
+    } else { // Demo is not running.
+        // Hide the black frame.
+        blackFrame = document.getElementById('black_frame');
+        blackFrame.style.opacity = 0;
+        blackFrame.style.pointerEvents = 'none';
+        // Hide the loading panel.
+        showLoadingPopup(false);
+    }
 }

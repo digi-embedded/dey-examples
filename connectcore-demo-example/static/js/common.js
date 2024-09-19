@@ -83,6 +83,7 @@ const ID_ID = "id";
 const ID_INFO_POPUP = "info_popup";
 const ID_INFO_POPUP_MESSAGE = "info_popup_message";
 const ID_INFO_POPUP_TITLE = "info_popup_title";
+const ID_IS_RUNNING = "is_running";
 const ID_KERNEL_VERSION = "kernel_version";
 const ID_LAST_MODIFIED = "last_modified";
 const ID_LED = "led";

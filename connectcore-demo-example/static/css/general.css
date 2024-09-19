@@ -351,7 +351,7 @@ body {
   width: 100%;
   height: 100%;
   position: relative;
-  z-index: 997;
+  z-index: 1003;
   text-align: center;
 }
 
@@ -372,7 +372,7 @@ body {
 
 /* POPUP */
 .popup {
-  z-index: 999;
+  z-index: 1002;
   position: fixed;
   transform: translate(-50%, -50%);
   background-color: white;
@@ -2418,3 +2418,17 @@ select {
   font-size: 1.25em;
 }
 /* END NETWORK */
+
+/* NPU BLACK FRAME */
+.npu-black-frame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  z-index: 1001;
+  opacity: 0;
+  pointer-events: none;
+  transition-duration: 1s;
+}
