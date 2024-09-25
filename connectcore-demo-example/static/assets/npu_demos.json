@@ -1,0 +1,92 @@
+{
+  "npu_demos": [
+    {
+      "id": "pose_estimation",
+      "name": "Pose Estimation",
+      "preview_image": "npu_pose_estimation.png",
+      "description": "This demo detects and tracks human body joints in real-time using video input, showcasing the NPU's efficiency in handling complex computations for applications like augmented reality and sports analysis.",
+      "compatible_platforms": [
+        {
+          "platform": "ccmp255-dvk",
+          "launch_script": "/etc/demos/scripts/launch_npu_demo_pose_estimation.sh"
+        }
+      ]
+    },
+    {
+      "id": "object_detection",
+      "name": "Object Detection",
+      "preview_image": "npu_object_detection.png",
+      "description": "This demo detects and identifies objects in real-time using a camera, demonstrating the NPU's capability to efficiently process visual data for applications like autonomous systems and smart surveillance.",
+      "compatible_platforms": [
+        {
+          "platform": "ccmp255-dvk",
+          "launch_script": "/etc/demos/scripts/launch_npu_demo_object_detection.sh"
+        },
+        {
+          "platform": "ccimx93-dvk",
+          "launch_script": "/etc/demos/scripts/launch_eiq_demo_object_detection.sh"
+        }
+      ]
+    },
+    {
+      "id": "image_classification",
+      "name": "Image Classification",
+      "preview_image": "npu_image_classification.png",
+      "description": "This demo scans images with a camera and classifies them in real-time, demonstrating the NPU's ability to quickly and accurately categorize visual data for applications like inventory management and automated sorting.",
+      "compatible_platforms": [
+        {
+          "platform": "ccmp255-dvk",
+          "launch_script": "/etc/demos/scripts/launch_npu_demo_image_classification.sh"
+        }
+      ]
+    },
+    {
+      "id": "semantic_segmentation",
+      "name": "Semantic Segmentation",
+      "preview_image": "npu_semantic_segmentation.png",
+      "description": "This demo captures images with a camera and performs semantic segmentation in real-time, dividing the scene into distinct regions by type, perfect for applications like robotics and environmental monitoring.",
+      "compatible_platforms": [
+        {
+          "platform": "ccmp255-dvk",
+          "launch_script": "/etc/demos/scripts/launch_npu_demo_semantic_segmentation.sh"
+        }
+      ]
+    },
+    {
+      "id": "gesture_detection",
+      "name": "Gesture Detection",
+      "preview_image": "npu_gesture_detection.png",
+      "description": "This demo identifies and interprets hand gestures in real-time, demonstrating the NPU's capacity for responsive interaction in applications such as touchless controls, augmented reality, and smart home automation.",
+      "compatible_platforms": [
+        {
+          "platform": "ccimx93-dvk",
+          "launch_script": "/etc/demos/scripts/launch_eiq_demo_gesture_detection.sh"
+        }
+      ]
+    },
+    {
+      "id": "face_recognition",
+      "name": "Face Recognition",
+      "preview_image": "npu_face_recognition.png",
+      "description": "This demo detects and recognizes human faces in real-time using a camera, showcasing the NPU's ability to process visual data efficiently for security systems, personalized user experiences, and access control applications.",
+      "compatible_platforms": [
+        {
+          "platform": "ccimx93-dvk",
+          "launch_script": "/etc/demos/scripts/launch_eiq_demo_face_recognition.sh"
+        }
+      ]
+    },
+    {
+      "id": "drowsy_detection",
+      "name": "Drowsy Detection",
+      "preview_image": "npu_drowsy_detection.png",
+      "description": "This demo monitors and detects signs of drowsiness in real-time, using visual cues to assess alertness, highlighting the NPU's potential for enhancing safety in driver assistance systems and fatigue monitoring in workplaces.",
+      "compatible_platforms": [
+        {
+          "platform": "ccimx93-dvk",
+          "launch_script": "/etc/demos/scripts/launch_eiq_demo_dms.sh"
+        }
+      ]
+    }
+  ]
+}

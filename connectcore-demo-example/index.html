@@ -68,6 +68,14 @@ Digi Demo - Dashboard
                         </div>
                     </a>
                 </li>
+                <li id="section_npu">
+                    <a href="npu.html" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="digi-menu-icon fas fa-brain fa-fw fa-lg mr-3"></span>
+                            <span class="menu-collapsed">Machine Learning</span>
+                        </div>
+                    </a>
+                </li>
                 <li id="section_network">
                     <a data-pjax href="network.html" class="list-group-item list-group-item-action d-flex align-items-center">
                         <div class="d-flex w-100 justify-content-start align-items-center">
@@ -586,6 +594,62 @@ Digi Demo - Dashboard
                                                     </table>
                                                 </div>
                                             </div>
+                                            <div id="ethernet2_panel_area" class="panel-area panel-tooltip" onclick="toggleInfoPanelVisibility('ethernet2')">
+                                                <span class="panel-tooltip-text">Ethernet 2 stats</span>
+                                                <span id="ethernet2_panel_icon" class="fas fa-ethernet panel-area-icon"></span>
+                                            </div>
+                                            <div id="ethernet2_panel" class="device-card ethernet-panel shadow-sm">
+                                                <span id="ethernet2_panel_arrow" class="panel-arrow"></span>
+                                                <div class="device-card-header">
+                                                    <span class="fas fa-ethernet fa-lg mr-2"></span>
+                                                    <span>Ethernet 2 stats</span>
+                                                    <div class="fas fa-window-close fa-lg device-card-header-button" onclick="setInfoPanelVisible('ethernet2', false)"></div>
+                                                </div>
+                                                <div class="device-card-content">
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">Status:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet2_state" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">MAC:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet2_mac" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">IP:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet2_ip" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">TX data:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet2_sent_data" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="device-card-content-text">RX data:</span>
+                                                            </td>
+                                                            <td>
+                                                                <span id="ethernet2_received_data" class="device-card-content-value">-</span>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
                                             <div id="video_panel_area" class="panel-area panel-tooltip" onclick="toggleInfoPanelVisibility('video')">
                                                 <span class="panel-tooltip-text">Video info</span>
                                                 <span id="video_panel_icon" class="fas fa-desktop panel-area-icon"></span>
@@ -756,16 +820,19 @@ Digi Demo - Dashboard
     <script type="text/javascript" src="./static/js/sidebar.js"></script>
     <script type="text/javascript" src="./static/js/ccmp133-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccmp157-dvk.js"></script>
+    <script type="text/javascript" src="./static/js/ccmp255-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccimx6ulsbc.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8mm-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8m-nano.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8x-sbc-pro.js"></script>
     <script type="text/javascript" src="./static/js/ccimx93-dvk.js"></script>
+    <script type="text/javascript" src="./static/js/ccimx91-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccimx6sbc.js"></script>
     <script type="text/javascript" src="./static/js/ccimx6qpsbc.js"></script>
     <script type="text/javascript" src="./static/js/dashboard.js"></script>
     <script type="text/javascript" src="./static/js/network.js"></script>
     <script type="text/javascript" src="./static/js/multimedia.js"></script>
+    <script type="text/javascript" src="./static/js/npu.js"></script>
     <script type="text/javascript" src="./static/js/management.js"></script>
     <script type="text/javascript" src="./static/js/file-system.js"></script>
     <script>

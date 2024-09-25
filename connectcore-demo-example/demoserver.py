@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Copyright (c) 2022, 2023, Digi International, Inc.
+# Copyright (c) 2022-2024, Digi International, Inc.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -102,12 +102,18 @@ BT_REQUEST_TIMEOUT = 5000
 COMMAND_PING = "ping -q -w 1 -c 1 -I %s 8.8.8.8"
 COMMAND_READ_SN = "fw_printenv -n serial#"
 
+NPU_DEMOS_FILE = "static/assets/npu_demos.json"
+
+PROGRAM_RUN_CHECK_TIMES = 3
+PROGRAM_RUN_CHECK_INTERVAL = 0.2
+
 # Variables.
 log = logging.getLogger(APP_NAME)
 last_cpu_work = 0
 last_cpu_total = 0
 led_status = {}
 fw_process = None
+npu_demos = None
 
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -146,7 +152,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             log.debug("Get device info")
 
             info = {
-                "device_type": read_proc_file("/proc/device-tree/digi,machine,name")
+                "device_type": get_platform_id()
             }
 
             # Send the JSON value.
@@ -169,7 +175,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                                                                 platform.machine()),
                 "dey_version": "DEY-%s-%s" % (get_dey_version(), read_file("/etc/version")),
                 "serial_number": get_serial_number(),
-                "device_type": read_proc_file("/proc/device-tree/digi,machine,name"),
+                "device_type": get_platform_id(),
                 "module_variant": read_proc_file("/proc/device-tree/digi,hwid,variant"),
                 "board_variant": read_proc_file("/proc/device-tree/digi,carrierboard,version"),
                 "board_id": read_proc_file("/proc/device-tree/digi,carrierboard,id"),
@@ -186,24 +192,22 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 "ethernet0_ip": ZERO_IP,
                 "ethernet1_mac": ZERO_MAC,
                 "ethernet1_ip": ZERO_IP,
+                "ethernet2_mac": ZERO_MAC,
+                "ethernet2_ip": ZERO_IP,
             }
             # Fill ethernet interfaces data.
             try:
                 interfaces = NetworkInterface.list_interfaces()
-                if interfaces and "eth0" in interfaces:
+                for iface in interfaces:
+                    if iface not in ("eth0", "eth1", "eth2"):
+                        continue
                     try:
-                        net_iface = NetworkInterface.get("eth0")
-                        info["ethernet0_mac"] = str(net_iface.mac)
-                        info["ethernet0_ip"] = str(net_iface.ipv4)
+                        net_iface = NetworkInterface.get(iface)
+                        index = iface[len("eth"):]
+                        info["ethernet%s_mac" % index] = str(net_iface.mac)
+                        info["ethernet%s_ip" % index] = str(net_iface.ipv4)
                     except NetworkException as exc2:
-                        log.error("Error reading interface 'eth0' data: %s", str(exc2))
-                if interfaces and "eth1" in interfaces:
-                    try:
-                        net_iface = NetworkInterface.get("eth1")
-                        info["ethernet1_mac"] = mac_to_human_string(net_iface.mac)
-                        info["ethernet1_ip"] = str(net_iface.ipv4)
-                    except NetworkException as exc2:
-                        log.error("Error reading interface 'eth1' data: %s", str(exc2))
+                        log.error("Error reading interface '%s' data: %s", iface, str(exc2))
             except DigiAPIXException as exc:
                 log.error("Error listing network interfaces: %s", str(exc))
 
@@ -626,6 +630,55 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps(result).encode(encoding="utf_8"))
             else:
                 self.wfile.write(json.dumps({"data": json.dumps(result)}).encode(encoding="utf_8"))
+        elif re.search("/ajax/get_npu_info", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Fill NPU info.
+            info = {
+                "has-npu-demos": str(has_npu_demos()).lower()
+            }
+            # Send the JSON value.
+            self.wfile.write(json.dumps(info).encode(encoding="utf_8"))
+        elif re.search("/ajax/get_npu_demos", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Get NPU demos data.
+            platform_id = get_platform_id()
+            demos = get_npu_demos_for_platform(platform_id)
+            self.wfile.write(json.dumps({"data": json.dumps(demos)}).encode(encoding="utf_8"))
+        elif re.search("/ajax/run_npu_demo", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            demo_id = json.loads(data.decode("utf-8")).get("demo_id", None)
+            # Get the demo with the given ID.
+            demo = get_npu_demo(demo_id)
+            if demo:
+                # Get the command to execute.
+                script = None
+                platform_id = get_platform_id()
+                for comp_platform in demo.get("compatible_platforms", []):
+                    if comp_platform.get("platform", None) == platform_id:
+                        script = comp_platform.get("launch_script", None)
+                        break
+                if script:
+                    # Execute the demo.
+                    exec_cmd_nowait(script)
+                    self.wfile.write(json.dumps({"id": demo_id}).encode(encoding="utf_8"))
+                else:
+                    self.wfile.write(json.dumps({"error": "NPU demo launch script not found."}).encode(encoding="utf_8"))
+            else:
+                self.wfile.write(json.dumps({"error": "NPU demo not found."}).encode(encoding="utf_8"))
+        elif re.search("/ajax/is_npu_demo_running", self.path) is not None:
+            # Set the response headers.
+            self._set_headers(200)
+            # Get the JSON data.
+            data = self.rfile.read(int(self.headers["Content-Length"]))
+            # Get the demo ID.
+            demo_id = json.loads(data.decode("utf-8")).get("demo_id", None)
+            # Return whether demo is running or not.
+            self.wfile.write(json.dumps({"id": demo_id, "is_running": is_npu_demo_running(demo_id)}).encode(encoding="utf_8"))
         else:
             # Forbidden.
             self._set_headers(403)
@@ -844,7 +897,7 @@ class BluetoothService:
             elif setting_name == "dey_version":
                 setting_value = f"DEY-{get_dey_version()}-{read_file('/etc/version')}"
             elif setting_name == "device_type":
-                setting_value = read_proc_file("/proc/device-tree/digi,machine,name")
+                setting_value = get_platform_id()
             elif setting_name == "ethernet0_mac":
                 setting_value = get_ethernet_mac()
             elif setting_name == "n_eth":
@@ -1509,7 +1562,7 @@ def set_audio_volume(value):
         String: Error string if fails.
     """
     cmd = f"amixer set 'Speaker' {value}% && amixer set 'Headphone' {value}%"\
-        if read_proc_file("/proc/device-tree/digi,machine,name") not in ("ccimx6sbc", "ccimx6qpsbc")\
+        if get_platform_id() not in ("ccimx6sbc", "ccimx6qpsbc")\
         else f"amixer set 'Master' {value}%"
     res = exec_cmd(cmd)
     if res[0] != 0:
@@ -1768,6 +1821,156 @@ def set_bluetooth_device_configuration(device, config_data):
     return data
 
 
+def has_npu_demos():
+    """
+    Returns whether the device has NPU demos available or not.
+
+    Returns:
+        Boolean: True if device has NPU demos available, False otherwise.
+    """
+    return len(get_npu_demos_for_platform(get_platform_id())) > 0
+
+
+def load_npu_demos():
+    """
+    Returns the loaded NPU demos or parses the JSON file with NPU demos
+    metadata.
+
+    Returns:
+        list: A list of dictionaries, each representing an NPU demo,
+              `None` if error
+    """
+    global npu_demos
+
+    # Return the demos if they are already loaded.
+    if npu_demos:
+        return npu_demos
+
+    # Initialize the demos var.
+    npu_demos = None
+
+    # Build demos file path.
+    npu_demos_file_path = os.path.join(os.path.dirname(__file__), NPU_DEMOS_FILE)
+    try:
+        with open(npu_demos_file_path, 'r') as file:
+            content = json.load(file)
+            if content:
+                npu_demos = content.get("npu_demos", [])
+    except FileNotFoundError:
+        log.error("Error reading NPU demos: File '%s' not found." % NPU_DEMOS_FILE)
+    except json.JSONDecodeError:
+        log.error("Error reading NPU demos: File '%s' contains invalid JSON." % NPU_DEMOS_FILE)
+    except OSError as exc:
+        log.error("Error reading NPU demos: %s" % str(exc))
+
+    return npu_demos
+
+
+def get_npu_demo(demo_id):
+    """
+    Returns the NPU demo matching the given ID.
+
+    Args:
+        demo_id (str): ID of the NPU demo to get.
+
+    Returns:
+        Dictionary: The NPU demo for the given ID, None if the demo is not
+                    found.
+    """
+    demos = load_npu_demos()
+    if not demos:
+        return None
+
+    return next((demo for demo in demos if demo.get("id", None) == demo_id), None)
+
+
+def get_npu_demos_for_platform(platform_name):
+    """
+    Returns a list of NPU demos that are compatible with the given platform.
+
+    Args:
+        platform_name (str): The name of the platform to filter NPU demos by.
+
+    Returns:
+        list: A list of dictionaries, each representing an NPU demo compatible
+              with the given platform.
+    """
+    compatible_demos = []
+    demos = load_npu_demos()
+
+    if demos:
+        for demo in demos:
+            for platform in demo.get('compatible_platforms', []):
+                if platform.get('platform') == platform_name and file_exists(platform.get('launch_script')):
+                    compatible_demos.append(demo)
+                    break
+
+    return compatible_demos
+
+
+def is_npu_demo_running(demo_id):
+    """
+    Check if the given NPU demo is currently running in the system or not.
+    
+    Args:
+        demo_id (str): ID of the demo to check.
+        
+    Returns:
+        bool: True if the demo is running, False otherwise.
+    """
+    demo = get_npu_demo(demo_id)
+    if demo:
+        # Get the demo execution script.
+        script = None
+        platform_id = get_platform_id()
+        for comp_platform in demo.get("compatible_platforms", []):
+            if comp_platform.get("platform", None) == platform_id:
+                script = comp_platform.get("launch_script", None)
+                break
+        if script:
+            return is_program_running(script)
+        
+    return False
+
+
+def is_program_running(program):
+    """
+    Check if a given program is currently running in the system or not.
+    
+    Args:
+        program (str): The program/command to check.
+        
+    Returns:
+        bool: True if the program is running, False otherwise.
+    """
+    try:
+        for i in range(PROGRAM_RUN_CHECK_TIMES):
+            # Run the 'ps' command and capture the output
+            command = f"ps w | grep -v 'grep' | grep -q '{program}'"
+            result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            
+            # Check if the return code is 0 (program is running)
+            if result.returncode == 0:
+                return True
+            
+            # Keep checking to discard false negatives.
+            time.sleep(PROGRAM_RUN_CHECK_INTERVAL)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    
+    return False
+
+
+def get_platform_id():
+    """
+    Returns the running platform ID.
+
+    Returns:
+        String: The running platform ID.
+    """
+    return read_proc_file("/proc/device-tree/digi,machine,name")
+
+
 def mac_to_human_string(mac, num_bytes=6):
     """
     Transforms the given MAC address into a human readable string.
@@ -1881,6 +2084,19 @@ def write_file(path, value):
         return False
 
     return True
+
+
+def file_exists(file_path):
+    """
+    Determines whether the given file path exists or not.
+
+    Args:
+        file_path (String): Absolute path of the file to check.
+
+    Returns:
+        Boolean: 'True' if the file exists, 'False' otherwise.
+    """
+    return os.path.isfile(file_path)
 
 
 def resize_to(value, to, divider=1024):

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024, Digi International Inc.
+ * Copyright 2024, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,11 +13,11 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-class CCIMX93 extends ConnectCoreDevice {
+class CCIMX91 extends ConnectCoreDevice {
 
     // Public constants.
-    static DEVICE_TYPE = "ccimx93-dvk";
-    static PLATFORM_NAME = "ConnectCore 93 DVK";
+    static DEVICE_TYPE = "ccimx91-dvk";
+    static PLATFORM_NAME = "ConnectCore 91 DVK";
 
     // Variables.
     BOARD_IMAGE = "ccimx93-dvk_board.png";
@@ -97,7 +97,7 @@ class CCIMX93 extends ConnectCoreDevice {
     CONSOLE_COMPONENT_AREA_WIDTH_PERCENT = 4;
     CONSOLE_COMPONENT_AREA_HEIGHT_PERCENT = 6;
 
-    VIDEO_COMPONENT_VISIBLE = true;
+    VIDEO_COMPONENT_VISIBLE = false;
     VIDEO_COMPONENT_HAS_PANEL = true; 
     VIDEO_COMPONENT_HAS_ARROW = true;
     VIDEO_COMPONENT_PANEL_ALWAYS_VISIBLE = false;
@@ -158,6 +158,6 @@ class CCIMX93 extends ConnectCoreDevice {
 
     // Constructor.
     constructor(deviceData) {
-        super(CCIMX93.DEVICE_TYPE, CCIMX93.PLATFORM_NAME, deviceData);
+        super(CCIMX91.DEVICE_TYPE, CCIMX91.PLATFORM_NAME, deviceData);
     }
 }

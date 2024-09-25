@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, 2023, Digi International Inc.
+ * Copyright 2022-2024, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -110,7 +110,7 @@ class CCIMX8X extends ConnectCoreDevice {
     VIDEO_COMPONENT_AREA_WIDTH_PERCENT = 27.5;
     VIDEO_COMPONENT_AREA_HEIGHT_PERCENT = 7.5;
 
-    AUDIO_COMPONENT_VISIBLE = false;
+    AUDIO_COMPONENT_VISIBLE = true;
     AUDIO_COMPONENT_HAS_PANEL = true;
     AUDIO_COMPONENT_HAS_ARROW = true;
     AUDIO_COMPONENT_PANEL_ALWAYS_VISIBLE = false;
@@ -151,7 +151,7 @@ class CCIMX8X extends ConnectCoreDevice {
 
     // Capabilities
     SUPPORTS_VIDEO_BRIGHTNESS = false;
-    SUPPORTS_DUAL_ETHERNET = true;
+    SUPPORTS_NUM_ETHERNET = 2;
 
     // Misc info
     PCB_COLOR = ID_COLOR_BLUE;

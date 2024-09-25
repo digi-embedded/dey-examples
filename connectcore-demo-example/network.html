@@ -68,6 +68,14 @@ Digi Demo - Network
                         </div>
                     </a>
                 </li>
+                <li id="section_npu">
+                    <a href="npu.html" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span class="digi-menu-icon fas fa-brain fa-fw fa-lg mr-3"></span>
+                            <span class="menu-collapsed">Machine Learning</span>
+                        </div>
+                    </a>
+                </li>
                 <li id="section_network">
                     <a data-pjax href="network.html" class="list-group-item list-group-item-action d-flex align-items-center">
                         <div class="d-flex w-100 justify-content-start align-items-center">
@@ -240,6 +248,63 @@ Digi Demo - Network
                                </div>
                            </div>
                        </div>
+                       <div id="eth2" class="card shadow-sm" style="padding: 0px">
+                           <div id="eth2_panel_header" class="interface-header" style="cursor: pointer;" onclick="togglePanelVisibility('eth2')">
+                               <span class="fas fa-ethernet fa-lg mr-2"></span>
+                               <span id="eth2_title" class="card-title interface-title">Ethernet 2</span>
+                               <div id="eth2_toggle_button" class="fas fa-caret-down fa-lg device-card-header-button"></div>
+                           </div>
+                           <div id="eth2_panel_container" class="interface-panel-container" style="display: none;">
+                               <div>Configure ethernet 2 parameters.</div>
+                               <div class="param-container">
+                                   <span class="param-label">MAC Address:</span>
+                                   <span id="eth2_mac" class="param-value"></span>
+                               </div>
+                               <div class="param-container">
+                                   <span class="param-label">Connected:</span>
+                                   <label class="switch-control">
+                                     <input id="eth2_enable" type="checkbox">
+                                     <span class="slider-control round"></span>
+                                   </label>
+                               </div>
+                               <div id="eth2_ip_mode_param" class="param-container">
+                                   <span class="param-label">IP mode:</span>
+                                   <select name="eth2_ip_mode" id="eth2_ip_mode" class="select-control">
+                                       <option value="static">Static</option>
+                                       <option value="dhcp" selected="selected">DHCP</option>
+                                   </select>
+                               </div>
+                               <div id="eth2_ip_addr_param" class="param-container">
+                                   <span class="param-label">IP address:</span>
+                                   <input id="eth2_ip_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth2_ip_addr_error" class="error-label"></div>
+                               </div>
+                               <div id="eth2_subnet_mask_param" class="param-container">
+                                   <span class="param-label">Subnet mask:</span>
+                                   <input id="eth2_subnet_mask" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth2_subnet_mask_error" class="error-label"></div>
+                               </div>
+                               <div id="eth2_default_gateway_param" class="param-container">
+                                   <span class="param-label">Default gateway:</span>
+                                   <input id="eth2_default_gateway" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth2_default_gateway_error" class="error-label"></div>
+                               </div>
+                               <div id="eth2_dns1_addr_param" class="param-container">
+                                   <span class="param-label">DNS1 address:</span>
+                                   <input id="eth2_dns1_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth2_dns1_addr_error" class="error-label"></div>
+                               </div>
+                               <div id="eth2_dns2_addr_param" class="param-container">
+                                   <span class="param-label">DNS2 address:</span>
+                                   <input id="eth2_dns2_addr" class="input-control input-control-wide" type="text"/>
+                                   <div id="eth2_dns2_addr_error" class="error-label"></div>
+                               </div>
+                               <div class="buttons-container">
+                                   <div id="eth2_refresh_button" class="device-card-button config-button" onclick="readConfiguration(['ethernet'], 'eth2')">Refresh</div>
+                                   <div id="eth2_save_button" class="device-card-button config-button config-button-disabled" onclick="saveInterface('ethernet', 'eth2')">Save</div>
+                               </div>
+                           </div>
+                       </div>
                        <div id="wlan0" class="card shadow-sm" style="padding: 0px;">
                            <div id="wlan0_panel_header" class="interface-header" style="cursor: pointer;" onclick="togglePanelVisibility('wlan0')">
                                <span class="fas fa-wifi fa-lg mr-2"></span>
@@ -358,18 +423,6 @@ Digi Demo - Network
         $("#eth1_subnet_mask").on("input", function(event) {
             validateInterface("eth1");
         });
-        $('#eth1_enable').click(function(){
-            updateInterfaceControls("eth1");
-        });
-        $("#eth1_ip_mode").on("change", function(event) {
-            updateInterfaceControls("eth1");
-        });
-        $("#eth1_ip_addr").on("input", function(event) {
-            validateInterface("eth1");
-        });
-        $("#eth1_subnet_mask").on("input", function(event) {
-            validateInterface("eth1");
-        });
         $("#eth1_default_gateway").on("input", function(event) {
             validateInterface("eth1");
         });
@@ -378,6 +431,27 @@ Digi Demo - Network
         });
         $("#eth1_dns2_addr").on("input", function(event) {
             validateInterface("eth1");
+        });
+        $('#eth2_enable').click(function(){
+            updateInterfaceControls("eth2");
+        });
+        $("#eth2_ip_mode").on("change", function(event) {
+            updateInterfaceControls("eth2");
+        });
+        $("#eth2_ip_addr").on("input", function(event) {
+            validateInterface("eth2");
+        });
+        $("#eth2_subnet_mask").on("input", function(event) {
+            validateInterface("eth2");
+        });
+        $("#eth2_default_gateway").on("input", function(event) {
+            validateInterface("eth2");
+        });
+        $("#eth2_dns1_addr").on("input", function(event) {
+            validateInterface("eth2");
+        });
+        $("#eth2_dns2_addr").on("input", function(event) {
+            validateInterface("eth2");
         });
         $('#wlan0_enable').click(function(){
             updateInterfaceControls("wlan0");
@@ -448,15 +522,19 @@ Digi Demo - Network
     <script type="text/javascript" src="./static/js/sidebar.js"></script>
     <script type="text/javascript" src="./static/js/ccmp133-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccmp157-dvk.js"></script>
+    <script type="text/javascript" src="./static/js/ccmp255-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccimx6ulsbc.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8mm-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8m-nano.js"></script>
     <script type="text/javascript" src="./static/js/ccimx8x-sbc-pro.js"></script>
+    <script type="text/javascript" src="./static/js/ccimx93-dvk.js"></script>
+    <script type="text/javascript" src="./static/js/ccimx91-dvk.js"></script>
     <script type="text/javascript" src="./static/js/ccimx6sbc.js"></script>
     <script type="text/javascript" src="./static/js/ccimx6qpsbc.js"></script>
     <script type="text/javascript" src="./static/js/dashboard.js"></script>
     <script type="text/javascript" src="./static/js/network.js"></script>
     <script type="text/javascript" src="./static/js/multimedia.js"></script>
+    <script type="text/javascript" src="./static/js/npu.js"></script>
     <script type="text/javascript" src="./static/js/management.js"></script>
     <script type="text/javascript" src="./static/js/file-system.js"></script>
     <script>

@@ -19,9 +19,9 @@ Running the application
 The application is included in `dey-image-webkit` image. For more information,
 go to:
 
-* [ConnectCore demo for ConnectCore 8M Mini](https://www.digi.com/resources/documentation/digidocs/embedded/dey/latest/cc8mmini/yocto_c_ccdemo-intro)
-* [ConnectCore demo for ConnectCore 8M Nano](https://www.digi.com/resources/documentation/digidocs/embedded/dey/latest/cc8mnano/yocto_c_ccdemo-intro)
-* [ConnectCore demo for ConnectCore 8X](https://www.digi.com/resources/documentation/digidocs/embedded/dey/latest/cc8x/yocto_c_ccdemo-intro)
+* [ConnectCore demo for ConnectCore 8M Mini](https://www.digi.com/resources/documentation/digidocs/embedded/dey/latest/cc8mmini/yocto-ccdemo-intro_c)
+* [ConnectCore demo for ConnectCore 8M Nano](https://www.digi.com/resources/documentation/digidocs/embedded/dey/latest/cc8mnano/yocto-ccdemo-intro_c)
+* [ConnectCore demo for ConnectCore 8X](https://www.digi.com/resources/documentation/digidocs/embedded/dey/latest/cc8x/yocto-ccdemo-intro_c)
 
 License
 -------

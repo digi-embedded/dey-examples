@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>
-Digi Demo - Multimedia
+Digi Demo - NPU
 </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./static/css/stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -26,6 +26,7 @@ Digi Demo - Multimedia
     <script type="text/javascript" src="./static/js/toastr.min.js"></script>
 </head>
 <body>
+    <div id="black_frame" class="npu-black-frame"></div>
     <nav id="topBar" class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="nav-container">
             <a id="banner-link" class="navbar-brand align-middle" href="index.html">
@@ -44,7 +45,6 @@ Digi Demo - Multimedia
     </nav>
 
     <div class="bg-light" id="body-row">
-        
         <!-- Sidebar https://www.codeply.com/go/3e0RAjccRO/bootstrap-4-collapsing-sidebar-menu# -->
         <div id="sidebar-container" class="sidebar-expanded d-none d-md-block">
             <!-- d-* hides the Sidebar in smaller devices. Its items can be kept on the Navbar 'Menu' -->
@@ -125,85 +125,10 @@ Digi Demo - Multimedia
                     <div id="loading_wrapper" class="loading-wrapper element-grayed">
                         <div class="card shadow-sm">
                             <div class="card-body">
-                                <h5 class="card-title">WebGL examples</h5>
-                                <!-- Multimedia items section -->
-                                <div class="row">
-                                    <div class="col-xl-2 multimedia-container">
-                                        <div class="d-flex justify-content-center align-items-center multimedia-box">
-                                            <div class="multimedia-item" onclick="location.href='multimedia_viewer.html?exampleURL=aquarium/aquarium.html'">
-                                                <div class="multimedia-title">Aquarium</div>
-                                                <img src="./static/images/aquarium.jpg" alt="Aquarium">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-2 multimedia-container">
-                                        <div class="d-flex justify-content-center align-items-center multimedia-box">
-                                            <div class="multimedia-item" onclick="location.href='multimedia_viewer.html?exampleURL=blob/blob.html'">
-                                                <div class="multimedia-title">Blob</div>
-                                                <img src="./static/images/blob.jpg" alt="Blob">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-2 multimedia-container">
-                                        <div class="d-flex justify-content-center align-items-center multimedia-box">
-                                            <div class="multimedia-item" onclick="location.href='multimedia_viewer.html?exampleURL=electricflower/electricflower.html'">
-                                                <div class="multimedia-title">Electricflower</div>
-                                                <img src="./static/images/electricflower.jpg" alt="Electricflower">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-2 multimedia-container">
-                                        <div class="d-flex justify-content-center align-items-center multimedia-box">
-                                            <div class="multimedia-item" onclick="location.href='multimedia_viewer.html?exampleURL=multiple-views/multiple-views.html'">
-                                                <div class="multimedia-title">Multiple Views</div>
-                                                <img src="./static/images/multiple-views.jpg" alt="Multiple Views">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-2 multimedia-container">
-                                        <div class="d-flex justify-content-center align-items-center multimedia-box">
-                                            <div class="multimedia-item" onclick="location.href='multimedia_viewer.html?exampleURL=spacerocks/spacerocks.html'">
-                                                <div class="multimedia-title">Spacerocks</div>
-                                                <img src="./static/images/spacerocks.jpg" alt="Spacerocks">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-2 multimedia-container">
-                                        <div class="d-flex justify-content-center align-items-center multimedia-box">
-                                            <div class="multimedia-item" onclick="location.href='multimedia_viewer.html?exampleURL=toon-shading/toon-shading.html'">
-                                                <div class="multimedia-title">Toon Shading</div>
-                                                <img src="./static/images/toon-shading.jpg" alt="Toon Shading">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!-- Multimedia items -->
-                                <div style="padding-top: 20px;">
-                                    All the WebGL examples have been obtained from <a href="#" onclick="location.href='multimedia_viewer.html?exampleURL=https://webglsamples.org/'">https://webglsamples.org/</a>
-                                </div>
-                            </div> <!-- card body -->
-                        </div> <!-- card shadow -->
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">Videos</h5>
-                                <!-- Videos -->
-                                <div class="row">
-                                    <div class="col-xl-2 multimedia-container">
-                                        <div class="d-flex justify-content-center align-items-center multimedia-box">
-                                            <div class="multimedia-item" onclick="location.href='multimedia_viewer.html?exampleURL=videos/big_buck_bunny.mov'">
-                                                <div class="multimedia-title">Big Buck Bunny (MOV)</div>
-                                                <img src="./static/images/big_buck_bunny.jpg" alt="Big Buck Bunny (MOV)">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-2 multimedia-container">
-                                        <div class="d-flex justify-content-center align-items-center multimedia-box">
-                                            <div class="multimedia-item" onclick="location.href='multimedia_viewer.html?exampleURL=videos/big_buck_bunny.webm'">
-                                                <div class="multimedia-title">Big Buck Bunny (WEBM)</div>
-                                                <img src="./static/images/big_buck_bunny.jpg" alt="Big Buck Bunny (WEBM)">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> <!--Videos -->
+                                <h5 class="card-title">NPU demos</h5>
+                                <!-- NPU items section -->
+                                <div id="npu_demos_container" class="row">
+                                </div> <!-- NPU items -->
                             </div> <!-- card body -->
                         </div> <!-- card shadow -->
                     </div> <!-- loading wrapper -->
@@ -212,10 +137,10 @@ Digi Demo - Multimedia
         <script>
         $(document).ready(function() {
             // Reset variables.
-            readingMultimediaInfo = false;
-            multimediaInfoRead = false;
+            readingNPUInfo = false;
+            npuInfoRead = false;
             // Initialize page.
-            initializeMultimediaPage();
+            initializeNPUPage();
         });
         </script>
         </div> <!-- pjax-container -->
@@ -304,8 +229,6 @@ Digi Demo - Multimedia
         setSelectedSection();
     });
     </script>
-
-
 </body>
 </html>
 
