@@ -124,12 +124,12 @@ static void can_rx_callback(struct canfd_frame *frame, struct timeval *tv)
 
 	if (prn_msg_info) {
 		printf(
-			" - Time:        %ld.%06ld\n"
+			" - Time:        %llu.%06llu\n"
 			" - Type:        %s\n"
 			" - ID:          %x\n"
 			" - Data length: %u\n"
 			" - Data:        "
-			,tv->tv_sec, tv->tv_usec, ldx_can_is_extid_frame(frame) ?
+			, (unsigned long long)tv->tv_sec, (unsigned long long)tv->tv_usec, ldx_can_is_extid_frame(frame) ?
 			"Extended ID" : "Standard ID", ldx_can_get_id(frame), frame->len);
 
 		for (i=0;i<frame->len;i++) {
