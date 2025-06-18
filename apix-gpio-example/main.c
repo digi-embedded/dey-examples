@@ -163,8 +163,8 @@ int main(int argc, char *argv[])
 		usage_and_exit(name, EXIT_FAILURE);
 	}
 
-	if (button_ctrl == NULL || button_line < 0 ||
-		led_ctrl == NULL || led_line < 0) {
+	if (button_ctrl[0] == '\0' || button_line < 0 ||
+		led_ctrl[0] == '\0' || led_line < 0) {
 		printf("Unable to parse button and led GPIOs\n");
 		return EXIT_FAILURE;
 	}
