@@ -281,6 +281,8 @@ static int read_page(int page_index, uint8_t* data)
 	read_data = (uint8_t *)calloc(page_size + OPERATION_BYTES + address_bytes,
 			  sizeof(uint8_t));
 	if (write_data == NULL || read_data == NULL) {
+		free(write_data);
+		free(read_data);
 		printf("Unable to allocate memory to read the page.");
 		return EXIT_FAILURE;
 	}
