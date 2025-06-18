@@ -34,6 +34,12 @@ static bool running = true;
 static bool prn_msg_info = false;
 static bool prn_msg_count = false;
 
+/* Default CAN filter if not specified in command line */
+static struct can_filter deffilter = {
+	.can_id = 0,
+	.can_mask = 0
+};
+
 /*
  * usage_and_exit() - Show usage information and exit with 'exitval' return
  *		      value
@@ -207,16 +213,12 @@ static int parse_filters(char *str, struct can_filter **cfilter, int *nfilters)
 int main(int argc, char **argv)
 {
 	char *name = basename(argv[0]);
-	char *iface;
+	char *iface = NULL;
 	can_if_cfg_t ifcfg;
 	int nfilters = 0;
 	int opt;
 	int ret;
 	float sp = 0.0;
-	struct can_filter deffilter;
-
-	deffilter.can_id = 0;
-	deffilter.can_mask = 0;
 
 	if (argc <= 3) {
 		usage_and_exit(name, EXIT_FAILURE);
@@ -277,6 +279,10 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if (!iface) {
+		fprintf(stderr, "Error: CAN interface not specified\n");
+		return EXIT_FAILURE;
+	}
 	printf("Requesting CAN interface %s... ", iface);
 
 	can_if = ldx_can_request_by_name(iface);
