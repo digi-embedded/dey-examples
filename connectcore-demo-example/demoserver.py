@@ -1304,7 +1304,7 @@ def get_dey_version():
     Returns:
         String: DEY version, "N/A" if it fails.
     """
-    build_info = read_file("/etc/build")
+    build_info = read_file("/etc/buildinfo")
     if build_info == NOT_AVAILABLE:
         return NOT_AVAILABLE
     for line in build_info.splitlines():

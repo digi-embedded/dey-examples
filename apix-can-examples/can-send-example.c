@@ -177,7 +177,7 @@ void update_msg(struct canfd_frame *frame, uint32_t id, uint8_t dlc, uint8_t fla
 int main(int argc, char **argv)
 {
 	char *name = basename(argv[0]);
-	char *iface;
+	char *iface = NULL;
 	can_if_cfg_t ifcfg;
 	int opt;
 	int ret;
@@ -262,10 +262,13 @@ int main(int argc, char **argv)
 		}
 	}
 
+	if (!iface) {
+		fprintf(stderr, "Error: CAN interface not specified\n");
+		return EXIT_FAILURE;
+	}
 	printf("Requesting CAN interface %s... ", iface);
 
 	can_if = ldx_can_request_by_name(iface);
-
 	if (!can_if) {
 		printf("ERROR\n");
 		return EXIT_FAILURE;
@@ -304,7 +307,7 @@ int main(int argc, char **argv)
 		}
 
 		if (!retries) {
-			printf("Failed to send CAN frame after %d tries\n", ret);
+			printf("Failed to send CAN frame after %d tries\n", TX_RETRIES);
 			goto error;
 		}
 
