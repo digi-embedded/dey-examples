@@ -1267,7 +1267,7 @@ def is_dual_system():
         Boolean: True for dual systems, False otherwise.
     """
     res = exec_cmd("fw_printenv -n dualboot")
-    return res[0] == 0 and res[1] == "yes"
+    return res[0] == 0 and res[1].strip() == "yes"
 
 
 def get_fw_store_path():
