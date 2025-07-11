@@ -1278,7 +1278,7 @@ def get_fw_store_path():
         String: Absolute path to store a firmware image.
     """
     if is_dual_system():
-        return "/home/root/"
+        return "/root/"
 
     return "/mnt/update/"
 
