@@ -570,8 +570,6 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": e.stdout}).encode(encoding="utf_8"))
                 fw_process = None
 
-            if is_dual_system() and os.path.exists(path):
-                os.remove(path)
         elif re.search("/ajax/check_firmware_update_running", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
