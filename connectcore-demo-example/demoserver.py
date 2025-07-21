@@ -570,8 +570,6 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": e.stdout}).encode(encoding="utf_8"))
                 fw_process = None
 
-            if is_dual_system() and os.path.exists(path):
-                os.remove(path)
         elif re.search("/ajax/check_firmware_update_running", self.path) is not None:
             # Set the response headers.
             self._set_headers(200)
@@ -1267,7 +1265,7 @@ def is_dual_system():
         Boolean: True for dual systems, False otherwise.
     """
     res = exec_cmd("fw_printenv -n dualboot")
-    return res[0] == 0 and res[1] == "yes"
+    return res[0] == 0 and res[1].strip() == "yes"
 
 
 def get_fw_store_path():
@@ -1278,7 +1276,7 @@ def get_fw_store_path():
         String: Absolute path to store a firmware image.
     """
     if is_dual_system():
-        return "/home/root/"
+        return "/root/"
 
     return "/mnt/update/"
 

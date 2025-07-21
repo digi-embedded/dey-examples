@@ -69,7 +69,7 @@ var deviceRebooting = false;
 var updatingFirmware = false;
 var firmwareUpdateTimer = null;
 var uploadFirmwareAjaxRequest = null;
-var fwStorageDir = "/home/root/";
+var fwStorageDir = "/root/";
 
 // Initializes the management page.
 function initializeManagementPage() {
