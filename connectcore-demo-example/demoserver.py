@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Copyright (c) 2022-2024, Digi International, Inc.
+# Copyright (c) 2022-2025, Digi International, Inc.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -204,7 +204,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
                     try:
                         net_iface = NetworkInterface.get(iface)
                         index = iface[len("eth"):]
-                        info["ethernet%s_mac" % index] = str(net_iface.mac)
+                        info["ethernet%s_mac" % index] = mac_to_human_string(net_iface.mac)
                         info["ethernet%s_ip" % index] = str(net_iface.ipv4)
                     except NetworkException as exc2:
                         log.error("Error reading interface '%s' data: %s", iface, str(exc2))
