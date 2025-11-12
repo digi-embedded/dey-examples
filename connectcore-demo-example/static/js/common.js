@@ -531,7 +531,7 @@ function getDeviceName() {
 // Updates the available web sections.
 function updateAvailableSections() {
     // Remove device specific sections when rendering the demo from a computer.
-    if (!navigator.platform.includes("aarch") && !navigator.platform.includes("arm")) {
+    if (!is_local_access()) {
         removeSection(ID_SECTION_MULTIMEDIA);
         removeSection(ID_SECTION_NPU);
     }
