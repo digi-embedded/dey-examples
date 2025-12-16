@@ -29,6 +29,11 @@ The CAN interface for this example depends on the running platform:
    - CAN1_H: Pin 2
    - CAN1_L: Pin 3
    - GND: Pin 4
+ - **ConnectCore 95 DVK**: CAN connector of the board (J11).
+   - 5V: Pin 1
+   - CAN1_H: Pin 2
+   - CAN1_L: Pin 3
+   - GND: Pin 4
  - **ConnectCore 93 DVK**: CAN connector of the board (J15).
    - 5V: Pin 1
    - CAN1_H: Pin 2
@@ -161,7 +166,7 @@ For more information, see the [Digi Embedded Yocto online documentation](https:/
 
 License
 -------
-Copyright 2018-2023, Digi International Inc.
+Copyright 2018-2025, Digi International Inc.
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice

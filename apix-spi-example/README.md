@@ -46,6 +46,13 @@ The SPI connections for this example depends on the running platform:
     - SPI-8 MISO: 5
     - SPI-8 MOSI: 6
     - SPI-8 SS0: 3
+ - **ConnectCore 95 DVK**: MikroBus connector (J38).
+    - VCC: Pin 7
+    - GND: Pin 8
+    - SPI-8 CLK: 4
+    - SPI-8 MISO: 5
+    - SPI-8 MOSI: 6
+    - SPI-8 SS0: 3
  - **ConnectCore 8X SBC Pro**: Expansion connector of the board (J27).
     - VCC: Pin D1
     - GND: Pin C1
@@ -133,7 +140,7 @@ For more information, see the [Digi Embedded Yocto online documentation](https:/
 
 License
 -------
-Copyright 2017-2023, Digi International Inc.
+Copyright 2017-2025, Digi International Inc.
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice
