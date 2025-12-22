@@ -33,6 +33,11 @@ The I2C connections for this example depend on the running platform:
    - GND: Pin 8
    - I2C-3 SDA: Pin 6
    - I2C-3 SCL: Pin 5
+ - **ConnectCore 95 DVK**: MikroBus connector (J39).
+   - VCC: Pin 7
+   - GND: Pin 8
+   - I2C-3 SDA: Pin 6
+   - I2C-3 SCL: Pin 5
  - **ConnectCore 8M Mini DVK**: Expansion connector of the board (J48).
    - VCC: Connector J52 Pin 7
    - GND: Pin 9
@@ -111,7 +116,7 @@ For more information, see the [Digi Embedded Yocto online documentation](https:/
 
 License
 -------
-Copyright 2017-2023, Digi International Inc.
+Copyright 2017-2025, Digi International Inc.
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice

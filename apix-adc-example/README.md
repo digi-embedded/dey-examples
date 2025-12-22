@@ -10,6 +10,7 @@ The ADC lines used in this example are mapped as follows in the Digi boards:
  - **ConnectCore MP25 DVK**: ANA0 (GPIO connector, J8, Pin 18).
  - **ConnectCore MP13 DVK**: ADC1_INP14 (MikroBus socket, J31, Pin 1).
  - **ConnectCore MP15 DVK**: ANA0 (GPIO connector, J41, Pin 4).
+ - **ConnectCore 95 DVK**: ADC IN0 (GPIO connector, J44, Pin 3).
  - **ConnectCore 93 DVK**: ADC IN0 (GPIO connector, J48, Pin 1).
  - **ConnectCore 91 DVK**:  ADC IN0 (GPIO connector, J48, Pin 1).
  - **ConnectCore 8M Mini DVK**: MCA_IO1 (channel 1) at XBEE1_UART_TX. By default
@@ -61,7 +62,7 @@ For more information, see the [Digi Embedded Yocto online documentation](https:/
 
 License
 -------
-Copyright 2017-2023, Digi International Inc.
+Copyright 2017-2025, Digi International Inc.
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice

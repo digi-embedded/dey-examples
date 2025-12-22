@@ -18,6 +18,9 @@ The GPIOs lines used in this example are mapped as follows in the Digi boards:
  - **ConnectCore MP15 DVK**:
   - User button: GPIOA,13 (User Button 1 in the board)
   - User led: GPIOC,3 (ULED in the board)
+- **ConnectCore 95 DVK**:
+  - User button: GPIOCHIP3,12 (User Button 1 in the board)
+  - User led: GPIOCHIP2,23 (User Led 2 in the board)
 - **ConnectCore 93 DVK**:
   - User button: GPIOCHIP2,7 (User Button 1 in the board)
   - User led: USER_LED1 (User Led 1 in the board)
@@ -84,7 +87,7 @@ For more information, see the [Digi Embedded Yocto online documentation](https:/
 
 License
 -------
-Copyright 2017-2023, Digi International Inc.
+Copyright 2017-2025, Digi International Inc.
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice
