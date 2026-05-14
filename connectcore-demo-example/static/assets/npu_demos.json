@@ -71,6 +71,10 @@
       "description": "This demo detects and recognizes human faces in real-time using a camera, showcasing the NPU's ability to process visual data efficiently for security systems, personalized user experiences, and access control applications.",
       "compatible_platforms": [
         {
+          "platform": "ccmp255-dvk",
+          "launch_script": "/etc/demos/scripts/launch_npu_demo_face_recognition.sh"
+        },
+        {
           "platform": "ccimx93-dvk",
           "launch_script": "/etc/demos/scripts/launch_eiq_demo_face_recognition.sh"
         }
