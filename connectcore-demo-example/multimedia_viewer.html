@@ -42,6 +42,13 @@
                 </div>
                 <div class="stat">
                     <div class="status-icon">
+                        <img src="./static/images/temp.png" height=32px/>
+                    </div>
+                    <div class="status-text">Temp:</div>
+                    <div id="stats-cpu-temperature" class="status-text">-</div>
+                </div>
+                <div class="stat">
+                    <div class="status-icon">
                         <img src="./static/images/ram.png" height=32px/>
                     </div>
                     <div class="status-text">Free memory:</div>
@@ -109,6 +116,7 @@
 
         function updateStats(stats) {
             updateValueWithEffect("stats-cpu-load", roundToTwoDecimals(stats[STREAM_CPU_LOAD]) + " %");
+            updateValueWithEffect("stats-cpu-temperature", roundToTwoDecimals(stats[STREAM_CPU_TEMPERATURE]) + " °C");
             updateValueWithEffect("stats-memory", roundToTwoDecimals(kiloBytesToMegaBytes(stats[STREAM_MEMORY_FREE])) + " MB");
         }
     </script>

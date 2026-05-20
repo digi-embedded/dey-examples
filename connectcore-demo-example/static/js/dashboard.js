@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025, Digi International Inc.
+ * Copyright (C) 2022-2026, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -82,7 +82,6 @@ const ID_ETHERNETX_PANEL_ICON = "ethernet{index}_panel_icon";
 const USER_LED = "user_led";
 
 const STREAM_CPU_FREQUENCY = PREFIX_STREAM + "frequency";
-const STREAM_CPU_TEMPERATURE = PREFIX_STREAM + "cpu_temperature";
 const STREAM_CPU_UPTIME = PREFIX_STREAM + "uptime";
 const STREAM_ETHERNET0_READ_BYTES = PREFIX_STREAM + IFACE_ETH0 + "/rx_bytes";
 const STREAM_ETHERNET0_SENT_BYTES = PREFIX_STREAM + IFACE_ETH0 + "/tx_bytes";

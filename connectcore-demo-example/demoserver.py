@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Copyright (c) 2022-2025, Digi International, Inc.
+# Copyright (c) 2022-2026, Digi International, Inc.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above

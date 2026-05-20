@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024, Digi International Inc.
+ * Copyright 2022-2026, Digi International Inc.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -174,6 +174,7 @@ const IFACE_WIFI = "wlan0";
 
 const PREFIX_STREAM = "system_monitor/";
 const STREAM_CPU_LOAD = PREFIX_STREAM + "cpu_load";
+const STREAM_CPU_TEMPERATURE = PREFIX_STREAM + "cpu_temperature";
 const STREAM_MEMORY_FREE = PREFIX_STREAM + "free_memory";
 
 const PATH_IMAGES = "../static/images/";
