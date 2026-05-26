@@ -46,6 +46,7 @@
                     </div>
                     <div class="status-text">Temp:</div>
                     <div id="stats-cpu-temperature" class="status-text">-</div>
+                    <div class="status-text">&deg;C</div>
                 </div>
                 <div class="stat">
                     <div class="status-icon">
@@ -116,7 +117,7 @@
 
         function updateStats(stats) {
             updateValueWithEffect("stats-cpu-load", roundToTwoDecimals(stats[STREAM_CPU_LOAD]) + " %");
-            updateValueWithEffect("stats-cpu-temperature", roundToTwoDecimals(stats[STREAM_CPU_TEMPERATURE]) + " °C");
+            updateValueWithEffect("stats-cpu-temperature", roundToTwoDecimals(stats[STREAM_CPU_TEMPERATURE]));
             updateValueWithEffect("stats-memory", roundToTwoDecimals(kiloBytesToMegaBytes(stats[STREAM_MEMORY_FREE])) + " MB");
         }
     </script>
